@@ -48,7 +48,7 @@ class SessionEditInvariantsTest {
     }
 
     @Test
-    void creationRejectsInactiveMovieAndInvalidRoomCapacity() {
+    void creationRejectsInactiveMovieAndRoom() {
         Movie inactive = movies.save(Movie.builder().title("Inactive").active(false).build());
         Room validRoom = rooms.save(Room.builder().name("Valid room").active(true).capacity(10).build());
         SessionForm form = new SessionForm();
@@ -60,9 +60,9 @@ class SessionEditInvariantsTest {
         assertThrows(IllegalArgumentException.class, () -> management.save(form));
 
         Movie active = movies.save(Movie.builder().title("Active").active(true).build());
-        Room invalidRoom = rooms.save(Room.builder().name("Invalid room").active(true).capacity(301).build());
+        Room inactiveRoom = rooms.save(Room.builder().name("Inactive room").active(false).capacity(10).build());
         form.setMovieId(active.getId());
-        form.setRoomId(invalidRoom.getId());
+        form.setRoomId(inactiveRoom.getId());
         assertThrows(IllegalArgumentException.class, () -> management.save(form));
         assertEquals(before, sessions.count());
     }
