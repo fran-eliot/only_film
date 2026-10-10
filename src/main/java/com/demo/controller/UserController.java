@@ -1,5 +1,7 @@
 package com.demo.controller;
 
+import com.demo.dto.AdminUserFormDTO;
+import com.demo.dto.ProfileFormDTO;
 import com.demo.model.User;
 import com.demo.model.enums.Role;
 import com.demo.service.FileService;
@@ -72,7 +74,7 @@ public class UserController {
     // GetMapping admin/users/new
     @GetMapping("admin/users/new")
     public String newUser(Model model) {
-        model.addAttribute(ATTR_USER, new User());
+        model.addAttribute(ATTR_USER, new AdminUserFormDTO());
         model.addAttribute(ATTR_ROLES, Role.values());
         model.addAttribute(ATTR_EDIT, false);
 
@@ -82,10 +84,7 @@ public class UserController {
     // GetMapping admin/users/edit/{id}
     @GetMapping("admin/users/edit/{id}")
     public String editUser(Model model, @PathVariable Long id) {
-        User user = userService.findById(id);
-        user.setPassword(null); // Se setea en null para no exponerla
-
-        model.addAttribute(ATTR_USER, user);
+        model.addAttribute(ATTR_USER, AdminUserFormDTO.from(userService.findById(id)));
         model.addAttribute(ATTR_ROLES, Role.values());
         model.addAttribute(ATTR_EDIT, true);
 
@@ -95,7 +94,7 @@ public class UserController {
     // PostMapping admin/users
     @PostMapping("admin/users")
     public String save(
-            @ModelAttribute User user,
+            @ModelAttribute AdminUserFormDTO user,
             BindingResult bindingResult,
             @AuthenticationPrincipal User currentUser,
             RedirectAttributes redirectAttributes,
@@ -120,18 +119,17 @@ public class UserController {
             return user.getId() == null ? REDIRECT_USER_NEW : REDIRECT_USER_EDIT + user.getId();
         }
 
-        // Never accept a hidden imageUrl field as a trusted upload path.
-        user.setImageUrl(imageUrl);
+        // La imagen se recibe solo desde el fichero validado, nunca desde imageUrl oculto.
 
         try {
             if (user.getId() == null) {
-                user = userService.create(user);
+                User saved = userService.create(user.toUser());
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_CREATED);
-                log.info("{} {}", MSG_USER_CREATED, user);
+                log.info("{} {}", MSG_USER_CREATED, saved.getUsername());
             } else {
-                user = userService.updateAdmin(user, currentUser.getId(), imageUrl);
+                User saved = userService.updateAdmin(user.toUser(), currentUser.getId(), imageUrl);
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_UPDATED);
-                log.info("{} {}", MSG_USER_UPDATED, user);
+                log.info("{} {}", MSG_USER_UPDATED, saved.getUsername());
             }
 
             // Tanto para CREAR como ACTUALIZAR redirige al listado de usuarios.
@@ -186,17 +184,14 @@ public class UserController {
 
     @GetMapping("profile/edit")
     public String editProfile(Model model, @AuthenticationPrincipal User user) {
-        User saved = userService.findById(user.getId());
-        saved.setPassword(null); // Evita exponer la contraseña en el formulario
-
-        model.addAttribute(ATTR_USER, saved);
+        model.addAttribute(ATTR_USER, ProfileFormDTO.from(userService.findById(user.getId())));
         return VIEW_PROFILE_FORM;
     }
 
     // PostMapping profile: permite al usuario autenticado actualizar su propio perfil.
     @PostMapping("profile")
     public String saveProfile(
-            @ModelAttribute User userForm,
+            @ModelAttribute ProfileFormDTO userForm,
             RedirectAttributes redirectAttributes,
             @RequestParam("imageFile") MultipartFile imageFile,
             @AuthenticationPrincipal User authenticatedUser,
@@ -218,9 +213,7 @@ public class UserController {
             redirectAttributes.addFlashAttribute(ATTR_ERROR, invalidImage.getMessage());
             return "redirect:/profile/edit";
         }
-        userForm.setImageUrl(imageUrl);
-
-        User userUpdated = userService.updateProfile(userForm, authenticatedUser.getId(), imageUrl);
+        User userUpdated = userService.updateProfile(userForm.toUser(), authenticatedUser.getId(), imageUrl);
 
         // Refresca Spring Security para que el principal/navbar muestren los datos nuevos.
         Authentication newAuth = new UsernamePasswordAuthenticationToken(
