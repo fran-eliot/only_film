@@ -60,16 +60,16 @@ class SessionManagementRollbackTest {
     }
 
     @Test
-    void rejectsInvalidCapacityWithoutSavingSession() {
+    void rejectsNegativePriceWithoutSavingSession() {
         Movie movie = movies.save(Movie.builder().title("Capacity Test Movie").active(true).build());
-        Room room = rooms.save(Room.builder().name("Invalid Room")
-                .capacity(0).active(true).build());
+        Room room = rooms.save(Room.builder().name("Validation Room")
+                .capacity(12).active(true).build());
         long before = sessions.count();
 
         SessionForm form = new SessionForm();
         form.setMovieId(movie.getId());
         form.setRoomId(room.getId());
-        form.setPrice(10.0);
+        form.setPrice(-1.0);
         try {
             assertThrows(IllegalArgumentException.class, () -> service.save(form));
             assertEquals(before, sessions.count());
