@@ -9,6 +9,7 @@ import com.demo.repository.TicketRepository;
 import com.demo.repository.RoomRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -110,6 +111,7 @@ public class TicketService {
         return tickets;
     }
 
+    @Transactional
     public void processCheckout(
             Long ticketId,
             User user,
@@ -122,6 +124,14 @@ public class TicketService {
 
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow();
+
+        if (ticket.getStatus() != BuyStatus.LIBRE) {
+            throw new IllegalStateException("La entrada ya no está disponible");
+        }
+        if (qtyPalomitasMedianas < 0 || qtyPalomitasGrandes < 0 || qtyRefresco < 0
+                || qtyPackDuo < 0 || qtyComboFamiliar < 0) {
+            throw new IllegalArgumentException("Las cantidades no pueden ser negativas");
+        }
 
         double snackTotal = calculateSnackTotal(
                 qtyPalomitasMedianas,
