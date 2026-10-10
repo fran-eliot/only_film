@@ -126,6 +126,7 @@ public class SessionControllerTest {
         Room room = roomRepository.save(Room.builder()
                 .name("Sala 1")
                 .capacity(12)
+                .active(true)
                 .build());
 
         mockMvc.perform(post("/sessions")

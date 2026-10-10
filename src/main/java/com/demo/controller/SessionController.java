@@ -6,7 +6,7 @@ package com.demo.controller;
     import com.demo.repository.MovieRepository;
     import com.demo.repository.RoomRepository;
     import com.demo.repository.TicketRepository;
-    import com.demo.service.TicketService;
+    import com.demo.service.SessionManagementService;
     import lombok.AllArgsConstructor;
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
@@ -24,7 +24,7 @@ package com.demo.controller;
         private final MovieRepository movieRepository;
         private final RoomRepository roomRepository;
         private final TicketRepository ticketRepository;
-        private final TicketService ticketService;
+        private final SessionManagementService sessionManagementService;
 
         // Lista de sesiones
         @GetMapping("/sessions")
@@ -66,25 +66,7 @@ public String listSessions(Model model) {
     // POST: Guardar (crear o actualizar)
     @PostMapping("/sessions")
     public String saveSession(@ModelAttribute("proyeccion") SessionForm form) {
-        boolean isNew = form.getId() == null;
-        Session session = isNew ? new Session() : sessionRepository.findById(form.getId()).orElseThrow();
-        // Only explicitly editable fields may be changed.
-        if (form.getStartTime() != null) session.setStartTime(form.getStartTime());
-        session.setPrice(form.getPrice());
-        session.setLanguage(form.getLanguage());
-        session.setAdMinutes(form.getAdMinutes());
-        if (form.getMovieId() != null) {
-            session.setMovie(movieRepository.findById(form.getMovieId()).orElseThrow());
-        }
-        if (form.getRoomId() != null) {
-            session.setRoom(roomRepository.findById(form.getRoomId()).orElseThrow());
-        }
-        // Active is not accepted from the HTTP form.
-        if (isNew) session.setActive(true);
-        Session saved = sessionRepository.save(session);
-        if (isNew) {
-            ticketService.generarTickets(saved);
-        }
+        sessionManagementService.save(form);
         return "redirect:/sessions";
     }
 
