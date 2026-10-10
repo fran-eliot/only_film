@@ -55,7 +55,7 @@ public class SecurityConfig {
 
                 // 4. Control de Sesiones / Proyecciones (SessionController - ¡Faltaba!)
                 .requestMatchers(HttpMethod.GET, "/sessions", "/sessions/{id}").permitAll() // Público para que vean la cartelera/horarios
-                .requestMatchers("/sessions/new", "/sessions/edit/**", "/sessions/delete/**").hasRole("ADMIN")
+                .requestMatchers("/sessions/new", "/sessions/edit/**", "/sessions/delete/**", "/sessions/deactivate/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/sessions").hasRole("ADMIN")
 
                 // 5. Control de Reseñas (ReviewController)

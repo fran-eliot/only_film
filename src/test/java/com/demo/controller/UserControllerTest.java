@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -67,7 +68,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET /admin/users muestra el listado de usuarios")
     void listUsers_returnsUserListView() throws Exception {
-        mockMvc.perform(get("/admin/users").with(user(admin)))
+        mockMvc.perform(get("/admin/users").with(user(admin)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("users/user-list"))
                 .andExpect(model().attributeExists("users"))
@@ -77,7 +78,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET /admin/users/{id} muestra el detalle de un usuario")
     void detail_existingUser_returnsUserDetailView() throws Exception {
-        mockMvc.perform(get("/admin/users/" + normalUser.getId()).with(user(admin)))
+        mockMvc.perform(get("/admin/users/" + normalUser.getId()).with(user(admin)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("users/user-detail"))
                 .andExpect(model().attributeExists("user"))
@@ -90,7 +91,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET /admin/users/new muestra formulario de creación")
     void newUser_returnsUserFormView() throws Exception {
-        mockMvc.perform(get("/admin/users/new").with(user(admin)))
+        mockMvc.perform(get("/admin/users/new").with(user(admin)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("users/user-form"))
                 .andExpect(model().attributeExists("user"))
@@ -101,7 +102,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("GET /admin/users/edit/{id} muestra formulario de edición")
     void editUser_existingUser_returnsUserFormView() throws Exception {
-        mockMvc.perform(get("/admin/users/edit/" + normalUser.getId()).with(user(admin)))
+        mockMvc.perform(get("/admin/users/edit/" + normalUser.getId()).with(user(admin)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("users/user-form"))
                 .andExpect(model().attributeExists("user"))
@@ -165,11 +166,11 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET /admin/users/deactivate/{id} desactiva un usuario")
+    @DisplayName("POST /admin/users/deactivate/{id} desactiva un usuario")
     void deactivate_existingUser_setsActiveFalse() throws Exception {
         assertTrue(normalUser.getActive());
 
-        mockMvc.perform(get("/admin/users/deactivate/" + normalUser.getId()).with(user(admin)))
+        mockMvc.perform(post("/admin/users/deactivate/" + normalUser.getId()).with(user(admin)).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"))
                 .andExpect(flash().attribute("message", "Usuario desactivado correctamente"));
@@ -180,12 +181,12 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("GET /admin/users/activate/{id} activa un usuario")
+    @DisplayName("POST /admin/users/activate/{id} activa un usuario")
     void activate_existingUser_setsActiveTrue() throws Exception {
         normalUser.setActive(false);
         userRepository.save(normalUser);
 
-        mockMvc.perform(get("/admin/users/activate/" + normalUser.getId()).with(user(admin)))
+        mockMvc.perform(post("/admin/users/activate/" + normalUser.getId()).with(user(admin)).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"))
                 .andExpect(flash().attribute("message", "Usuario activado correctamente"));

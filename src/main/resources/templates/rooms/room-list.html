@@ -116,14 +116,9 @@
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
 
-                                    <a th:href="@{/salas/deactivate/{id}(id=${room.id})}"
-                                       class="btn btn-danger btn-sm"
-                                       title="Eliminar sala"
-                                       data-bs-toggle="tooltip"
-                                       data-bs-placement="top"
-                                       onclick="return confirm('¿Seguro que quieres desactivar esta sala?');">
+                                    <form method="post" th:action="@{/salas/deactivate/{id}(id=${room.id})}" class="d-inline" onsubmit="return confirm('¿Seguro que quieres desactivar esta sala?');"><button type="submit" class="btn btn-danger btn-sm" title="Eliminar sala">
                                         <i class="fa-solid fa-trash"></i>
-                                    </a>
+                                    </button></form>
                                 </div>
                             </td>
                         </tr>

@@ -76,7 +76,7 @@ public String listSessions(Model model) {
     }
 
     // GET: Desactivar (en lugar de eliminar, para evitar errores de constraint con tickets asociados)
-    @GetMapping("/sessions/deactivate/{id}")
+    @PostMapping("/sessions/deactivate/{id}")
     public String deactivateSession(@PathVariable Long id) {
         sessionRepository.findById(id).ifPresent(session -> {
             session.setActive(false);

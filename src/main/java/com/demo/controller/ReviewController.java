@@ -123,7 +123,7 @@ public class ReviewController {
         return "redirect:/reviews";
     }
 
-    @GetMapping("/reviews/delete/{id}")
+    @PostMapping("/reviews/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         // Solo ADMIN pasa por aqui, comprobado con debug, SecurityConfig ya lo garantiza a nivel de ruta
         reviewRepository.deleteById(id);

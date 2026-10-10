@@ -197,8 +197,8 @@ class ReviewControllerTest {
 
         Long id = review.getId();
 
-        mockMvc.perform(get("/reviews/delete/" + id)
-                        .with(user(admin)))
+        mockMvc.perform(post("/reviews/delete/" + id)
+                        .with(user(admin)).with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/reviews"));
 

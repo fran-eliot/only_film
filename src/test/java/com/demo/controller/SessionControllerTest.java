@@ -112,7 +112,7 @@ public class SessionControllerTest {
     @Test
     void deactivateSession() throws Exception {
         var session = sessionRepository.save(com.demo.model.Session.builder().build());
-        mockMvc.perform(get("/sessions/deactivate/" + session.getId()))
+        mockMvc.perform(post("/sessions/deactivate/" + session.getId()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/sessions"));
     }

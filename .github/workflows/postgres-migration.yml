@@ -25,7 +25,7 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Run existing H2 regression tests
-        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest' -DrerunFailingTestsCount=0
+        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest,MutationCsrfSecurityTest' -DrerunFailingTestsCount=0
 
   postgres-schema:
     runs-on: ubuntu-latest

@@ -79,12 +79,9 @@
             </div>
 
             <!-- Borrar: solo admin -->
-            <a sec:authorize="hasRole('ADMIN')"
-               class="btn btn-sm btn-danger ms-auto"
-               th:href="@{/reviews/delete/{id}(id=${review.id})}"
-               onclick="return confirm('¿Seguro que quieres eliminar esta reseña? Esta acción no se puede deshacer.')">
+            <form method="post" th:action="@{/reviews/delete/{id}(id=${review.id})}" sec:authorize="hasRole('ADMIN')" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar esta reseña? Esta acción no se puede deshacer.')"><button type="submit" class="btn btn-sm btn-danger ms-auto">
                 <i class="fa-solid fa-trash me-1" aria-hidden="true"></i> Eliminar
-            </a>
+            </button></form>
 
         </div>
     </div>
