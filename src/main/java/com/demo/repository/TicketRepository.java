@@ -16,6 +16,15 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findBySession_Id(Long id);
 
+    // Lock the existing seat inventory before changing a session's essential details.
+    // Checkout locks individual tickets, so an edit waits for any in-flight purchase.
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query(
+            "select t from Ticket t where t.session.id = :sessionId order by t.id")
+    List<Ticket> findBySessionIdForUpdate(
+            @org.springframework.data.repository.query.Param("sessionId") Long sessionId);
+
+
     List<Ticket> findBySession_Movie_Id(Long id);
 
     List<Ticket> findByUser_IdOrderByBuyDateTimeDesc(Long id);
