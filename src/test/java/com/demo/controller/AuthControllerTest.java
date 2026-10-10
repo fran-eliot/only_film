@@ -43,7 +43,7 @@ public class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.not(
                         org.hamcrest.Matchers.containsString("autofocus"))))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("for=\\"username\\"")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("for=\"username\"")));
     }
 
     @Test
