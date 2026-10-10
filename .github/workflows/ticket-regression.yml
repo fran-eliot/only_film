@@ -24,7 +24,7 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Run existing repository, service, controller and security tests
-        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,MutationCsrfSecurityTest,EnvironmentHardeningTest,SessionManagementRollbackTest' -Dsurefire.failIfNoSpecifiedTests=false -DrerunFailingTestsCount=0
+        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,MutationCsrfSecurityTest,EnvironmentHardeningTest,SessionManagementRollbackTest,MvcErrorContractTest' -Dsurefire.failIfNoSpecifiedTests=false -DrerunFailingTestsCount=0
 
   ticket-regression:
     runs-on: ubuntu-latest
