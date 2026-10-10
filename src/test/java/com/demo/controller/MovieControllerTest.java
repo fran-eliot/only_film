@@ -190,7 +190,7 @@ public class MovieControllerTest {
     @Test
     void deactivateMovieNotFound() throws Exception {
         // Verificamos la rama del if cuando la película NO EXISTE, redirigimos a /movies
-        mockMvc.perform(get("/movies/deactivate/99999"))
+        mockMvc.perform(post("/movies/deactivate/99999"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/movies"));
     }
