@@ -232,4 +232,52 @@ public class UserControllerTest {
 
         assertEquals(before, after);
     }
+
+    @Test
+    @DisplayName("POST /profile ignora ID, rol y estado falsificados")
+    void saveProfile_ignoresForgedAdminFields() throws Exception {
+        mockMvc.perform(multipart("/profile")
+                        .file("imageFile", new byte[0])
+                        .param("id", admin.getId().toString())
+                        .param("username", "fran_safe")
+                        .param("email", "fran.safe@onlyfilm.com")
+                        .param("role", Role.ROLE_ADMIN.name())
+                        .param("active", "false")
+                        .param("imageUrl", "/uploads/forged.jpg")
+                        .with(user(normalUser))
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/profile"));
+
+        User persisted = userRepository.findById(normalUser.getId()).orElseThrow();
+        User unchangedAdmin = userRepository.findById(admin.getId()).orElseThrow();
+        assertEquals(Role.ROLE_USER, persisted.getRole());
+        assertTrue(persisted.getActive());
+        assertEquals("fran_safe", persisted.getUsername());
+        assertNull(persisted.getImageUrl());
+        assertEquals("admin", unchangedAdmin.getUsername());
+        assertEquals(Role.ROLE_ADMIN, unchangedAdmin.getRole());
+    }
+
+    @Test
+    @DisplayName("POST /admin/users no permite al administrador quitarse su rol")
+    void adminCannotDemoteHisOwnAccount() throws Exception {
+        mockMvc.perform(multipart("/admin/users")
+                        .file("imageFile", new byte[0])
+                        .param("id", admin.getId().toString())
+                        .param("username", admin.getUsername())
+                        .param("email", admin.getEmail())
+                        .param("role", Role.ROLE_USER.name())
+                        .param("active", "true")
+                        .with(user(admin))
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/users/edit/" + admin.getId()))
+                .andExpect(flash().attributeExists("error"));
+
+        User persisted = userRepository.findById(admin.getId()).orElseThrow();
+        assertEquals(Role.ROLE_ADMIN, persisted.getRole());
+        assertTrue(persisted.getActive());
+    }
+
 }
