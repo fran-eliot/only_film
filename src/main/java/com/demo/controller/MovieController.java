@@ -75,7 +75,7 @@ public class MovieController {
 
     }
     //Desactivar una pelicula
-    @GetMapping("movies/deactivate/{id}")
+    @PostMapping("movies/deactivate/{id}")
     public String movieDeactivate(@PathVariable Long id, Model model){
         Optional<Movie> movieOptional = movieRepository.findById(id);
 
