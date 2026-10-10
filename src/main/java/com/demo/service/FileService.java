@@ -101,11 +101,12 @@ public class FileService {
                         graphics.dispose();
                     }
                 }
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                if (!ImageIO.write(normalized, extension.equals("jpg") ? "jpeg" : "png", output)) {
-                    throw new IOException("Image writer unavailable");
+                try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                    if (!ImageIO.write(normalized, extension.equals("jpg") ? "jpeg" : "png", output)) {
+                        throw new IOException("Image writer unavailable");
+                    }
+                    return new ImageData(output.toByteArray(), extension);
                 }
-                return new ImageData(output.toByteArray(), extension);
             } finally {
                 reader.dispose();
             }
@@ -114,5 +115,22 @@ public class FileService {
         }
     }
 
-    private record ImageData(byte[] bytes, String extension) { }
+    // Internal transfer container: byte arrays should not use record reference-based equality.
+    private static final class ImageData {
+        private final byte[] bytes;
+        private final String extension;
+
+        private ImageData(byte[] bytes, String extension) {
+            this.bytes = bytes;
+            this.extension = extension;
+        }
+
+        private byte[] bytes() {
+            return bytes;
+        }
+
+        private String extension() {
+            return extension;
+        }
+    }
 }

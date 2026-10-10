@@ -59,6 +59,23 @@ class FileServiceTest {
     }
 
     @Test
+    void jpegWithTrailingContentIsNormalizedAndDecodable() throws Exception {
+        configureDirectory();
+        byte[] original = image("jpeg");
+        byte[] tail = "<script>injected</script>".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        byte[] supplied = java.util.Arrays.copyOf(original, original.length + tail.length);
+        System.arraycopy(tail, 0, supplied, original.length, tail.length);
+
+        String url = fileService.store(new MockMultipartFile("file", "photo.png", "image/png", supplied));
+        assertTrue(url.endsWith(".jpg"));
+        Path saved = directory.resolve(url.substring("/uploads/".length()));
+        byte[] stored = Files.readAllBytes(saved);
+        assertNotNull(ImageIO.read(saved.toFile()));
+        assertFalse(new String(stored, java.nio.charset.StandardCharsets.ISO_8859_1)
+                .contains("<script>injected</script>"));
+    }
+
+    @Test
     void rejectsFakeImageAndNeverCreatesAFile() throws Exception {
         configureDirectory();
         MockMultipartFile invalid = new MockMultipartFile("file", "fake.png", "image/png",
