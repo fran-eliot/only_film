@@ -265,12 +265,13 @@ public class UserServiceTest {
 
         // The service accepts a path only if it has been validated and passed by its caller.
         // Identity and permissions always come from the saved user.
-        User updated = userService.updateProfile(forged, 1L);
+        User updated = userService.updateProfile(forged, 1L, null);
         assertEquals(1L, updated.getId());
         assertEquals(Role.ROLE_USER, updated.getRole());
         assertTrue(updated.getActive());
         assertEquals("updated", updated.getUsername());
         assertEquals("encoded", updated.getPassword());
+        assertEquals("/uploads/existing.png", updated.getImageUrl());
         verify(passwordEncoder, never()).encode(anyString());
     }
 
@@ -287,7 +288,7 @@ public class UserServiceTest {
                 User.builder().id(1L).role(Role.ROLE_USER).active(true).build(),
                 User.builder().id(1L).role(Role.ROLE_USER).active(false).build()
         )) {
-            assertThrows(IllegalArgumentException.class, () -> userService.updateAdmin(requested, 1L));
+            assertThrows(IllegalArgumentException.class, () -> userService.updateAdmin(requested, 1L, null));
         }
         assertEquals(Role.ROLE_ADMIN, admin.getRole());
         assertTrue(admin.getActive());
@@ -301,7 +302,7 @@ public class UserServiceTest {
         when(userRepository.findById(4L)).thenReturn(Optional.of(actor));
         User request = User.builder().id(5L).role(Role.ROLE_ADMIN).active(true).build();
         assertThrows(org.springframework.security.access.AccessDeniedException.class,
-                () -> userService.updateAdmin(request, 4L));
+                () -> userService.updateAdmin(request, 4L, null));
         verify(userRepository, never()).save(any());
     }
 
@@ -319,7 +320,7 @@ public class UserServiceTest {
         when(userRepository.findByEmail("changed@example.com")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User result = userService.updateAdmin(request, 1L);
+        User result = userService.updateAdmin(request, 1L, null);
         assertEquals("changed", result.getUsername());
         assertEquals(Role.ROLE_ADMIN, result.getRole());
         assertEquals("encodedOldPassword", result.getPassword());
