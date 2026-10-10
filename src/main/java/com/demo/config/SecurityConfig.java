@@ -32,8 +32,7 @@ public class SecurityConfig {
 
         // H2 console uses frames and POST without CSRF; allow it ONLY in explicit local dev.
         // Do not bypass CSRF or relax frame protections in standard/PostgreSQL execution.
-        if (environment.acceptsProfiles(Profiles.of("dev"))
-                && !environment.acceptsProfiles(Profiles.of("postgres"))) {
+        if (isLocalH2ConsoleAllowed(environment)) {
             http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
             http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
         }
@@ -106,6 +105,11 @@ public class SecurityConfig {
         // contruir la cadena de filtros de seguridad (vamos, la configuración final obligatoria)
         return http.build();
     }
+    static boolean isLocalH2ConsoleAllowed(Environment environment) {
+        return environment.acceptsProfiles(Profiles.of("dev"))
+                && !environment.acceptsProfiles(Profiles.of("postgres"));
+    }
+
     @Bean
     public SavedRequestAwareAuthenticationSuccessHandler savedRequestAwareAuthenticationSuccessHandler() {
         SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
