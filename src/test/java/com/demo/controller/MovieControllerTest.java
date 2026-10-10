@@ -205,4 +205,21 @@ public class MovieControllerTest {
                 .andExpect(model().attributeExists("reviews"));    // y también "reviews"
     }
 
+    @Test
+    void editingMovieIgnoresForgedImageUrlAndKeepsExistingState() throws Exception {
+        Movie movie = movieRepository.findAll().getFirst();
+        movie.setImageUrl("/uploads/original.jpg");
+        movie.setActive(true);
+        movieRepository.save(movie);
+        mockMvc.perform(multipart("/movies").file("imageFile", new byte[0])
+                        .param("id", movie.getId().toString())
+                        .param("title", "Changed title")
+                        .param("imageUrl", "/uploads/forged.html"))
+                .andExpect(status().is3xxRedirection());
+        Movie persisted = movieRepository.findById(movie.getId()).orElseThrow();
+        assertEquals("/uploads/original.jpg", persisted.getImageUrl());
+        assertTrue(persisted.getActive());
+        assertEquals("Changed title", persisted.getTitle());
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.demo.controller;
 
     import com.demo.model.Session;
+    import com.demo.dto.SessionForm;
     import com.demo.repository.SessionRepository;
     import com.demo.repository.MovieRepository;
     import com.demo.repository.RoomRepository;
@@ -36,7 +37,7 @@ public String listSessions(Model model) {
     // Formulario nueva sesión
     @GetMapping("/sessions/new")
     public String newSession(Model model) {
-        model.addAttribute("proyeccion", new Session());
+        model.addAttribute("proyeccion", new SessionForm());
         model.addAttribute("movies", movieRepository.findAll()); // Todas las películas
         model.addAttribute("rooms", roomRepository.findAll()); // Todas las salas
         return "sessions/session-form";
@@ -56,7 +57,7 @@ public String listSessions(Model model) {
     // Formulario editar sesión
     @GetMapping("/sessions/edit/{id}")
     public String editSession(Model model, @PathVariable Long id) {
-        model.addAttribute("proyeccion", sessionRepository.findById(id).orElseThrow());
+        model.addAttribute("proyeccion", SessionForm.from(sessionRepository.findById(id).orElseThrow()));
         model.addAttribute("movies", movieRepository.findAll());
         model.addAttribute("rooms", roomRepository.findAll());
         return "sessions/session-form";
@@ -64,18 +65,30 @@ public String listSessions(Model model) {
 
     // POST: Guardar (crear o actualizar)
     @PostMapping("/sessions")
-    public String saveSession(@ModelAttribute Session session) {
-        // Guardar la sesión (crea o actualiza)
-        boolean isNew = session.getId() == null;
+    public String saveSession(@ModelAttribute("proyeccion") SessionForm form) {
+        boolean isNew = form.getId() == null;
+        Session session = isNew ? new Session() : sessionRepository.findById(form.getId()).orElseThrow();
+        // Only explicitly editable fields may be changed.
+        if (form.getStartTime() != null) session.setStartTime(form.getStartTime());
+        session.setPrice(form.getPrice());
+        session.setLanguage(form.getLanguage());
+        session.setAdMinutes(form.getAdMinutes());
+        if (form.getMovieId() != null) {
+            session.setMovie(movieRepository.findById(form.getMovieId()).orElseThrow());
+        }
+        if (form.getRoomId() != null) {
+            session.setRoom(roomRepository.findById(form.getRoomId()).orElseThrow());
+        }
+        // Active is not accepted from the HTTP form.
+        if (isNew) session.setActive(true);
         Session saved = sessionRepository.save(session);
-
         if (isNew) {
-            ticketService.generarTickets(saved); // ← NUEVO: Llamar al servicio
+            ticketService.generarTickets(saved);
         }
         return "redirect:/sessions";
     }
 
-    // GET: Desactivar (en lugar de eliminar, para evitar errores de constraint con tickets asociados)
+        // GET: Desactivar (en lugar de eliminar, para evitar errores de constraint con tickets asociados)
     @PostMapping("/sessions/deactivate/{id}")
     public String deactivateSession(@PathVariable Long id) {
         sessionRepository.findById(id).ifPresent(session -> {

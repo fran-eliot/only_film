@@ -133,8 +133,8 @@ public class SessionControllerTest {
                         .param("price", "10.0")
                         .param("language", "VOSE")
                         .param("adMinutes", "5")
-                        .param("movie.id", String.valueOf(movie.getId()))
-                        .param("room.id", String.valueOf(room.getId())))
+                        .param("movieId", String.valueOf(movie.getId()))
+                        .param("roomId", String.valueOf(room.getId())))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/sessions"));
 
@@ -159,10 +159,24 @@ public class SessionControllerTest {
                         .with(csrf())
                         .param("id", String.valueOf(existing.getId()))
                         .param("price", "11.0")
-                        .param("room.id", String.valueOf(room.getId())))
+                        .param("roomId", String.valueOf(room.getId())))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/sessions"));
 
         org.junit.jupiter.api.Assertions.assertEquals(0, ticketRepository.findBySession_Id(existing.getId()).size());
     }
+    @Test
+    void editingSessionIgnoresForgedActiveFlag() throws Exception {
+        var original = sessionRepository.save(com.demo.model.Session.builder()
+                .price(7.0).active(true).build());
+        mockMvc.perform(post("/sessions")
+                        .param("id", original.getId().toString())
+                        .param("price", "8.0")
+                        .param("active", "false"))
+                .andExpect(status().is3xxRedirection());
+        var persisted = sessionRepository.findById(original.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertTrue(persisted.getActive());
+        org.junit.jupiter.api.Assertions.assertEquals(8.0, persisted.getPrice());
+    }
+
 }
