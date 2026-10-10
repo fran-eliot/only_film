@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -104,8 +105,15 @@ public class MovieController {
 
     @PostMapping("movies")
     public String createMovie(@ModelAttribute Movie movie,
-                              @RequestParam("imageFile") MultipartFile imageFile){
-        String imageUrl = fileService.store(imageFile);
+                              @RequestParam("imageFile") MultipartFile imageFile,
+                              RedirectAttributes redirectAttributes){
+        String imageUrl;
+        try {
+            imageUrl = fileService.store(imageFile);
+        } catch (IllegalArgumentException invalidImage) {
+            redirectAttributes.addFlashAttribute("error", invalidImage.getMessage());
+            return movie.getId() == null ? "redirect:/movies/new" : "redirect:/movies/edit/" + movie.getId();
+        }
         if (imageUrl != null) {
             movie.setImageUrl(imageUrl);
         }

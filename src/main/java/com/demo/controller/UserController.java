@@ -112,7 +112,13 @@ public class UserController {
         // Requiere la anotación @Slf4j.
         log.info("Guardando user {}", user.getUsername());
 
-        String imageUrl = fileService.store(imageFile);
+        String imageUrl;
+        try {
+            imageUrl = fileService.store(imageFile);
+        } catch (IllegalArgumentException invalidImage) {
+            redirectAttributes.addFlashAttribute(ATTR_ERROR, invalidImage.getMessage());
+            return user.getId() == null ? REDIRECT_USER_NEW : REDIRECT_USER_EDIT + user.getId();
+        }
 
         if (imageUrl != null) {
             user.setImageUrl(imageUrl);
@@ -211,7 +217,13 @@ public class UserController {
         userForm.setActive(authenticatedUser.getActive());
 
         // Imagen: si no se sube una nueva, mantiene la imagen actual.
-        String imageUrl = fileService.store(imageFile);
+        String imageUrl;
+        try {
+            imageUrl = fileService.store(imageFile);
+        } catch (IllegalArgumentException invalidImage) {
+            redirectAttributes.addFlashAttribute(ATTR_ERROR, invalidImage.getMessage());
+            return "redirect:/profile/edit";
+        }
         userForm.setImageUrl(imageUrl != null ? imageUrl : authenticatedUser.getImageUrl());
 
         User userUpdated = userService.update(userForm, authenticatedUser.getId());
