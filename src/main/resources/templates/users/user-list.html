@@ -57,16 +57,12 @@
                            class="btn btn-sm btn-outline-primary" title="Editar">
                             <i class="fa-solid fa-user-pen me-1" aria-hidden="true"></i> Editar
                         </a>
-                        <a th:if="${user.active == true and user.role.name() != 'ROLE_ADMIN'}"
-                           th:href="@{/admin/users/deactivate/{id}(id=${user.id})}"
-                           class="btn btn-sm btn-danger equal-btn" title="Desactivar">
+                        <form method="post" th:action="@{/admin/users/deactivate/{id}(id=${user.id})}" th:if="${user.active == true and user.role.name() != 'ROLE_ADMIN'}" class="d-inline"><button type="submit" class="btn btn-sm btn-danger equal-btn" title="Desactivar">
                             <i class="fa-solid fa-user-slash me-1" aria-hidden="true"></i> Desactivar
-                        </a>
-                        <a th:if="${!user.active}"
-                           th:href="@{/admin/users/activate/{id}(id=${user.id})}"
-                           class="btn btn-sm btn-success equal-btn" title="Activar">
+                        </button></form>
+                        <form method="post" th:action="@{/admin/users/activate/{id}(id=${user.id})}" th:if="${!user.active}" class="d-inline"><button type="submit" class="btn btn-sm btn-success equal-btn" title="Activar">
                             <i class="fa-solid fa-user-check me-1" aria-hidden="true"></i> Activar
-                        </a>
+                        </button></form>
                     </div>
                 </td>
             </tr>
