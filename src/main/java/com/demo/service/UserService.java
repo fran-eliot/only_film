@@ -94,14 +94,14 @@ public class UserService implements UserDetailsService {
      * and ownership are resolved from the authenticated user in the database,
      * never from the submitted form.
      */
-    public User updateProfile(User form, Long authenticatedUserId) {
+    public User updateProfile(User form, Long authenticatedUserId, String validatedImageUrl) {
         if (authenticatedUserId == null) {
             throw new org.springframework.security.access.AccessDeniedException("Debes iniciar sesión");
         }
         User existing = findById(authenticatedUserId);
         updateContactFields(existing, form);
-        if (StringUtils.hasText(form.getImageUrl())) {
-            existing.setImageUrl(form.getImageUrl());
+        if (StringUtils.hasText(validatedImageUrl)) {
+            existing.setImageUrl(validatedImageUrl);
         }
         updatePasswordIfPresent(existing, form.getPassword());
         return userRepository.save(existing);
@@ -111,7 +111,7 @@ public class UserService implements UserDetailsService {
      * Administrative update with independent authorization and invariants.
      * The actor is reloaded from storage to avoid trusting submitted roles.
      */
-    public User updateAdmin(User form, Long authenticatedAdminId) {
+    public User updateAdmin(User form, Long authenticatedAdminId, String validatedImageUrl) {
         if (authenticatedAdminId == null) {
             throw new org.springframework.security.access.AccessDeniedException("No tienes permisos");
         }
@@ -134,8 +134,8 @@ public class UserService implements UserDetailsService {
         updateContactFields(existing, form);
         existing.setRole(form.getRole());
         existing.setActive(form.getActive());
-        if (StringUtils.hasText(form.getImageUrl())) {
-            existing.setImageUrl(form.getImageUrl());
+        if (StringUtils.hasText(validatedImageUrl)) {
+            existing.setImageUrl(validatedImageUrl);
         }
         updatePasswordIfPresent(existing, form.getPassword());
         return userRepository.save(existing);
