@@ -68,7 +68,7 @@ public class UserService implements UserDetailsService {
     //En este metodo como es 1 usuario en particular, el metodo devuelve algo de TIPO user.
     //Es lo mismo que haciamos antes en el controller, pedirle al Repository que nos de el user por id y si no que nos de una excepcion
     public User findById(Long id){
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        return userRepository.findById(id).orElseThrow(() -> new java.util.NoSuchElementException("Usuario no encontrado"));
     }
 
     public User create(User user){
