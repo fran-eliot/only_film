@@ -159,23 +159,19 @@ public class TicketControllerTest {
     }
 
     @Test
-    void verEdicionTicket() throws Exception {
-        Long ticketId = ticket1.getId();
-
-        // El endpoint GET tickets/edit/{id} debe inyectar el ticket, la lista de usuarios y las sesiones
-        mockMvc.perform(get("/tickets/edit/" + ticketId).with(user(user)))
+    void editFreeTicketShowsDiscountOnlyForm() throws Exception {
+        mockMvc.perform(get("/tickets/edit/" + ticket3.getId()).with(user(user)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("tickets/ticket-form"))
-                .andExpect(model().attributeExists("ticket"))
-                .andExpect(model().attributeExists("users"))
-                .andExpect(model().attributeExists("sessions"))
-                // findAll() puede contener datos de otras clases de test (H2 en memoria
-                // compartido), así que verificamos que el modelo CONTIENE el usuario y la
-                // sesión esperados en vez de afirmar un tamaño absoluto (frágil).
-                .andExpect(model().attribute("users", hasItem(hasProperty("id", is(user.getId())))))
-                .andExpect(model().attribute("sessions", hasItem(hasProperty("id", is(session.getId())))));
+                .andExpect(model().attributeExists("ticket", "ticketDetails"))
+                .andExpect(model().attribute("ticket", hasProperty("id", is(ticket3.getId()))));
     }
 
+    @Test
+    void editingPaidTicketReturnsConflict() throws Exception {
+        mockMvc.perform(get("/tickets/edit/" + ticket1.getId()).with(user(user)))
+                .andExpect(status().isConflict());
+    }
 
     @Test
     @WithMockUser(username = "cliente_test", roles = {"USER"})
@@ -199,69 +195,56 @@ public class TicketControllerTest {
     }
 
     @Test
-    @DisplayName("POST /tickets/save crea un nuevo ticket")
-    void saveTicketCreate() throws Exception {
+    void adminCannotCreateTicketsManually() throws Exception {
         long before = ticketRepository.count();
-
-        mockMvc.perform(post("/tickets/save")
-                        .with(user(user))
-                        .with(csrf())
-                        .param("row", "B")
-                        .param("seat", "5")
-                        .param("price", "12.50")
+        mockMvc.perform(post("/tickets/save").with(user(user)).with(csrf())
                         .param("discount", "0")
-                        .param("status", BuyStatus.LIBRE.name())
-                        .param("session", session.getId().toString())
-                        .param("user", user.getId().toString())
-                        .param("qrCode", "ONLYFILM-NEW-QR"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/tickets"));
-
-        assertEquals(before + 1, ticketRepository.count());
-
-        Ticket saved = ticketRepository.findAll().stream()
-                .filter(ticket -> "B".equals(ticket.getRow()) && "5".equals(ticket.getSeat()))
-                .findFirst()
-                .orElseThrow();
-
-        assertEquals(12.50, saved.getPrice());
-        assertEquals(0.0, saved.getDiscount());
-        assertEquals(BuyStatus.LIBRE, saved.getStatus());
-        assertEquals(session.getId(), saved.getSession().getId());
-        assertEquals(user.getId(), saved.getUser().getId());
-        assertEquals("ONLYFILM-NEW-QR", saved.getQrCode());
+                        .param("row", "B").param("seat", "5")
+                        .param("status", BuyStatus.PAGADO.name())
+                        .param("session", session.getId().toString()))
+                .andExpect(status().isBadRequest());
+        assertEquals(before, ticketRepository.count());
     }
 
     @Test
-    @DisplayName("POST /tickets/save actualiza un ticket existente")
-    void saveTicketUpdate() throws Exception {
-        Long ticketId = ticket2.getId();
-
-        mockMvc.perform(post("/tickets/save")
-                        .with(user(user))
-                        .with(csrf())
-                        .param("id", ticketId.toString())
-                        .param("row", "C")
-                        .param("seat", "9")
-                        .param("price", "15.00")
-                        .param("discount", "2.00")
+    void adminChangesOnlyFreeTicketDiscountDespiteForgedFields() throws Exception {
+        Long id = ticket3.getId();
+        mockMvc.perform(post("/tickets/save").with(user(user)).with(csrf())
+                        .param("id", id.toString()).param("discount", "2.00")
+                        .param("row", "X").param("seat", "99")
                         .param("status", BuyStatus.PAGADO.name())
-                        .param("session", session.getId().toString())
-                        .param("user", user.getId().toString())
-                        .param("qrCode", "ONLYFILM-UPDATED-QR"))
+                        .param("price", "999.00")
+                        .param("qrCode", "FORGED")
+                        .param("user.id", user.getId().toString())
+                        .param("session.id", session.getId().toString()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/tickets"));
+        Ticket persisted = ticketRepository.findById(id).orElseThrow();
+        assertEquals("B", persisted.getRow());
+        assertEquals("7", persisted.getSeat());
+        assertEquals(10.0, persisted.getPrice());
+        assertEquals(2.0, persisted.getDiscount());
+        assertEquals(BuyStatus.LIBRE, persisted.getStatus());
+        assertNull(persisted.getQrCode());
+        assertNull(persisted.getUser());
+        assertEquals(session.getId(), persisted.getSession().getId());
+    }
 
-        Ticket updated = ticketRepository.findById(ticketId).orElseThrow();
+    @Test
+    void adminCannotChangePaidTicket() throws Exception {
+        mockMvc.perform(post("/tickets/save").with(user(user)).with(csrf())
+                        .param("id", ticket1.getId().toString()).param("discount", "3.00"))
+                .andExpect(status().isConflict());
+        Ticket persisted = ticketRepository.findById(ticket1.getId()).orElseThrow();
+        assertEquals(BuyStatus.PAGADO, persisted.getStatus());
+        assertEquals(user.getId(), persisted.getUser().getId());
+    }
 
-        assertEquals("C", updated.getRow());
-        assertEquals("9", updated.getSeat());
-        assertEquals(15.00, updated.getPrice());
-        assertEquals(2.00, updated.getDiscount());
-        assertEquals(BuyStatus.PAGADO, updated.getStatus());
-        assertEquals(session.getId(), updated.getSession().getId());
-        assertEquals(user.getId(), updated.getUser().getId());
-        assertEquals("ONLYFILM-UPDATED-QR", updated.getQrCode());
+    @Test
+    void adminCannotDiscountMoreThanPrice() throws Exception {
+        mockMvc.perform(post("/tickets/save").with(user(user)).with(csrf())
+                        .param("id", ticket3.getId().toString()).param("discount", "11.00"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
