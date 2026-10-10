@@ -220,4 +220,77 @@ class ReviewControllerTest {
     }
 
 
+
+    @Test
+    void saveReview_shouldRejectDirectPostByNonOwnerAndKeepOriginal() throws Exception {
+        mockMvc.perform(post("/reviews").with(user(otherUser)).with(csrf())
+                        .param("id", review.getId().toString())
+                        .param("movieId", movie.getId().toString())
+                        .param("title", "Reseña robada")
+                        .param("description", "Contenido modificado")
+                        .param("rating", "1"))
+                .andExpect(status().isForbidden());
+
+        Review persisted = reviewRepository.findById(review.getId()).orElseThrow();
+        assertEquals("Gran película", persisted.getTitle());
+        assertEquals(5, persisted.getRating());
+        assertEquals(user.getId(), persisted.getUser().getId());
+    }
+
+    @Test
+    void saveReview_shouldAllowOwnerWithoutChangingMovieOrAuthor() throws Exception {
+        Movie anotherMovie = movieRepository.save(Movie.builder().title("Otra película").active(true).build());
+        var originalCreationDate = review.getCreationDate();
+
+        mockMvc.perform(post("/reviews").with(user(user)).with(csrf())
+                        .param("id", review.getId().toString())
+                        .param("movieId", anotherMovie.getId().toString())
+                        .param("user.id", otherUser.getId().toString())
+                        .param("creationDate", "2000-01-01T00:00:00")
+                        .param("title", "Actualizada por autor")
+                        .param("description", "Nueva opinión")
+                        .param("rating", "4"))
+                .andExpect(status().is3xxRedirection());
+
+        Review persisted = reviewRepository.findById(review.getId()).orElseThrow();
+        assertEquals("Actualizada por autor", persisted.getTitle());
+        assertEquals(4, persisted.getRating());
+        assertEquals(movie.getId(), persisted.getMovie().getId());
+        assertEquals(user.getId(), persisted.getUser().getId());
+        assertEquals(originalCreationDate, persisted.getCreationDate());
+    }
+
+    @Test
+    void saveReview_shouldAllowAdminToEditWithoutChangingAuthor() throws Exception {
+        mockMvc.perform(post("/reviews").with(user(admin)).with(csrf())
+                        .param("id", review.getId().toString())
+                        .param("movieId", movie.getId().toString())
+                        .param("title", "Corregida por admin")
+                        .param("description", "Moderación")
+                        .param("rating", "3"))
+                .andExpect(status().is3xxRedirection());
+
+        Review persisted = reviewRepository.findById(review.getId()).orElseThrow();
+        assertEquals("Corregida por admin", persisted.getTitle());
+        assertEquals(user.getId(), persisted.getUser().getId());
+    }
+
+    @Test
+    void saveReview_shouldIgnoreInjectedIdentityAndMovieOnCreate() throws Exception {
+        mockMvc.perform(post("/reviews").with(user(user)).with(csrf())
+                        .param("movieId", movie.getId().toString())
+                        .param("user.id", otherUser.getId().toString())
+                        .param("creationDate", "2000-01-01T00:00:00")
+                        .param("title", "Nueva legítima")
+                        .param("description", "Una reseña")
+                        .param("rating", "5"))
+                .andExpect(status().is3xxRedirection());
+
+        Review created = reviewRepository.findAll().stream()
+                .filter(r -> "Nueva legítima".equals(r.getTitle())).findFirst().orElseThrow();
+        assertEquals(user.getId(), created.getUser().getId());
+        assertEquals(movie.getId(), created.getMovie().getId());
+        assertThat(created.getCreationDate()).isAfter(java.time.LocalDateTime.of(2020, 1, 1, 0, 0));
+    }
+
 }
