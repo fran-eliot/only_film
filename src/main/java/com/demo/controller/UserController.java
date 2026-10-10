@@ -120,9 +120,8 @@ public class UserController {
             return user.getId() == null ? REDIRECT_USER_NEW : REDIRECT_USER_EDIT + user.getId();
         }
 
-        if (imageUrl != null) {
-            user.setImageUrl(imageUrl);
-        }
+        // Never accept a hidden imageUrl field as a trusted upload path.
+        user.setImageUrl(imageUrl);
 
         try {
             if (user.getId() == null) {
@@ -130,7 +129,7 @@ public class UserController {
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_CREATED);
                 log.info("{} {}", MSG_USER_CREATED, user);
             } else {
-                user = userService.update(user, currentUser.getId());
+                user = userService.updateAdmin(user, currentUser.getId(), imageUrl);
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_UPDATED);
                 log.info("{} {}", MSG_USER_UPDATED, user);
             }
@@ -210,12 +209,7 @@ public class UserController {
             return REDIRECT_PROFILE;
         }
 
-        // Evita que el usuario pueda cambiar id, rol o active desde el formulario,
-        // previniendo escalada de privilegios.
-        userForm.setId(authenticatedUser.getId());
-        userForm.setRole(authenticatedUser.getRole());
-        userForm.setActive(authenticatedUser.getActive());
-
+        // The service resolves ID, role and active state from the database.\n
         // Imagen: si no se sube una nueva, mantiene la imagen actual.
         String imageUrl;
         try {
@@ -224,9 +218,9 @@ public class UserController {
             redirectAttributes.addFlashAttribute(ATTR_ERROR, invalidImage.getMessage());
             return "redirect:/profile/edit";
         }
-        userForm.setImageUrl(imageUrl != null ? imageUrl : authenticatedUser.getImageUrl());
+        userForm.setImageUrl(imageUrl);
 
-        User userUpdated = userService.update(userForm, authenticatedUser.getId());
+        User userUpdated = userService.updateProfile(userForm, authenticatedUser.getId(), imageUrl);
 
         // Refresca Spring Security para que el principal/navbar muestren los datos nuevos.
         Authentication newAuth = new UsernamePasswordAuthenticationToken(
