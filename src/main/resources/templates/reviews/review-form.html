@@ -52,22 +52,22 @@
                 </div>
 
                 <!-- Estrellas -->
-                <div class="mb-4">
-                    <span id="ratingLabel" class="form-label fw-semibold d-block">Puntuación <span class="text-danger">*</span></span>
+                <fieldset class="mb-4">
+                    <legend class="form-label fw-semibold">Puntuación <span class="text-danger">*</span></legend>
 
-                    <div class="star-rating d-flex gap-1" id="starRating" role="group" aria-labelledby="ratingLabel">
+                    <div class="star-rating d-flex gap-1" id="starRating">
                         <button type="button" class="rating-star" data-value="1" aria-label="1 estrella" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
-                        <i class="fa-regular fa-star" data-value="2" aria-label="2 estrellas" role="button" tabindex="0"></i>
-                        <i class="fa-regular fa-star" data-value="3" aria-label="3 estrellas" role="button" tabindex="0"></i>
-                        <i class="fa-regular fa-star" data-value="4" aria-label="4 estrellas" role="button" tabindex="0"></i>
-                        <i class="fa-regular fa-star" data-value="5" aria-label="5 estrellas" role="button" tabindex="0"></i>
+                        <button type="button" class="rating-star" data-value="2" aria-label="2 estrellas" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
+                        <button type="button" class="rating-star" data-value="3" aria-label="3 estrellas" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
+                        <button type="button" class="rating-star" data-value="4" aria-label="4 estrellas" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
+                        <button type="button" class="rating-star" data-value="5" aria-label="5 estrellas" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
                     </div>
 
                     <small class="text-muted mt-1 d-block" id="ratingText">Selecciona una puntuación</small>
                     <div class="text-danger small mt-1" id="ratingError" style="display:none">
                         <i class="fa-solid fa-circle-exclamation me-1" aria-hidden="true"></i>Por favor selecciona una puntuación.
                     </div>
-                </div>
+                </fieldset>
 
                 <div class="d-flex gap-2 flex-wrap">
                     <button id="submitReviewBtn" type="submit" class="btn btn-primary">
@@ -127,7 +127,7 @@
 
     const labels = ['', 'Muy mala', 'Floja', 'Está bien', 'Muy buena', 'Maravillosa'];
 
-    let selected = parseInt(hidden.value) || 0;
+    let selected = Number.parseInt(hidden.value, 10) || 0;
 
     function paintStars(upTo) {
         stars.forEach((s, i) => {
@@ -143,6 +143,7 @@
 
     // Pintar estado inicial si venimos de edición
     paintStars(selected);
+    stars.forEach(star => star.setAttribute('aria-pressed', String(Number(star.dataset.value) === selected)));
     if (selected > 0) ratingText.textContent = selected + ' / 5 — ' + labels[selected];
 
     function chooseRating(val) {
@@ -155,7 +156,7 @@
     }
 
     stars.forEach(star => {
-        const val = parseInt(star.dataset.value);
+        const val = Number.parseInt(star.dataset.value, 10);
 
         // Hover: iluminar hasta aquí
         star.addEventListener('mouseenter', () => {
