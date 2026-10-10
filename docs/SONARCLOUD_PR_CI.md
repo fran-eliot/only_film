@@ -4,7 +4,7 @@
 
 El job `h2-regression` de `.github/workflows/postgres-migration.yml` compila y ejecuta la selección de regresión H2. JaCoCo publica su informe en el artefacto `jacoco-h2-regression`. En los PR internos hacia `main`, el mismo runner utiliza a continuación las clases compiladas y el informe JaCoCo para invocar el scanner Maven de SonarCloud **sin volver a ejecutar los tests**.
 
-La identidad del proyecto SonarCloud está definida en `pom.xml` (`certidevs_g1_testing`, organización `certidevs`). Esta configuración procede del proyecto académico y debe comprobarse antes de considerarla válida para Only Film. El análisis necesita `SONAR_TOKEN` como secreto del repositorio; no se imprime ni se versiona.
+La identidad del proyecto propio está definida en `pom.xml`: `sonar.projectKey=fran-eliot_only_film` y `sonar.organization=fran-eliot`. Proyecto: https://sonarcloud.io/project/overview?id=fran-eliot_only_film. El análisis necesita `SONAR_TOKEN` como secreto del repositorio; no se imprime ni se versiona.
 
 El workflow `.github/workflows/sonar.yml` continúa siendo una ejecución manual independiente, no se activa automáticamente en los PR.
 
@@ -18,4 +18,4 @@ El workflow `.github/workflows/sonar.yml` continúa siendo una ejecución manual
 
 ## Validación pendiente
 
-Para declarar la integración plenamente operativa es imprescindible una ejecución real que confirme la subida del análisis del PR y la correspondencia con el proyecto SonarCloud. Si el proyecto académico original ya no es accesible, habría que configurar un proyecto propio y actualizar `sonar.organization` y `sonar.projectKey` en una decisión posterior, sin inventar credenciales ni afirmar que el Quality Gate se ha evaluado.
+Para declarar la integración plenamente operativa es imprescindible una ejecución real que confirme la subida del análisis del PR y la correspondencia con el proyecto SonarCloud. El proyecto propio ya está creado y se ha actualizado el `pom.xml`. Queda confirmar mediante el workflow que el scanner puede publicar el análisis del PR con el secreto `SONAR_TOKEN` y que importa JaCoCo. Si no aparece el análisis, revisar también si el análisis automático del proyecto está activado y podría interferir con el análisis de CI.
