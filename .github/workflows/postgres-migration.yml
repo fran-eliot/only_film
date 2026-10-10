@@ -3,6 +3,7 @@ name: PostgreSQL schema and regression validation
 on:
   push:
     branches:
+      - main
       - feature/postgresql-flyway
       - test/postgresql-jpa-integration
   pull_request:
@@ -16,9 +17,13 @@ permissions:
 jobs:
   h2-regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -36,6 +41,16 @@ jobs:
             target/surefire-reports/
           if-no-files-found: warn
           retention-days: 14
+      # El análisis no vuelve a compilar ni a ejecutar las pruebas.
+      # Los PR de forks no reciben los secretos del repositorio.
+      - name: Analizar PR y rama main con SonarQube Cloud
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        run: |
+          if [ -z "${SONAR_TOKEN:-}" ]; then
+            echo "::notice::Análisis SonarQube Cloud omitido: SONAR_TOKEN no disponible. No se ha verificado la calidad del código."
+            exit 0
+          fi
+          mvn -B -ntp -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
   postgres-schema:
     runs-on: ubuntu-latest
