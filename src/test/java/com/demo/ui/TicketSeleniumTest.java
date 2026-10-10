@@ -277,28 +277,19 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
     }
 
     @Test
-    void editTicketTemplateAsAdminShowsFormFields() {
+    void editFreeTicketAsAdminOnlyShowsDiscountField() {
         loginAdmin();
 
-        driver.get(baseUrl + "tickets/edit/" + paidTicket.getId());
+        driver.get(baseUrl + "tickets/edit/" + freeTicket.getId());
 
-        assertTrue(driver.getPageSource().contains("Registro de Ticket"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("discount")));
+        assertTrue(driver.getPageSource().contains("Editar descuento de entrada libre"));
+        assertEquals("0", driver.findElement(By.id("discount")).getAttribute("value").replaceFirst("\\.0$", ""));
 
-        WebElement rowInput = driver.findElement(By.id("row"));
-        WebElement seatInput = driver.findElement(By.id("seat"));
-        WebElement priceInput = driver.findElement(By.id("price"));
-        WebElement statusSelect = driver.findElement(By.id("status"));
-        WebElement sessionSelect = driver.findElement(By.id("session"));
-        WebElement userSelect = driver.findElement(By.id("user"));
-        WebElement qrInput = driver.findElement(By.id("qrCode"));
-
-        assertEquals(paidTicket.getRow(), rowInput.getAttribute("value"));
-        assertEquals(paidTicket.getSeat(), seatInput.getAttribute("value"));
-        assertEquals("9.5", priceInput.getAttribute("value"));
-        assertEquals(BuyStatus.PAGADO.name(), statusSelect.getAttribute("value"));
-        assertFalse(sessionSelect.getText().isBlank());
-        assertFalse(userSelect.getText().isBlank());
-        assertEquals("ONLYFILM-TEST-QR", qrInput.getAttribute("value"));
+        // Los datos de inventario y checkout no pueden alterarse desde el formulario.
+        for (String protectedField : List.of("row", "seat", "price", "status", "session", "user", "qrCode")) {
+            assertTrue(driver.findElements(By.id(protectedField)).isEmpty(), protectedField);
+        }
     }
 
     private void loginUser() {

@@ -1,19 +1,18 @@
-name: Tests (manual)
+name: Tests (manual + validación Selenium en PR)
 
-# Solo se ejecuta cuando lo lanzas manualmente desde la pestaña Actions de GitHub
-# o vía: gh workflow run tests.yml
-#
-# Manual a propósito: hacemos +10 commits al día en este repo y no queremos
-# desperdiciar minutos de runner en cada push. Lo lanzas cuando quieres
-# validar (antes de una review, al cerrar un sprint, etc.).
+# La batería completa se ejecuta manualmente. Solo Selenium se ejecuta en PR
+# cuando cambia este workflow, para validar su configuración antes del merge.
 on:
-#  push:
-#    branches:
-#        - main
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/tests.yml'
 
 jobs:
   repository-tests:
+    if: github.event_name == 'workflow_dispatch'
     name: Tests de repositorios (@DataJpaTest)
     runs-on: ubuntu-latest
 
@@ -32,6 +31,7 @@ jobs:
         run: mvn -B test -Dtest='*RepositoryTest'
 
   controller-tests:
+    if: github.event_name == 'workflow_dispatch'
     name: Tests de controllers (@SpringBootTest + MockMvc)
     runs-on: ubuntu-latest
 
@@ -50,6 +50,7 @@ jobs:
         run: mvn -B test -Dtest='*ControllerTest'
 
   service-tests:
+    if: github.event_name == 'workflow_dispatch'
     name: Tests de servicios (Unitarios con mocks)
     runs-on: ubuntu-latest
     steps:
@@ -66,6 +67,7 @@ jobs:
 
 
   security-tests:
+    if: github.event_name == 'workflow_dispatch'
     name: Tests de seguridad (rutas SecurityConfig)
     runs-on: ubuntu-latest
     steps:
@@ -94,8 +96,9 @@ jobs:
           cache: maven
       - name: Versión de Chrome del runner
         run: google-chrome --version
+      # Selección fija de las cinco clases E2E existentes, sin entrada manual indefinida.
       - name: Ejecutar tests de Selenium
-        run: mvn -B test -Dtest="${{ inputs.test }}"
+        run: mvn -B -ntp test -Dtest='*SeleniumTest' -DrerunFailingTestsCount=0
         # opcional, para ver más detalles
       - name: Subir reporte de Selenium a GitHub Actions
         if: always() # Siempre subir el reporte, incluso si los tests fallan
