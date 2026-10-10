@@ -2,6 +2,17 @@
 
 La aplicación mantiene H2 como configuración predeterminada. El perfil opcional `postgres` utiliza PostgreSQL 17, Flyway para las migraciones y `ddl-auto=validate` para comprobar el esquema.
 
+## Perfiles y configuración segura (issue #16)
+
+- **Predeterminado (H2 temporal):** consola H2 deshabilitada, sin impresión de SQL ni credenciales estáticas en `application.properties`. Apto para arranque local básico; la base H2 en memoria se reinicia al cerrar Java.
+- **`dev` (solo equipo local):** habilita explícitamente `/h2-console`, el log SQL y la recarga de plantillas para desarrollo. La excepción de CSRF y los permisos de frame de Spring Security se limitan a este perfil. No usarlo en servidores públicos.
+- **`postgres`:** Flyway activado, Hibernate `validate`, consola H2 y log SQL deshabilitados. Las credenciales proceden exclusivamente de `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`, sin valores de reserva.
+- **`postgres,demo`:** solo pruebas locales con datos ficticios y contraseñas conocidas. Nunca debe activarse en un entorno accesible desde Internet.
+
+Para habilitar las herramientas de H2 de forma explícita, ejecuta `SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run` (en PowerShell configura `$env:SPRING_PROFILES_ACTIVE = 'dev'` previamente). Para usar PostgreSQL real, conserva solo `postgres` como perfil activo.
+
+Las contraseñas de usuarios demo **no** equivalen a la antigua propiedad `spring.security.user.password`. El proyecto usa `UserService` y credenciales de usuarios guardadas en su base de datos.
+
 ## Requisitos
 
 - Docker Engine + Docker Compose
