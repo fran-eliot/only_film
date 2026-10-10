@@ -1,0 +1,92 @@
+name: PostgreSQL optional demo seed
+
+on:
+  push:
+    branches:
+      - feature/optional-postgres-demo-data
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-demo-seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: onlyfilm
+          POSTGRES_USER: onlyfilm
+          POSTGRES_PASSWORD: ci-demo-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U onlyfilm -d onlyfilm"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Package application
+        run: mvn -B -ntp package -DskipTests
+      - name: Assert demo profile only seeds empty database once
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/onlyfilm
+          DB_USERNAME: onlyfilm
+          DB_PASSWORD: ci-demo-only-password
+        run: |
+          set -euo pipefail
+          PG_CONTAINER=$(docker ps -q --filter ancestor=postgres:17-alpine | head -n 1)
+          sql() {
+            docker exec "$PG_CONTAINER" psql -v ON_ERROR_STOP=1 -U onlyfilm -d onlyfilm -Atc "$1"
+          }
+          APP_PID=""
+          stop_app() {
+            if [ -n "$APP_PID" ]; then
+              kill "$APP_PID" 2>/dev/null || true
+              wait "$APP_PID" 2>/dev/null || true
+              APP_PID=""
+            fi
+          }
+          trap 'stop_app; tail -n 120 /tmp/onlyfilm-demo.log || true' EXIT
+          start_app() {
+            SPRING_PROFILES_ACTIVE="$1" java -jar target/*.jar > /tmp/onlyfilm-demo.log 2>&1 &
+            APP_PID=$!
+            for i in $(seq 1 90); do
+              if ! kill -0 "$APP_PID" 2>/dev/null; then
+                echo "Application failed to start"
+                exit 1
+              fi
+              CODE=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/movies || true)
+              if [ "$CODE" = "200" ]; then
+                return 0
+              fi
+              sleep 2
+            done
+            echo "Application did not become ready"
+            exit 1
+          }
+          start_app postgres
+          test "$(sql 'select count(*) from movies')" = "0"
+          stop_app
+          start_app postgres,demo
+          INITIAL=$(sql 'select count(*) from movies')
+          test "$INITIAL" -gt 0
+          USERS=$(sql 'select count(*) from users')
+          test "$USERS" -gt 0
+          stop_app
+          start_app postgres,demo
+          test "$(sql 'select count(*) from movies')" = "$INITIAL"
+          test "$(sql 'select count(*) from users')" = "$USERS"
+          stop_app
+          echo "PASS: PostgreSQL stays empty by default; demo seeds only once"
