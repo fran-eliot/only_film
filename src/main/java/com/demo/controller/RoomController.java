@@ -1,6 +1,7 @@
 package com.demo.controller;
 
 import com.demo.model.Room;
+import com.demo.dto.RoomForm;
 import com.demo.repository.RoomRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -66,22 +67,32 @@ public class RoomController {
 
     @GetMapping ("salas/new")
     public String create(Model model){
-        model.addAttribute("room", new Room());
+        model.addAttribute("room", new RoomForm());
         return "rooms/room-form";
     }
 
     @PostMapping("salas")
-    public String guardar(@Valid @ModelAttribute Room room, BindingResult bindingresult){
-        if (bindingresult.hasErrors()){
+    public String guardar(@Valid @ModelAttribute("room") RoomForm form, BindingResult bindingresult) {
+        if (bindingresult.hasErrors()) {
             return "rooms/room-form";
         }
+        Room room = form.getId() == null
+                ? new Room()
+                : roomRepository.findById(form.getId()).orElseThrow();
+        room.setName(form.getName());
+        room.setCapacity(form.getCapacity());
+        room.setScreenType(form.getScreenType() == null
+                ? com.demo.model.enums.ScreenType.STANDARD : form.getScreenType());
+        room.setFloorNumber(form.getFloorNumber());
+        // Preserve the persisted active flag; never accept the hidden form field.
+        if (form.getId() == null) room.setActive(true);
         roomRepository.save(room);
         return "redirect:/salas";
     }
 
     @GetMapping ("salas/edit/{id}")
     public String edit(Model model, @PathVariable Long id){
-        model.addAttribute("room", roomRepository.findById(id).orElseThrow());
+        model.addAttribute("room", RoomForm.from(roomRepository.findById(id).orElseThrow()));
         return "rooms/room-form";
     }
 
