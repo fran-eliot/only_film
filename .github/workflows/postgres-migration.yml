@@ -95,6 +95,8 @@ jobs:
 
           start_app
           test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''1'\'' AND success = true')" = "1"
+          test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''2'\'' AND success = true')" = "1"
+          test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''1'\'' AND success = true')" = "1"
           sql "INSERT INTO movies (title, active) VALUES ('CI persistence probe', true)"
           test "$(sql "SELECT COUNT(*) FROM movies WHERE title = 'CI persistence probe'")" = "1"
           stop_app
@@ -111,7 +113,7 @@ jobs:
           # A second Spring Boot startup must neither reapply V1 nor erase stored data.
           start_app
           test "$(sql "SELECT COUNT(*) FROM movies WHERE title = 'CI persistence probe'")" = "1"
-          test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''1'\'' AND success = true')" = "1"
+          test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''2'\'' AND success = true')" = "1"
           echo "PASS: Flyway history and PostgreSQL data survived application restart"
 
   postgres-integration:
