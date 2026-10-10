@@ -10,9 +10,9 @@ import java.util.Optional;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    @Override
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<Ticket> findById(Long id);
+    @org.springframework.data.jpa.repository.Query("select t from Ticket t where t.id = :id")
+    Optional<Ticket> findByIdForCheckout(@org.springframework.data.repository.query.Param("id") Long id);
 
     List<Ticket> findBySession_Id(Long id);
 
