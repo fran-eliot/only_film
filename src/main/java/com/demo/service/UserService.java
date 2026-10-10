@@ -89,43 +89,73 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public User update(User userForm, Long currentUserId) {
-        //Obtenemos de BD el usuario
-        User userDB = findById(userForm.getId());
-
-        //Comprobamos si el username esta ocupado por un usuario distinto a este usuario.
-        Optional<User> userOptional = userRepository.findByUsername(userForm.getUsername());
-
-        if(userOptional.isPresent() && !userOptional.get().getId().equals(userForm.getId())){
-            throw new IllegalArgumentException("Este username ya existe");
+    /**
+     * A regular user may only update their own profile. Role, active state, ID,
+     * and ownership are resolved from the authenticated user in the database,
+     * never from the submitted form.
+     */
+    public User updateProfile(User form, Long authenticatedUserId) {
+        if (authenticatedUserId == null) {
+            throw new org.springframework.security.access.AccessDeniedException("Debes iniciar sesión");
         }
-
-        //Con el email se hace lo mismo
-        userRepository.findByEmail(userForm.getEmail())
-                .filter(user -> !user.getId().equals(userForm.getId()))
-                .ifPresent(user -> {
-                    throw new IllegalArgumentException("El email de usuario ya existe");
-                });
-
-        userDB.setUsername(userForm.getUsername());
-        userDB.setEmail(userForm.getEmail());
-        userDB.setRole(userForm.getRole());
-        userDB.setImageUrl(userForm.getImageUrl());
-
-        // Impedir que un admin se desactive a sí mismo
-        if (userDB.getRole() == Role.ROLE_ADMIN
-                && currentUserId.equals(userDB.getId())
-                && Boolean.FALSE.equals(userForm.getActive())) {
-            throw new IllegalArgumentException("Un administrador no puede desactivarse a sí mismo");
+        User existing = findById(authenticatedUserId);
+        updateContactFields(existing, form);
+        if (StringUtils.hasText(form.getImageUrl())) {
+            existing.setImageUrl(form.getImageUrl());
         }
-        userDB.setActive(userForm.getActive());
+        updatePasswordIfPresent(existing, form.getPassword());
+        return userRepository.save(existing);
+    }
 
-        // Si se introduce una nueva contraseña se cifra y actualizamos,
-        // sino la contraseña actual queda sin cambios
-        if(StringUtils.hasText(userForm.getPassword()))
-            userDB.setPassword(passwordEncoder.encode(userForm.getPassword()));
+    /**
+     * Administrative update with independent authorization and invariants.
+     * The actor is reloaded from storage to avoid trusting submitted roles.
+     */
+    public User updateAdmin(User form, Long authenticatedAdminId) {
+        if (authenticatedAdminId == null) {
+            throw new org.springframework.security.access.AccessDeniedException("No tienes permisos");
+        }
+        User actor = findById(authenticatedAdminId);
+        if (actor.getRole() != Role.ROLE_ADMIN || !Boolean.TRUE.equals(actor.getActive())) {
+            throw new org.springframework.security.access.AccessDeniedException("No tienes permisos");
+        }
+        if (form.getId() == null) {
+            throw new IllegalArgumentException("ID de usuario obligatorio");
+        }
+        User existing = findById(form.getId());
+        // Check the ORIGINAL role before applying any mutations.
+        if (existing.getId().equals(actor.getId()) &&
+                (form.getRole() != Role.ROLE_ADMIN || !Boolean.TRUE.equals(form.getActive()))) {
+            throw new IllegalArgumentException("Un administrador no puede desactivarse ni quitarse su rol");
+        }
+        if (form.getRole() == null || form.getActive() == null) {
+            throw new IllegalArgumentException("Rol y estado son obligatorios");
+        }
+        updateContactFields(existing, form);
+        existing.setRole(form.getRole());
+        existing.setActive(form.getActive());
+        if (StringUtils.hasText(form.getImageUrl())) {
+            existing.setImageUrl(form.getImageUrl());
+        }
+        updatePasswordIfPresent(existing, form.getPassword());
+        return userRepository.save(existing);
+    }
 
-        return userRepository.save(userDB); // guardamos el usuario ACTUALIZADO en BD
+    private void updateContactFields(User existing, User form) {
+        userRepository.findByUsername(form.getUsername())
+                .filter(other -> !other.getId().equals(existing.getId()))
+                .ifPresent(other -> { throw new IllegalArgumentException("Este username ya existe"); });
+        userRepository.findByEmail(form.getEmail())
+                .filter(other -> !other.getId().equals(existing.getId()))
+                .ifPresent(other -> { throw new IllegalArgumentException("El email de usuario ya existe"); });
+        existing.setUsername(form.getUsername());
+        existing.setEmail(form.getEmail());
+    }
+
+    private void updatePasswordIfPresent(User existing, String newPassword) {
+        if (StringUtils.hasText(newPassword)) {
+            existing.setPassword(passwordEncoder.encode(newPassword));
+        }
     }
 
     public void deactivate(Long userId, Long currentUserId) {
