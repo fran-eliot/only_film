@@ -26,6 +26,16 @@ jobs:
           cache: maven
       - name: Run existing H2 regression tests
         run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest,MutationCsrfSecurityTest,EnvironmentHardeningTest,SessionManagementRollbackTest,SessionEditInvariantsTest,MvcErrorContractTest' -DrerunFailingTestsCount=0
+      - name: Upload JaCoCo H2 regression coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-h2-regression
+          path: |
+            target/site/jacoco/
+            target/surefire-reports/
+          if-no-files-found: warn
+          retention-days: 14
 
   postgres-schema:
     runs-on: ubuntu-latest
