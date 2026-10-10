@@ -141,7 +141,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("admin/users/deactivate/{id}")
+    @PostMapping("admin/users/deactivate/{id}")
     public String deactivate(
             @PathVariable Long id,
             @AuthenticationPrincipal User currentUser,
@@ -157,7 +157,7 @@ public class UserController {
         return REDIRECT_USERS;
     }
 
-    @GetMapping("admin/users/activate/{id}")
+    @PostMapping("admin/users/activate/{id}")
     public String activate(
             @PathVariable Long id,
             RedirectAttributes redirectAttributes
