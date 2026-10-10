@@ -80,6 +80,16 @@ jobs:
           test "$(sql 'select count(*) from movies')" = "0"
           stop_app
           start_app postgres,demo
+          # The HTTP listener may be ready before CommandLineRunner completes.
+          for i in $(seq 1 120); do
+            if grep -q "DataInitializer completado" /tmp/onlyfilm-demo.log; then break; fi
+            if ! kill -0 "$APP_PID" 2>/dev/null; then
+              echo "Demo seeding terminated unexpectedly"
+              exit 1
+            fi
+            sleep 2
+          done
+          grep -q "DataInitializer completado" /tmp/onlyfilm-demo.log
           INITIAL=$(sql 'select count(*) from movies')
           test "$INITIAL" -gt 0
           USERS=$(sql 'select count(*) from users')
