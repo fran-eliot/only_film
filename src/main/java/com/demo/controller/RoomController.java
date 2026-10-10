@@ -43,7 +43,7 @@ public class RoomController {
         }
     }
 
-    @GetMapping("salas/deactivate/{id}")
+    @PostMapping("salas/deactivate/{id}")
     public String deactivateSala(@PathVariable Long id, Model model) {
 
         // forma 1:
