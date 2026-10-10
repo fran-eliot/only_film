@@ -369,7 +369,7 @@ public class TicketControllerTest {
 
     @Test
     @DisplayName("GET /tickets/{id} con ticket inexistente responde 404")
-    void ticketDetailNotFoundThrowsNoSuchElementException() {
+    void ticketDetailNotFoundThrowsNoSuchElementException() throws Exception {
         Long nonExistingId = 999999L;
 
         mockMvc.perform(get("/tickets/" + nonExistingId).with(user(user)))
@@ -378,7 +378,7 @@ public class TicketControllerTest {
 
     @Test
     @DisplayName("GET /tickets/edit/{id} con ticket inexistente responde 404")
-    void editTicketNotFoundThrowsNoSuchElementException() {
+    void editTicketNotFoundThrowsNoSuchElementException() throws Exception {
         Long nonExistingId = 999999L;
 
         mockMvc.perform(get("/tickets/edit/" + nonExistingId).with(user(user)))
