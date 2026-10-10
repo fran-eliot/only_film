@@ -3,6 +3,7 @@ name: PostgreSQL schema and regression validation
 on:
   push:
     branches:
+      - main
       - feature/postgresql-flyway
       - test/postgresql-jpa-integration
   pull_request:
@@ -42,11 +43,11 @@ jobs:
           retention-days: 14
       # El análisis no vuelve a compilar ni a ejecutar las pruebas.
       # Los PR de forks no reciben los secretos del repositorio.
-      - name: Analizar PR con SonarQube Cloud
-        if: github.event_name == 'pull_request'
+      - name: Analizar PR y rama main con SonarQube Cloud
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         run: |
           if [ -z "${SONAR_TOKEN:-}" ]; then
-            echo "::notice::Análisis SonarQube Cloud omitido: SONAR_TOKEN no disponible."
+            echo "::notice::Análisis SonarQube Cloud omitido: SONAR_TOKEN no disponible. No se ha verificado la calidad del código."
             exit 0
           fi
           mvn -B -ntp -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
