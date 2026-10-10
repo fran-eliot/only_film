@@ -98,7 +98,7 @@ class RoomControllerTest {
 
         Long id = room.getId();
 
-        mockMvc.perform(get("/salas/deactivate/" + id))
+        mockMvc.perform(post("/salas/deactivate/" + id))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/salas"));
 
