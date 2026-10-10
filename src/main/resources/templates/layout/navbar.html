@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <body>
@@ -115,10 +115,8 @@
                         <img
                                 th:src="${#authentication.principal.imageUrl != null ? #authentication.principal.imageUrl : '/images/avatar.svg'}"
                                 alt="Avatar de usuario"
-                                width="36"
-                                height="36"
                                 class="rounded-circle object-fit-cover border border-2"
-                                style="border-color: var(--cinema-accent-gold) !important;">
+                                style="width: 36px; height: 36px; border-color: var(--cinema-accent-gold) !important;">
 
                         <span class="d-none d-sm-inline fw-semibold text-light">
                         Hola,
