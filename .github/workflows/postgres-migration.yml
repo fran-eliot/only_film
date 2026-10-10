@@ -16,9 +16,13 @@ permissions:
 jobs:
   h2-regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -36,6 +40,16 @@ jobs:
             target/surefire-reports/
           if-no-files-found: warn
           retention-days: 14
+      # Se reutilizan las clases compiladas y el informe JaCoCo del paso de tests.
+      # En PR de forks, GitHub no entrega los secretos del repositorio.
+      - name: Analizar PR con SonarCloud
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && env.SONAR_TOKEN != ''
+        run: mvn -B -ntp -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+
+      - name: Informar si SonarCloud no se ha ejecutado
+        if: github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name != github.repository || env.SONAR_TOKEN == '')
+        run: echo "::notice::SonarCloud omitido: PR externo o SONAR_TOKEN no configurado. No equivale a un análisis aprobado."
+
 
   postgres-schema:
     runs-on: ubuntu-latest
