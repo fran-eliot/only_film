@@ -97,6 +97,15 @@ jobs:
           sql "INSERT INTO movies (title, active) VALUES ('CI persistence probe', true)"
           test "$(sql "SELECT COUNT(*) FROM movies WHERE title = 'CI persistence probe'")" = "1"
           stop_app
+          # Restart PostgreSQL itself; its data directory must survive container restart.
+          docker restart "$PG_CONTAINER"
+          for i in $(seq 1 30); do
+            if docker exec "$PG_CONTAINER" pg_isready -U onlyfilm -d onlyfilm >/dev/null 2>&1; then
+              break
+            fi
+            sleep 2
+          done
+          docker exec "$PG_CONTAINER" pg_isready -U onlyfilm -d onlyfilm
 
           # A second Spring Boot startup must neither reapply V1 nor erase stored data.
           start_app
