@@ -58,6 +58,14 @@ class RoomControllerTest {
     // la vista correcta (rooms/room-list)
     // y que el modelo tiene el atributo "rooms" con exactamente 1 sala (la del setUp).
     @Test
+    void listTableHeadersUseCssWidths() throws Exception {
+        mockMvc.perform(get("/salas"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("style=\"width: 25%;\"")))
+                .andExpect(content().string(not(containsString("scope=\"col\" width="))));
+    }
+
+    @Test
     void listarSalas() throws Exception {
         mockMvc.perform(get("/salas"))
                 .andExpect(status().isOk())
