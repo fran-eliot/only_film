@@ -29,8 +29,8 @@
     <properties>
         <java.version>25</java.version>
         <selenium.version>4.44.0</selenium.version>
-        <sonar.organization>certidevs</sonar.organization>
-        <sonar.projectKey>certidevs_g1_testing</sonar.projectKey>
+        <sonar.organization>fran-eliot</sonar.organization>
+        <sonar.projectKey>fran-eliot_only_film</sonar.projectKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.coverage.exclusions>**/DataInitializer.java,**/G1TestingApplication.java</sonar.coverage.exclusions>
