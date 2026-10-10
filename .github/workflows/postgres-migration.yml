@@ -40,16 +40,16 @@ jobs:
             target/surefire-reports/
           if-no-files-found: warn
           retention-days: 14
-      # Se reutilizan las clases compiladas y el informe JaCoCo del paso de tests.
-      # En PR de forks, GitHub no entrega los secretos del repositorio.
-      - name: Analizar PR con SonarCloud
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && env.SONAR_TOKEN != ''
-        run: mvn -B -ntp -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
-
-      - name: Informar si SonarCloud no se ha ejecutado
-        if: github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name != github.repository || env.SONAR_TOKEN == '')
-        run: echo "::notice::SonarCloud omitido: PR externo o SONAR_TOKEN no configurado. No equivale a un análisis aprobado."
-
+      # El análisis no vuelve a compilar ni a ejecutar las pruebas.
+      # Los PR de forks no reciben los secretos del repositorio.
+      - name: Analizar PR con SonarQube Cloud
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ -z "${SONAR_TOKEN:-}" ]; then
+            echo "::notice::Análisis SonarQube Cloud omitido: SONAR_TOKEN no disponible."
+            exit 0
+          fi
+          mvn -B -ntp -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
   postgres-schema:
     runs-on: ubuntu-latest
