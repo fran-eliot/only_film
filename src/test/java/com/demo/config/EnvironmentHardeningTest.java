@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,7 +15,7 @@ class EnvironmentHardeningTest {
 
     private Properties load(String name) throws IOException {
         Properties properties = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream(name)) {
+        try (InputStream input = Files.newInputStream(Path.of("src", "main", "resources", name))) {
             assertNotNull(input, "Missing configuration " + name);
             properties.load(input);
         }
