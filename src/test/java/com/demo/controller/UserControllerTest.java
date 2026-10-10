@@ -117,6 +117,19 @@ public class UserControllerTest {
     }
 
     @Test
+    void userFormsDoNotStealInitialFocus() throws Exception {
+        mockMvc.perform(get("/admin/users/new").with(user(admin)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString("autofocus"))))
+                .andExpect(content().string(containsString("for=\\"username\\"")));
+
+        mockMvc.perform(get("/profile/edit").with(user(normalUser)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString("autofocus"))))
+                .andExpect(content().string(containsString("for=\\"username\\"")));
+    }
+
+    @Test
     @DisplayName("POST /admin/users crea un usuario nuevo")
     void save_newUser_createsUserAndRedirects() throws Exception {
         long before = userRepository.count();
