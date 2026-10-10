@@ -126,10 +126,10 @@ public class MovieController {
         movie.setSinopsis(form.getSinopsis());
         movie.setReleaseYear(form.getReleaseYear());
         movie.setDurationMinutes(form.getDurationMinutes());
-        // Active is editable through the admin form; missing checkbox means false on edit.
-        movie.setActive(form.getActive() == null
-                ? (form.getId() == null ? true : false)
-                : form.getActive());
+        // Only an explicitly bound active checkbox may change the current state.
+        // For new movies, default to active unless the form explicitly says otherwise.
+        if (form.getActive() != null) movie.setActive(form.getActive());
+        else if (form.getId() == null) movie.setActive(true);
         // imageUrl sent in a hidden field is ignored.
         if (imageUrl != null) movie.setImageUrl(imageUrl);
 
