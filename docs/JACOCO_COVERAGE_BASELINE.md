@@ -1,25 +1,29 @@
-# JaCoCo coverage baseline — H2 regression job
+# Línea base de cobertura JaCoCo — Regresión H2
 
-## Scope and provenance
+## Alcance y procedencia
 
-The existing `h2-regression` job in `.github/workflows/postgres-migration.yml` runs a targeted Maven Surefire test selection with `-DrerunFailingTestsCount=0`. The `jacoco-maven-plugin` configured in `pom.xml` attaches its agent and generates HTML/XML coverage reports during `mvn test`. The job uploads `target/site/jacoco/` and `target/surefire-reports/` in the **jacoco-h2-regression** artifact (14-day retention). The upload step uses `if: always()`, so test failure does not prevent collecting any reports that were produced.
+El job `h2-regression` de `.github/workflows/postgres-migration.yml` ejecuta una selección concreta de pruebas mediante Maven Surefire con `-DrerunFailingTestsCount=0`. El plugin `jacoco-maven-plugin` configurado en `pom.xml` instrumenta el código y genera informes HTML/XML durante `mvn test`.
 
-Find it under **Actions → PostgreSQL schema and regression validation → PR run → Artifacts → jacoco-h2-regression**. Open `target/site/jacoco/index.html` locally, or inspect `target/site/jacoco/jacoco.xml` for machine-readable counters. The artifact is evidence of the selected H2 regression tests, **not** a coverage percentage for every test in the repository.
+El job publica `target/site/jacoco/` y `target/surefire-reports/` como artefacto **jacoco-h2-regression**, que se conserva durante 14 días. El paso usa `if: always()`, de modo que los informes que se hayan generado se intentan publicar incluso si fallan las pruebas.
 
-## Reproduce locally
+Ruta en GitHub: **Actions → PostgreSQL schema and regression validation → ejecución del PR → Artifacts → jacoco-h2-regression**. Tras descargarlo, se puede abrir `target/site/jacoco/index.html` o consultar `target/site/jacoco/jacoco.xml` para obtener contadores procesables.
 
-With Java 25 and Maven available at the repository root:
+**Importante:** esta medición representa la selección de pruebas de regresión H2, no la cobertura global de todas las pruebas del repositorio.
+
+## Reproducción local
+
+Con Java 25 y Maven disponibles, desde la raíz del repositorio:
 
 ```bash
 mvn -B -ntp clean test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest,MutationCsrfSecurityTest,EnvironmentHardeningTest,SessionManagementRollbackTest,SessionEditInvariantsTest,MvcErrorContractTest' -DrerunFailingTestsCount=0
 ```
 
-The resulting HTML and XML reports are generated under `target/site/jacoco/`. Use `clean` locally to avoid stale execution data. This job runs on a fresh GitHub-hosted runner.
+Los informes HTML y XML se generan en `target/site/jacoco/`. El comando `clean` evita mezclar datos de ejecuciones locales anteriores; en Actions el job se ejecuta en un runner nuevo.
 
-## Interpretation and next steps
+## Interpretación y siguientes pasos
 
-- Record actual line/branch coverage **only after inspecting a generated report**; no baseline percentage has been verified as of this change.
-- This job excludes Selenium browser scenarios and other classes not matched by its Surefire selector; separate workflows run PostgreSQL tests and other validations.
-- Coverage across independent jobs/JVMs cannot be computed by averaging their percentages. A whole-suite figure would require a deliberately unified execution and properly aggregated JaCoCo execution data.
-- A passing test suite does not prove every business invariant is covered. Prioritize checkout concurrency, purchase authorization, session updates, seat uniqueness and administrative ticket edits when reviewing uncovered paths.
-- No minimum threshold is enforced by this change; agree on new-code expectations after measuring an actual baseline.
+- Registrar porcentajes de líneas y ramas **solo después de inspeccionar un informe real**.
+- Este job no incluye las pruebas de navegador Selenium ni todas las clases fuera del selector de Surefire; otros workflows validan PostgreSQL y más escenarios.
+- No se obtiene una cobertura global promediando los porcentajes de jobs o JVM independientes. Para ello haría falta una ejecución unificada o agregación correcta de datos JaCoCo.
+- Un porcentaje alto no garantiza las invariantes de negocio. Conviene revisar especialmente concurrencia de checkout, autorización de compras, edición de sesiones, unicidad de butacas y edición administrativa de entradas.
+- Este cambio no establece umbrales mínimos: los objetivos para código nuevo se decidirán a partir de resultados comprobados.
