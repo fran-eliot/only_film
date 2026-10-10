@@ -46,7 +46,7 @@ public class AuthController {
             userService.register(form);
             redirectAttributes.addFlashAttribute("message", "Cuenta creada correctamente, inicia sesión.");
             return "redirect:/login";
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             // Si el username/email ya existe lo mostramos como error general y mantenemos lo que habia puesto el usuario
             model.addAttribute("error", e.getMessage());
             return "auth/register";

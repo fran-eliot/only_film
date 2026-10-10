@@ -136,7 +136,7 @@ public class UserController {
 
             // Tanto para CREAR como ACTUALIZAR redirige al listado de usuarios.
             return REDIRECT_USERS;
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute(ATTR_ERROR, MSG_USER_CREATE_ERROR);
             log.error("{} {}", MSG_USER_CREATE_ERROR, e.getMessage());
 
