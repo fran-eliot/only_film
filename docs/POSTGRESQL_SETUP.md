@@ -30,7 +30,7 @@ docker compose restart app
 docker compose down
 ```
 
-`docker compose down` conserva el volumen PostgreSQL. **No ejecutes `docker compose down -v` si necesitas los datos**: elimina el volumen y la información persistente.
+`docker compose down` conserva los volúmenes de PostgreSQL **y de los archivos subidos** (`postgres_data` y `uploads_data`). El directorio de la aplicación `/app/uploads` se guarda en un volumen Docker: las imágenes de perfil y películas sobreviven a los reinicios y a la recreación del contenedor `app`. Para ejecución fuera de Docker, la ruta predeterminada sigue siendo `uploads/`; puede cambiarse con `ONLYFILM_UPLOAD_DIR`. **No ejecutes `docker compose down -v` si necesitas los datos o las imágenes**: elimina ambos volúmenes y su contenido. Las imágenes preexistentes del directorio local `uploads/` del repositorio no se copian automáticamente al volumen Docker; realiza una migración explícita si necesitas conservarlas.
 
 Para arrancar solo la base de datos y ejecutar Spring Boot desde el IDE, utiliza `docker compose up -d postgres` y las instrucciones del apartado siguiente.
 

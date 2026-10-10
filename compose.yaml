@@ -9,6 +9,9 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-onlyfilm}
       DB_USERNAME: ${POSTGRES_USER:-onlyfilm}
       DB_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD in .env}
+      ONLYFILM_UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads_data:/app/uploads
     ports:
       - "127.0.0.1:${APP_PORT:-8080}:8080"
     depends_on:
@@ -34,3 +37,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
