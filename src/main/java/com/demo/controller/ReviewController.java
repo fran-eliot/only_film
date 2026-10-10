@@ -9,6 +9,7 @@ import com.demo.repository.MovieRepository;
 import com.demo.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -82,27 +83,43 @@ public class ReviewController {
                              @AuthenticationPrincipal User currentUser,
                              RedirectAttributes ra) {
 
-        if (movieId != null)
-            review.setMovie(movieRepository.findById(movieId).orElse(null));
+        Review persisted;
 
         if (review.getId() != null) {
-            // Edición: conservar el autor original
-            reviewRepository.findById(review.getId())
-                    .ifPresent(existing -> review.setUser(existing.getUser()));
+            // Never trust ownership, movie or timestamp supplied by form fields.
+            persisted = reviewRepository.findById(review.getId()).orElseThrow();
+            boolean isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
+            boolean isOwner = persisted.getUser() != null
+                    && persisted.getUser().getId().equals(currentUser.getId());
+            if (!isAdmin && !isOwner) {
+                throw new AccessDeniedException("No puedes modificar esta reseña");
+            }
+
+            // Only editable fields are copied: the original author, movie and date are immutable.
+            persisted.setTitle(review.getTitle());
+            persisted.setDescription(review.getDescription());
+            persisted.setRating(review.getRating());
         } else {
-            // Creación: exigir entrada comprada de esa película
+            // Creation requires an actual paid ticket for the target movie.
             if (movieId == null ||
-                    !ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(currentUser.getId(), movieId, BuyStatus.PAGADO)) {
+                    !ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(
+                            currentUser.getId(), movieId, BuyStatus.PAGADO)) {
                 ra.addFlashAttribute("error", "Debes haber comprado una entrada de esta película para reseñarla.");
                 return movieId != null ? "redirect:/movies/" + movieId : "redirect:/movies";
             }
-            review.setUser(currentUser);
+
+            persisted = new Review();
+            persisted.setTitle(review.getTitle());
+            persisted.setDescription(review.getDescription());
+            persisted.setRating(review.getRating());
+            persisted.setMovie(movieRepository.findById(movieId).orElseThrow());
+            persisted.setUser(currentUser);
         }
 
-        reviewRepository.save(review);
+        reviewRepository.save(persisted);
 
-        if (review.getMovie() != null)
-            return "redirect:/movies/" + review.getMovie().getId() + "#reviews";
+        if (persisted.getMovie() != null)
+            return "redirect:/movies/" + persisted.getMovie().getId() + "#reviews";
         return "redirect:/reviews";
     }
 
