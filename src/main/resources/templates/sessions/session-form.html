@@ -25,12 +25,12 @@
                         <label for="movie" class="form-label">
                             <i class="fa-solid fa-film me-2 text-gold"></i>Película <span class="text-danger">*</span>
                         </label>
-                        <select id="movie" th:field="*{movie}" class="form-select" required>
+                        <select id="movie" th:field="*{movieId}" class="form-select" required>
                             <option value="">-- Selecciona una película --</option>
                             <option th:each="movie : ${movies}"
                                     th:value="${movie.id}"
                                     th:text="${movie.title}"
-                                    th:selected="${proyeccion.movie?.id == movie.id}">
+                                    th:selected="${proyeccion.movieId == movie.id}">
                             </option>
                         </select>
                     </div>
@@ -39,12 +39,12 @@
                         <label for="room" class="form-label">
                             <i class="fa-solid fa-door-open me-2 text-gold"></i>Sala <span class="text-danger">*</span>
                         </label>
-                        <select id="room" th:field="*{room}" class="form-select" required>
+                        <select id="room" th:field="*{roomId}" class="form-select" required>
                             <option value="">-- Selecciona una sala --</option>
                             <option th:each="room : ${rooms}"
                                     th:value="${room.id}"
                                     th:text="${room.name + ' (' + room.screenType + ')'}"
-                                    th:selected="${proyeccion.room?.id == room.id}">
+                                    th:selected="${proyeccion.roomId == room.id}">
                             </option>
                         </select>
                     </div>
