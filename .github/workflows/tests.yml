@@ -94,8 +94,9 @@ jobs:
           cache: maven
       - name: Versión de Chrome del runner
         run: google-chrome --version
+      # Selección fija de las cinco clases E2E existentes, sin entrada manual indefinida.
       - name: Ejecutar tests de Selenium
-        run: mvn -B test -Dtest="${{ inputs.test }}"
+        run: mvn -B -ntp test -Dtest='*SeleniumTest' -DrerunFailingTestsCount=0
         # opcional, para ver más detalles
       - name: Subir reporte de Selenium a GitHub Actions
         if: always() # Siempre subir el reporte, incluso si los tests fallan
