@@ -95,6 +95,8 @@ jobs:
 
           start_app
           test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''1'\'' AND success = true')" = "1"
+          test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''1'\'' AND success = true')" = "1"
+          test "$(sql 'SELECT COUNT(*) FROM flyway_schema_history WHERE version = '\''1'\'' AND success = true')" = "1"
           sql "INSERT INTO movies (title, active) VALUES ('CI persistence probe', true)"
           test "$(sql "SELECT COUNT(*) FROM movies WHERE title = 'CI persistence probe'")" = "1"
           stop_app
