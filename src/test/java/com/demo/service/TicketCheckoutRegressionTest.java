@@ -31,7 +31,7 @@ class TicketCheckoutRegressionTest {
 
     @Test
     void paidTicketCannotBePurchasedAgain() {
-        when(ticketRepository.findById(1L))
+        when(ticketRepository.findByIdForCheckout(1L))
                 .thenReturn(Optional.of(ticket(1L, BuyStatus.PAGADO)));
         assertThrows(IllegalStateException.class,
                 () -> ticketService.processCheckout(1L, User.builder().id(2L).build(), 0, 0, 0, 0, 0));
@@ -40,7 +40,7 @@ class TicketCheckoutRegressionTest {
 
     @Test
     void cancelledTicketCannotBePurchased() {
-        when(ticketRepository.findById(2L))
+        when(ticketRepository.findByIdForCheckout(2L))
                 .thenReturn(Optional.of(ticket(2L, BuyStatus.CANCELADO)));
         assertThrows(IllegalStateException.class,
                 () -> ticketService.processCheckout(2L, User.builder().id(3L).build(), 0, 0, 0, 0, 0));
@@ -49,7 +49,7 @@ class TicketCheckoutRegressionTest {
 
     @Test
     void negativeSnackQuantityIsRejected() {
-        when(ticketRepository.findById(3L))
+        when(ticketRepository.findByIdForCheckout(3L))
                 .thenReturn(Optional.of(ticket(3L, BuyStatus.LIBRE)));
         assertThrows(IllegalArgumentException.class,
                 () -> ticketService.processCheckout(3L, User.builder().id(4L).build(), -1, 0, 0, 0, 0));
