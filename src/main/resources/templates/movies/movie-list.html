@@ -63,12 +63,14 @@
                   class="d-flex flex-wrap gap-2 align-items-center">
 
                 <div class="search-input-wrapper flex-grow-1">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" name="title" class="form-control search-input"
+                    <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                    <label for="movieTitleFilter" class="visually-hidden">Buscar película por título</label>
+                    <input id="movieTitleFilter" type="text" name="title" class="form-control search-input"
                            placeholder="Buscar película..." th:value="${param.title != null ? param.title[0] : ''}">
                 </div>
 
-                <select name="releaseYear" class="form-select filter-select">
+                <label for="movieYearFilter" class="visually-hidden">Filtrar por año de estreno</label>
+                <select id="movieYearFilter" name="releaseYear" class="form-select filter-select">
                     <option value="">Año de estreno</option>
                     <option value="2025" th:selected="${param.releaseYear != null and param.releaseYear[0] == '2025'}">Estrenos recientes (2025+)</option>
                     <option value="2022" th:selected="${param.releaseYear != null and param.releaseYear[0] == '2022'}">Últimos 5 años (2022+)</option>
@@ -76,7 +78,8 @@
                     <option value="2010" th:selected="${param.releaseYear != null and param.releaseYear[0] == '2010'}">Desde 2010</option>
                 </select>
 
-                <select name="durationMinutes" class="form-select filter-select">
+                <label for="movieDurationFilter" class="visually-hidden">Filtrar por duración máxima</label>
+                <select id="movieDurationFilter" name="durationMinutes" class="form-select filter-select">
                     <option value="">Duración</option>
                     <option value="90"  th:selected="${param.durationMinutes != null and param.durationMinutes[0] == '90'}">Hasta 90 min</option>
                     <option value="120" th:selected="${param.durationMinutes != null and param.durationMinutes[0] == '120'}">Hasta 120 min</option>
@@ -101,7 +104,7 @@
             <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
                 <div class="col" th:each="movie : ${movies}">
                     <div class="card movie-card h-100">
-                        <img th:src="${movie.getImageUrl}" class="card-img-top" alt="Film card">
+                        <img th:src="${movie.getImageUrl}" class="card-img-top" th:alt="|Cartel de ${movie.title}|">
                             <div class="card-body d-flex flex-column">
                             <h5 class="card-title" th:text="${movie.title}">Película</h5>
                             <div class="mt-auto">
