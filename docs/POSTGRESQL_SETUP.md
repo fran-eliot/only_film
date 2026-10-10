@@ -52,4 +52,4 @@ Flyway aplica `V1__initial_schema.sql` en una base vacía. El perfil `postgres` 
 
 El workflow `postgres-migration.yml` ejecuta los tests habituales con H2 y arranca la aplicación contra PostgreSQL real en CI para validar las migraciones y el esquema. Consulta los resultados de Actions antes de dar por completada la migración.
 
-**Pendiente:** comprobar la ejecución real y corregir posibles discrepancias de Flyway/Hibernate. Se aconseja incorporar pruebas persistentes de repositorios contra PostgreSQL en una fase posterior.
+El job `postgres-schema` comprueba tanto el arranque inicial como el reinicio de Spring Boot sobre la misma instancia PostgreSQL: inserta un registro de prueba, reinicia la aplicación y confirma que el registro permanece y que la migración V1 figura una sola vez como completada en `flyway_schema_history`. Consulta la última ejecución del workflow para confirmar su resultado.\n\n**Pendiente para una iteración posterior:** pruebas de integración específicas de repositorios y operaciones concurrentes contra PostgreSQL.
