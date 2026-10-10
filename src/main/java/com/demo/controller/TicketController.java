@@ -3,6 +3,7 @@ package com.demo.controller;
 import com.demo.model.Ticket;
 import com.demo.model.User;
 import com.demo.model.enums.Role;
+import com.demo.model.enums.BuyStatus;
 import com.demo.repository.SessionRepository;
 import com.demo.repository.UserRepository;
 import com.demo.service.TicketService;
@@ -10,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -77,6 +80,9 @@ public class TicketController {
     @GetMapping("tickets/{id}/checkout")
     public String checkoutGet(@PathVariable Long id, Model model) {
         Ticket ticket = ticketService.findById(id).orElseThrow();
+        if (ticket.getStatus() != BuyStatus.LIBRE) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La entrada ya no está disponible");
+        }
         model.addAttribute("ticket", ticket);
         return "tickets/ticket-checkout";
     }
