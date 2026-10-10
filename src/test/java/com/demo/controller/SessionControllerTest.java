@@ -42,6 +42,14 @@ public class SessionControllerTest {
     }
 
     @Test
+    void listTableHeadersUseCssWidths() throws Exception {
+        mockMvc.perform(get("/sessions"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("style=\"width: 30%;\"")))
+                .andExpect(content().string(not(containsString("scope=\"col\" width="))));
+    }
+
+    @Test
     void sessionEmpty() throws Exception {
         mockMvc.perform(get("/sessions"))
                 .andExpect(status().isOk())
