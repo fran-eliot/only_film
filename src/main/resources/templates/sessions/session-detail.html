@@ -30,10 +30,9 @@
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/sessions/edit/{id}(id=${proyeccion.id})}" class="btn btn-primary">
                 <i class="fa-solid fa-pencil me-1"></i> Editar
             </a>
-            <a sec:authorize="hasRole('ADMIN')" th:href="@{/sessions/deactivate/{id}(id=${proyeccion.id})}" class="btn btn-danger"
-               onclick="return confirm('¿Estás seguro de que deseas desactivar esta proyección?');">
+            <form method="post" th:action="@{/sessions/deactivate/{id}(id=${proyeccion.id})}" sec:authorize="hasRole('ADMIN')" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas desactivar esta proyección?');"><button type="submit" class="btn btn-danger">
                 <i class="fa-solid fa-trash me-1"></i> Desactivar
-            </a>
+            </button></form>
         </div>
     </div>
 
