@@ -69,6 +69,7 @@ public class SecurityConfig {
                 // 6. Control de Tickets / Compras (TicketController y Órdenes)
                 .requestMatchers(HttpMethod.GET, "/tickets", "/tickets/{id}").authenticated() // Ver todos los tickets es de Admin
                 .requestMatchers("/tickets/edit/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/tickets/save").hasRole("ADMIN")
                 .requestMatchers("/tickets/buy/**").authenticated() // Comprar requiere estar logueado
 
                 // (paso 6.5) panel de usuarios para admins
@@ -81,7 +82,7 @@ public class SecurityConfig {
 
         http.exceptionHandling(ex -> ex
                 .accessDeniedHandler((request, response, e) ->
-                        response.sendRedirect(request.getContextPath() + "/movies"))
+                        response.sendError(403))
         );
         // Config del formulario de login
         http.formLogin(form -> form
