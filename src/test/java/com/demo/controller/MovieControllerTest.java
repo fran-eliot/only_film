@@ -90,6 +90,20 @@ public class MovieControllerTest {
     }
 
     @Test
+    void movieListHasAccessibleSearchFiltersAndPosterDescriptions() throws Exception {
+        mockMvc.perform(get("/movies"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "for=\"movieTitleFilter\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "for=\"movieYearFilter\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "for=\"movieDurationFilter\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "Cartel de The Dark Knight")));
+    }
+
+    @Test
     void movieEmpty() throws Exception{
         movieRepository.deleteAll();
         mockMvc.perform(get("/movies"))
