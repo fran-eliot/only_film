@@ -129,7 +129,7 @@ public class UserController {
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_CREATED);
                 log.info("{} {}", MSG_USER_CREATED, user);
             } else {
-                user = userService.updateAdmin(user, currentUser.getId());
+                user = userService.updateAdmin(user, currentUser.getId(), imageUrl);
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_UPDATED);
                 log.info("{} {}", MSG_USER_UPDATED, user);
             }
@@ -220,7 +220,7 @@ public class UserController {
         }
         userForm.setImageUrl(imageUrl);
 
-        User userUpdated = userService.updateProfile(userForm, authenticatedUser.getId());
+        User userUpdated = userService.updateProfile(userForm, authenticatedUser.getId(), imageUrl);
 
         // Refresca Spring Security para que el principal/navbar muestren los datos nuevos.
         Authentication newAuth = new UsernamePasswordAuthenticationToken(
