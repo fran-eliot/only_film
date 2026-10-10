@@ -1,6 +1,6 @@
 # Ejecución manual de pruebas Selenium E2E
 
-El workflow `.github/workflows/tests.yml` continúa ejecutándose **solo de forma manual** mediante `workflow_dispatch`. Esto evita lanzar navegadores en cada push o pull request.
+El workflow `.github/workflows/tests.yml` se ejecuta manualmente mediante `workflow_dispatch`. Además, el job Selenium se ejecuta automáticamente en los PR hacia `main` **solo cuando cambia `.github/workflows/tests.yml`**, para comprobar la configuración antes de integrarla. Los otros cuatro jobs se ejecutan únicamente en modo manual, lo que evita duplicar las pruebas de regresión habituales.
 
 ## Ejecución desde GitHub
 
@@ -22,4 +22,4 @@ En GitHub Actions, la variable `CI` activa Chrome headless en `BaseSeleniumTest`
 
 ## Validación pendiente
 
-Los checks automáticos del PR no ejecutan este workflow manual. Para dar por demostrada la estabilidad E2E es necesario lanzar el workflow desde Actions sobre la rama del PR y revisar el resultado y los informes, sin afirmar que los tests Selenium han pasado simplemente porque el PR tenga checks verdes.
+Cuando un PR modifica este workflow, el job Selenium se ejecuta automáticamente; es necesario comprobar su resultado y los informes antes del merge. Para repetir las pruebas tras una integración, se puede lanzar el workflow manualmente desde Actions. Un único resultado satisfactorio no demuestra ausencia permanente de intermitencias.
