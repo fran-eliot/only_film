@@ -1,6 +1,7 @@
 package com.demo.controller;
 
 import com.demo.model.Movie;
+import com.demo.dto.MovieForm;
 import com.demo.model.User;
 import com.demo.model.enums.BuyStatus;
 import com.demo.repository.MovieRepository;
@@ -91,7 +92,7 @@ public class MovieController {
     //Creamos una pelicula
     @GetMapping("movies/new")
     public String newMovie(Model model){
-        model.addAttribute("movie", new Movie());
+        model.addAttribute("movie", new MovieForm());
         return "movies/movie-form";
     }
 
@@ -99,27 +100,41 @@ public class MovieController {
     @GetMapping("movies/edit/{id}")
     public String editMovie(@PathVariable Long id, Model model){
         //Se pude hacer tambien con el Optional
-        model.addAttribute("movie", movieRepository.findById(id).orElseThrow());
+        model.addAttribute("movie", MovieForm.from(movieRepository.findById(id).orElseThrow()));
         return "movies/movie-form";
     }
 
     @PostMapping("movies")
-    public String createMovie(@ModelAttribute Movie movie,
+    public String createMovie(@ModelAttribute("movie") MovieForm form,
                               @RequestParam("imageFile") MultipartFile imageFile,
-                              RedirectAttributes redirectAttributes){
+                              RedirectAttributes redirectAttributes) {
         String imageUrl;
         try {
             imageUrl = fileService.store(imageFile);
         } catch (IllegalArgumentException invalidImage) {
             redirectAttributes.addFlashAttribute("error", invalidImage.getMessage());
-            return movie.getId() == null ? "redirect:/movies/new" : "redirect:/movies/edit/" + movie.getId();
-        }
-        if (imageUrl != null) {
-            movie.setImageUrl(imageUrl);
+            return form.getId() == null ? "redirect:/movies/new" : "redirect:/movies/edit/" + form.getId();
         }
 
-        movieRepository.save(movie);
-        return "redirect:/movies/" + movie.getId();
+        // Load the existing entity: never copy arbitrary HTTP-bound properties.
+        Movie movie = form.getId() == null
+                ? new Movie()
+                : movieRepository.findById(form.getId()).orElseThrow();
+        movie.setTitle(form.getTitle());
+        movie.setDirector(form.getDirector());
+        movie.setGenre(form.getGenre());
+        movie.setSinopsis(form.getSinopsis());
+        movie.setReleaseYear(form.getReleaseYear());
+        movie.setDurationMinutes(form.getDurationMinutes());
+        // Active is editable through the admin form; missing checkbox means false on edit.
+        movie.setActive(form.getActive() == null
+                ? (form.getId() == null ? true : false)
+                : form.getActive());
+        // imageUrl sent in a hidden field is ignored.
+        if (imageUrl != null) movie.setImageUrl(imageUrl);
+
+        Movie saved = movieRepository.save(movie);
+        return "redirect:/movies/" + saved.getId();
     }
 
 
