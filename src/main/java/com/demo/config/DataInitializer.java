@@ -38,7 +38,7 @@ public class DataInitializer implements CommandLineRunner {
      * Sin configuración explícita, las cuentas demo reciben contraseñas aleatorias
      * que no se publican ni quedan disponibles para iniciar sesión.
      */
-    private String demoPassword() {
+    String demoPassword() {
         String configured = environment.getProperty("onlyfilm.demo.password");
         return configured != null && !configured.isBlank()
                 ? configured
