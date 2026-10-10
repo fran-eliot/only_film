@@ -1,5 +1,6 @@
 package com.demo.controller;
 
+import com.demo.dto.ReviewFormDTO;
 import com.demo.model.enums.BuyStatus;
 import com.demo.repository.TicketRepository;
 import com.demo.model.Review;
@@ -53,9 +54,8 @@ public class ReviewController {
             return movieId != null ? "redirect:/movies/" + movieId : "redirect:/movies";
         }
 
-        Review review = new Review();
-        review.setMovie(movieRepository.findById(movieId).orElseThrow());
-        model.addAttribute("review", review);
+        model.addAttribute("review", new ReviewFormDTO());
+        model.addAttribute("movie", movieRepository.findById(movieId).orElseThrow());
         return "reviews/review-form";
     }
 
@@ -72,13 +72,14 @@ public class ReviewController {
         if (!isAdmin && !isOwner)
             return "redirect:/reviews/" + id;
 
-        model.addAttribute("review", review);
+        model.addAttribute("review", ReviewFormDTO.from(review));
+        model.addAttribute("movie", review.getMovie());
         return "reviews/review-form";
     }
 
     //movieId viene del campo hidden del formulario para asociar la película correctamente
     @PostMapping("/reviews")
-    public String saveReview(@ModelAttribute Review review,
+    public String saveReview(@ModelAttribute ReviewFormDTO review,
                              @RequestParam(required = false) Long movieId,
                              @AuthenticationPrincipal User currentUser,
                              RedirectAttributes ra) {

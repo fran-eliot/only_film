@@ -13,9 +13,9 @@
     </h1>
 
     <!-- Aviso de peli asociada -->
-    <div class="alert alert-info my-3" th:if="${review.movie != null}">
+    <div class="alert alert-info my-3" th:if="${movie != null}">
         <i class="fa-solid fa-film me-1" aria-hidden="true"></i>
-        Reseña sobre: <strong th:text="${review.movie.title}"></strong>
+        Reseña sobre: <strong th:text="${movie.title}"></strong>
     </div>
 
     <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
@@ -27,7 +27,7 @@
 
                 <!-- movieid como campo separado para que el POST lo reciba limpio -->
                 <input type="hidden" name="movieId"
-                       th:value="${review.movie != null ? review.movie.id : ''}">
+                       th:value="${movie != null ? movie.id : ''}">
 
                 <!-- Valor numérico real que se envía al controller -->
                 <input type="hidden" id="ratingHidden" name="rating"
@@ -75,11 +75,11 @@
                     <button id="submitReviewBtn" type="submit" class="btn btn-primary">
                         <i class="fa-solid fa-floppy-disk me-1" aria-hidden="true"></i> Guardar
                     </button>
-                    <a th:if="${review.movie != null}" class="btn btn-outline-primary"
-                       th:href="@{/movies/{id}(id=${review.movie.id})}">
+                    <a th:if="${movie != null}" class="btn btn-outline-primary"
+                       th:href="@{/movies/{id}(id=${movie.id})}">
                         <i class="fa-solid fa-times me-1" aria-hidden="true"></i> Cancelar
                     </a>
-                    <a th:if="${review.movie == null}" class="btn btn-outline-primary"
+                    <a th:if="${movie == null}" class="btn btn-outline-primary"
                        th:href="@{/reviews}">
                         <i class="fa-solid fa-times me-1" aria-hidden="true"></i> Cancelar
                     </a>

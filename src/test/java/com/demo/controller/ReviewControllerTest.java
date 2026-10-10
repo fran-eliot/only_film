@@ -1,5 +1,6 @@
 package com.demo.controller;
 
+import com.demo.dto.ReviewFormDTO;
 import com.demo.model.Session;
 import com.demo.model.Ticket;
 import com.demo.model.enums.BuyStatus;
@@ -149,7 +150,8 @@ class ReviewControllerTest {
                         .with(user(user)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("reviews/review-form"))
-                .andExpect(model().attributeExists("review"));
+                .andExpect(model().attributeExists("review", "movie"))
+                .andExpect(model().attribute("review", org.hamcrest.Matchers.instanceOf(ReviewFormDTO.class)));
     }
 
     // Verificamos que POST /reviews guarda una nueva review en BD
@@ -178,7 +180,8 @@ class ReviewControllerTest {
         mockMvc.perform(get("/reviews/edit/" + review.getId())
                         .with(user(user)))
                 .andExpect(status().isOk())
-                .andExpect(view().name("reviews/review-form"));
+                .andExpect(view().name("reviews/review-form"))
+                .andExpect(model().attribute("review", org.hamcrest.Matchers.instanceOf(ReviewFormDTO.class)));
     }
 
     // Verificamos que un usuario que no es el autor es redirigido
