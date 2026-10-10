@@ -75,6 +75,12 @@ class TicketSecurityRegressionTest {
     }
 
     @Test
+    void paidTicketCannotOpenCheckoutPage() throws Exception {
+        mockMvc.perform(get("/tickets/{id}/checkout", paidTicket.getId()).with(user(owner)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
     void regularUserCannotCreateTicketViaAdministrativeEndpoint() throws Exception {
         mockMvc.perform(post("/tickets/save").with(user(otherUser)).with(csrf())
                         .param("row", "B")
