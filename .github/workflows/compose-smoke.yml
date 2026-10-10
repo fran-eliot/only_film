@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/fullstack-compose
+      - feature/persistent-uploads
   pull_request:
     branches:
       - main
