@@ -1,6 +1,7 @@
 package com.demo.service;
 
 import com.demo.model.Ticket;
+import com.demo.dto.TicketAdminForm;
 import com.demo.model.Session;
 import com.demo.model.Room;
 import com.demo.model.User;
@@ -53,7 +54,29 @@ public class TicketService {
         return ticketRepository.findById(id);
     }
 
-    public Ticket save(Ticket ticket){
+    /**
+     * Administration may adjust only a free seat's discount.
+     * Purchase state, price, seat, session, owner and QR belong to checkout/inventory.
+     * The pessimistic lock serializes this change with checkout.
+     */
+    @Transactional
+    public Ticket updateAdminDiscount(TicketAdminForm form) {
+        if (form.getId() == null) {
+            throw new IllegalArgumentException("La entrada debe existir");
+        }
+        Ticket ticket = ticketRepository.findByIdForCheckout(form.getId()).orElseThrow();
+        if (ticket.getStatus() != BuyStatus.LIBRE) {
+            throw new IllegalStateException("No se puede modificar una entrada que ya no está libre");
+        }
+        Double discount = form.getDiscount();
+        if (discount == null || !Double.isFinite(discount) || discount < 0) {
+            throw new IllegalArgumentException("Descuento inválido");
+        }
+        double price = ticket.getPrice() == null ? 0.0 : ticket.getPrice();
+        if (discount > price) {
+            throw new IllegalArgumentException("El descuento supera el precio de la entrada");
+        }
+        ticket.setDiscount(discount);
         return ticketRepository.save(ticket);
     }
 
