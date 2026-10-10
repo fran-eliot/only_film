@@ -368,23 +368,21 @@ public class TicketControllerTest {
     }
 
     @Test
-    @DisplayName("GET /tickets/{id} con ticket inexistente lanza NoSuchElementException")
+    @DisplayName("GET /tickets/{id} con ticket inexistente responde 404")
     void ticketDetailNotFoundThrowsNoSuchElementException() {
         Long nonExistingId = 999999L;
 
-        assertThrows(ServletException.class, () ->
-                mockMvc.perform(get("/tickets/" + nonExistingId).with(user(user)))
-        );
+        mockMvc.perform(get("/tickets/" + nonExistingId).with(user(user)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("GET /tickets/edit/{id} con ticket inexistente lanza NoSuchElementException")
+    @DisplayName("GET /tickets/edit/{id} con ticket inexistente responde 404")
     void editTicketNotFoundThrowsNoSuchElementException() {
         Long nonExistingId = 999999L;
 
-        assertThrows(ServletException.class, () ->
-                mockMvc.perform(get("/tickets/edit/" + nonExistingId).with(user(user)))
-        );
+        mockMvc.perform(get("/tickets/edit/" + nonExistingId).with(user(user)))
+                .andExpect(status().isNotFound());
     }
 
 }
