@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -66,4 +67,11 @@ public class SecurityConfigTest {
                         .with(user(adminUser)))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void h2ConsoleEndpointDoesNotBypassCsrfInTestOrDefaultProfile() throws Exception {
+        mockMvc.perform(post("/h2-console/login.do").with(user(adminUser)))
+                .andExpect(status().isForbidden());
+    }
+
 }
