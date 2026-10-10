@@ -97,6 +97,38 @@ class PostgresPersistenceIntegrationTest {
     }
 
     @Test
+    void postgresRejectsDuplicateSeatWithinSameSession() {
+        String suffix = unique();
+        Ticket original = createAvailableTicket(suffix);
+        long sessionId = original.getSession().getId();
+
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT count(*) FROM tickets WHERE session_id = ? AND fila = ? AND seat = ?",
+                Integer.class, sessionId, "A", "1"));
+
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class,
+                () -> jdbc.update(
+                        "INSERT INTO tickets (session_id, fila, seat, status) VALUES (?, ?, ?, ?)",
+                        sessionId, "A", "1", BuyStatus.LIBRE.name()));
+
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT count(*) FROM tickets WHERE session_id = ? AND fila = ? AND seat = ?",
+                Integer.class, sessionId, "A", "1"));
+    }
+
+    @Test
+    void postgresAllowsSameSeatInDifferentSessions() {
+        Ticket first = createAvailableTicket(unique());
+        Ticket second = createAvailableTicket(unique());
+
+        assertNotEquals(first.getSession().getId(), second.getSession().getId());
+        assertEquals("A", first.getRow());
+        assertEquals("1", first.getSeat());
+        assertEquals("A", second.getRow());
+        assertEquals("1", second.getSeat());
+    }
+
+    @Test
     void pessimisticCheckoutLockAllowsExactlyOneConcurrentPurchase() throws Exception {
         String suffix = unique();
         User buyer1 = createBuyer("a" + suffix);
