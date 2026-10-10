@@ -118,7 +118,7 @@
                                        class="btn btn-primary btn-sm w-100">
                                         <i class="fa-solid fa-paintbrush"></i> Editar
                                     </a>
-                                    <form method="post" th:action="@{movies/deactivate/{id}(id=${movie.id})}" sec:authorize="hasRole('ADMIN')" class="d-inline" onsubmit="return confirm('¿Estás seguro que quieres inhabilitar esta película?');"><button type="submit" class="btn btn-danger btn-sm w-100">
+                                    <form method="post" th:action="@{/movies/deactivate/{id}(id=${movie.id})}" sec:authorize="hasRole('ADMIN')" class="d-inline" onsubmit="return confirm('¿Estás seguro que quieres inhabilitar esta película?');"><button type="submit" class="btn btn-danger btn-sm w-100">
                                         <i class="fa-solid fa-circle-minus"></i> Inhabilitar
                                     </button></form>
                                 </div>
