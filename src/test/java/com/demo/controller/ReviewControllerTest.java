@@ -155,6 +155,16 @@ class ReviewControllerTest {
     }
 
     @Test
+    void reviewFormRendersPageTitleFromSharedHeadFragment() throws Exception {
+        mockMvc.perform(get("/reviews/new")
+                        .param("movieId", movie.getId().toString())
+                        .with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "<title>Formulario de reseña — Only Film</title>")));
+    }
+
+    @Test
     void reviewFormRendersAccessibleRatingButtonsAndNavigation() throws Exception {
         mockMvc.perform(get("/reviews/new")
                         .param("movieId", movie.getId().toString())

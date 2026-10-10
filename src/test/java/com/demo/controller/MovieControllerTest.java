@@ -79,6 +79,13 @@ public class MovieControllerTest {
 
     //Las peliculas activas segun setUp son 7
     @Test
+    void movieListRendersPageTitleFromSharedHeadFragment() throws Exception {
+        mockMvc.perform(get("/movies"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("<title>Cartelera — Only Film</title>")));
+    }
+
+    @Test
     void moviesFull() throws Exception {
         //Se invoca EndPoint http://localhost:8080/movies, se lanza peticion HTTP Get al controles / movies
         //Luego verificamos que devuelve el status 200, que la vista es movies/movie-list
