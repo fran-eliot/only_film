@@ -1,5 +1,7 @@
 package com.demo.controller;
 
+import com.demo.dto.AdminUserFormDTO;
+import com.demo.dto.ProfileFormDTO;
 import com.demo.model.User;
 import com.demo.model.enums.Role;
 import com.demo.repository.UserRepository;
@@ -96,7 +98,8 @@ public class UserControllerTest {
                 .andExpect(view().name("users/user-form"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attributeExists("roles"))
-                .andExpect(model().attribute("edit", false));
+                .andExpect(model().attribute("edit", false))
+                .andExpect(model().attribute("user", instanceOf(AdminUserFormDTO.class)));
     }
 
     @Test
@@ -109,7 +112,8 @@ public class UserControllerTest {
                 .andExpect(model().attributeExists("roles"))
                 .andExpect(model().attribute("edit", true))
                 .andExpect(model().attribute("user", hasProperty("id", is(normalUser.getId()))))
-                .andExpect(model().attribute("user", hasProperty("password", nullValue())));
+                .andExpect(model().attribute("user", hasProperty("password", nullValue())))
+                .andExpect(model().attribute("user", instanceOf(AdminUserFormDTO.class)));
     }
 
     @Test
@@ -278,6 +282,38 @@ public class UserControllerTest {
         User persisted = userRepository.findById(admin.getId()).orElseThrow();
         assertEquals(Role.ROLE_ADMIN, persisted.getRole());
         assertTrue(persisted.getActive());
+    }
+
+    @Test
+    @DisplayName("GET /profile/edit usa un DTO sin contraseña persistida")
+    void editProfile_usesSafeForm() throws Exception {
+        mockMvc.perform(get("/profile/edit").with(user(normalUser)))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("user", instanceOf(ProfileFormDTO.class)))
+                .andExpect(model().attribute("user", hasProperty("password", nullValue())));
+    }
+
+    @Test
+    @DisplayName("POST /admin/users ignora los campos JPA no permitidos")
+    void adminCreate_ignoresForgedPersistentFields() throws Exception {
+        mockMvc.perform(multipart("/admin/users")
+                        .file("imageFile", new byte[0])
+                        .param("username", "nuevo_seguro")
+                        .param("email", "nuevo@onlyfilm.com")
+                        .param("firstName", "Nuevo")
+                        .param("password", "new-password-123")
+                        .param("role", Role.ROLE_USER.name())
+                        .param("active", "true")
+                        .param("imageUrl", "/uploads/falsificada.png")
+                        .param("authorities[0].authority", "ROLE_ADMIN")
+                        .with(user(admin)).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/users"));
+
+        User created = userRepository.findByUsername("nuevo_seguro").orElseThrow();
+        assertEquals(Role.ROLE_USER, created.getRole());
+        assertNull(created.getImageUrl());
+        assertTrue(passwordEncoder.matches("new-password-123", created.getPassword()));
     }
 
 }
