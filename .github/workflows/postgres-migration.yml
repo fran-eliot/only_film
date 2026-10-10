@@ -1,0 +1,78 @@
+name: PostgreSQL schema and regression validation
+
+on:
+  push:
+    branches:
+      - feature/postgresql-flyway
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  h2-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Run existing H2 regression tests
+        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest' -DrerunFailingTestsCount=0
+
+  postgres-schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: onlyfilm
+          POSTGRES_USER: onlyfilm
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U onlyfilm -d onlyfilm"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Package application
+        run: mvn -B -ntp package -DskipTests
+      - name: Start app and validate Flyway schema against PostgreSQL
+        env:
+          SPRING_PROFILES_ACTIVE: postgres
+          DB_URL: jdbc:postgresql://localhost:5432/onlyfilm
+          DB_USERNAME: onlyfilm
+          DB_PASSWORD: ci-only-password
+        run: |
+          java -jar target/*.jar > /tmp/onlyfilm-postgres.log 2>&1 &
+          APP_PID=$!
+          trap 'cat /tmp/onlyfilm-postgres.log; kill $APP_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            if ! kill -0 "$APP_PID" 2>/dev/null; then
+              echo "Application terminated during startup"
+              exit 1
+            fi
+            CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/movies || true)
+            if [ "$CODE" = "200" ]; then
+              echo "PostgreSQL + Flyway + Hibernate validate: OK"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Application did not become ready"
+          exit 1
