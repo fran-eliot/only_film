@@ -138,8 +138,7 @@ class ReviewControllerTest {
         mockMvc.perform(get("/reviews/" + review.getId()).with(user(user)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("reviews/review-detail"))
-                .andExpect(model().attributeExists("review", "movie"))
-                .andExpect(model().attribute("review", org.hamcrest.Matchers.instanceOf(ReviewFormDTO.class)));
+                .andExpect(model().attributeExists("review"));
     }
 
     // Verificamos que GET /reviews/new devuelve el formulario vacío
@@ -151,7 +150,8 @@ class ReviewControllerTest {
                         .with(user(user)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("reviews/review-form"))
-                .andExpect(model().attributeExists("review"));
+                .andExpect(model().attributeExists("review", "movie"))
+                .andExpect(model().attribute("review", org.hamcrest.Matchers.instanceOf(ReviewFormDTO.class)));
     }
 
     // Verificamos que POST /reviews guarda una nueva review en BD
