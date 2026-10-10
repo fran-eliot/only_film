@@ -43,6 +43,8 @@ jobs:
           }
           test "$(sql "SELECT COUNT(*) FROM flyway_schema_history WHERE version='1' AND success=true")" = "1"
           sql "INSERT INTO movies (title, active) VALUES ('Compose persistence probe', true)"
+          docker compose exec -T app sh -c "printf 'upload-persistence-probe' > /app/uploads/ci-persistence.txt"
+          test "$(curl -fsS http://127.0.0.1:8080/uploads/ci-persistence.txt)" = "upload-persistence-probe"
           docker compose restart postgres app
           for i in $(seq 1 90); do
             CODE=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/movies || true)
@@ -52,6 +54,13 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/movies)" = "200"
           test "$(sql "SELECT COUNT(*) FROM movies WHERE title='Compose persistence probe'")" = "1"
           test "$(sql "SELECT COUNT(*) FROM flyway_schema_history WHERE version='1' AND success=true")" = "1"
+          docker compose up --force-recreate -d app
+          for i in $(seq 1 90); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/movies || true)" = "200" ]; then break; fi
+            sleep 2
+          done
+          test "$(curl -fsS http://127.0.0.1:8080/uploads/ci-persistence.txt)" = "upload-persistence-probe"
+          echo "PASS: uploaded content survives application container recreation"
           echo "PASS: web 200, Flyway V1, data preserved after Compose restart"
       - name: Clean up Compose
         if: always()
