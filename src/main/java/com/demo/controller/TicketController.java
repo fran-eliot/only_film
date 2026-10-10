@@ -139,8 +139,10 @@ public class TicketController {
     @PostMapping("tickets/save")
     public String saveTicket(@Valid @ModelAttribute("ticket") TicketAdminForm form,
                              BindingResult bindingResult, Model model) {
+        if (form.getId() == null) {
+            throw new IllegalArgumentException("Solo se pueden editar entradas existentes");
+        }
         if (bindingResult.hasErrors()) {
-            if (form.getId() == null) return "tickets/ticket-form";
             model.addAttribute("ticketDetails", ticketService.findById(form.getId()).orElseThrow());
             return "tickets/ticket-form";
         }
