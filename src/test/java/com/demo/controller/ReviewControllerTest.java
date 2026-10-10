@@ -170,6 +170,17 @@ class ReviewControllerTest {
                         .string(org.hamcrest.Matchers.containsString("aria-pressed=\"false\"")));
     }
 
+    @Test
+    void navigationAvatarUsesCssDimensionsInsteadOfDeprecatedHtmlAttributes() throws Exception {
+        mockMvc.perform(get("/reviews/new")
+                        .param("movieId", movie.getId().toString())
+                        .with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString(
+                                "width: 36px; height: 36px; border-color:")));
+    }
+
     // Verificamos que POST /reviews guarda una nueva review en BD
     @Test
     void saveReview_shouldCreateReview() throws Exception {
