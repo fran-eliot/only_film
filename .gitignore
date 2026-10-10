@@ -34,3 +34,8 @@ build/
 
 # SonarQube local
 sonar/token.txt
+
+# Local PostgreSQL credentials
+.env
+.env.*
+!.env.example

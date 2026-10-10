@@ -19,7 +19,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-@Profile("!test")
+@Profile("!test & !postgres")
 public class DataInitializer implements CommandLineRunner {
 
     private RoomRepository roomRepo;
