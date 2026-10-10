@@ -34,6 +34,17 @@ public class DataInitializer implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
     private Environment environment;
 
+    /**
+     * Sin configuración explícita, las cuentas demo reciben contraseñas aleatorias
+     * que no se publican ni quedan disponibles para iniciar sesión.
+     */
+    private String demoPassword() {
+        String configured = environment.getProperty("onlyfilm.demo.password");
+        return configured != null && !configured.isBlank()
+                ? configured
+                : java.util.UUID.randomUUID().toString();
+    }
+
     @Override
     @Transactional
     public void run(String... args) throws Exception {
@@ -125,53 +136,53 @@ public class DataInitializer implements CommandLineRunner {
         userRepo.save(User.builder()
                 .firstName("Admin").lastName("Cinema").username("admin")
                 .email("admin@cinema.com").role(Role.ROLE_ADMIN).active(true).imageUrl("/uploads/lobo.png")
-                .password(passwordEncoder.encode("adminadminadmin26")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         userRepo.save(User.builder()
                 .firstName("Admin2").lastName("Cinema").username("admin2")
                 .email("admin2@cinema.com").role(Role.ROLE_ADMIN).active(true)
-                .password(passwordEncoder.encode("admin2")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         var user = userRepo.save(User.builder()
                 .firstName("Alejandro").lastName("Mendoza").username("user")
                 .email("alex_m98@gmail.com").role(Role.ROLE_USER).active(true)
-                .password(passwordEncoder.encode("user")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         var user2 = userRepo.save(User.builder()
                 .firstName("Maria").lastName("Fernandez").username("user2")
                 .email("maria.fernandez@gmail.com").role(Role.ROLE_USER).active(false)
-                .password(passwordEncoder.encode("user2")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         // — Usuarios nuevos —
         var carlosR = userRepo.save(User.builder()
                 .firstName("Carlos").lastName("Ruiz").username("carlos_r")
                 .email("carlos.ruiz@outlook.com").role(Role.ROLE_USER).active(true)
-                .password(passwordEncoder.encode("carlos_r")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         var lauraS = userRepo.save(User.builder()
                 .firstName("Laura").lastName("Sánchez").username("laura_s")
                 .email("laurasanchez91@gmail.com").role(Role.ROLE_USER).active(true)
-                .password(passwordEncoder.encode("laura_s")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         var pabloG = userRepo.save(User.builder()
                 .firstName("Pablo").lastName("García").username("pablo_g")
                 .email("pablo.garcia@icloud.com").role(Role.ROLE_USER).active(true)
-                .password(passwordEncoder.encode("pablo_g")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         var elenaM = userRepo.save(User.builder()
                 .firstName("Elena").lastName("Morales").username("elena_m")
                 .email("elena.morales@hotmail.com").role(Role.ROLE_USER).active(true)
-                .password(passwordEncoder.encode("elena_m")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         var javierT = userRepo.save(User.builder()
                 .firstName("Javier").lastName("Torres").username("javier_t")
                 .email("jtorres_cine@gmail.com").role(Role.ROLE_USER).active(true)
-                .password(passwordEncoder.encode("javier_t")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         var sofiaL = userRepo.save(User.builder()
                 .firstName("Sofía").lastName("López").username("sofia_l")
                 .email("sofia.lopez@gmail.com").role(Role.ROLE_USER).active(true)
-                .password(passwordEncoder.encode("sofia_l")).build());
+                .password(passwordEncoder.encode(demoPassword())).build());
 
         // ==========================================
         // SESIONES PASADAS (para historial de tickets de user1)
