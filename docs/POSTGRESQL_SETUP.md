@@ -1,6 +1,6 @@
 # PostgreSQL local (fase 1 de la issue #3)
 
-Este paso prepara **solo la infraestructura de base de datos**. La aplicación conserva H2 como datasource por defecto hasta que incorporemos el perfil PostgreSQL y las migraciones Flyway.
+La aplicación mantiene H2 como configuración predeterminada. El perfil opcional `postgres` utiliza PostgreSQL 17, Flyway para las migraciones y `ddl-auto=validate` para comprobar el esquema.
 
 ## Requisitos
 
@@ -32,10 +32,24 @@ docker compose down -v
 
 **Seguridad:** no subir el archivo `.env`; Compose solo expone PostgreSQL en `127.0.0.1`. Los valores de `.env.example` son marcadores de posición, nunca secretos utilizables.
 
-## Pendiente
+## Arranque de Only Film con PostgreSQL
 
-1. Revisar las seis entidades JPA y la inicialización de datos existente.
-2. Añadir driver PostgreSQL, Flyway y perfil `postgres`, con Hibernate `ddl-auto=validate`.
-3. Crear `V1__initial_schema.sql` y validar la migración sobre una base vacía.
-4. Desactivar o adaptar `DataInitializer` en PostgreSQL para evitar inserciones duplicadas.
-5. Verificar arranque y tests de integración con PostgreSQL en CI.
+Al arrancar PostgreSQL con Compose, configura estas variables para el proceso de Java (no son variables de Spring leídas automáticamente del archivo `.env`):
+
+```bash
+export SPRING_PROFILES_ACTIVE=postgres
+export DB_URL=jdbc:postgresql://localhost:5432/onlyfilm
+export DB_USERNAME=onlyfilm
+export DB_PASSWORD='tu-contrasena-del-archivo-env'
+./mvnw spring-boot:run
+```
+
+En PowerShell utiliza `$env:NOMBRE_VARIABLE = 'valor'` y `./mvnw.cmd spring-boot:run`.
+
+Flyway aplica `V1__initial_schema.sql` en una base vacía. El perfil `postgres` desactiva los datos de demostración (`DataInitializer`) y Hibernate solo valida el esquema. **No ejecutes `docker compose down -v` sobre bases que quieras conservar.**
+
+## Validación
+
+El workflow `postgres-migration.yml` ejecuta los tests habituales con H2 y arranca la aplicación contra PostgreSQL real en CI para validar las migraciones y el esquema. Consulta los resultados de Actions antes de dar por completada la migración.
+
+**Pendiente:** comprobar la ejecución real y corregir posibles discrepancias de Flyway/Hibernate. Se aconseja incorporar pruebas persistentes de repositorios contra PostgreSQL en una fase posterior.
