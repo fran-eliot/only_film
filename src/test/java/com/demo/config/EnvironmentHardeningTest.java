@@ -1,6 +1,11 @@
 package com.demo.config;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.env.MockEnvironment;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,4 +53,24 @@ class EnvironmentHardeningTest {
         assertEquals("validate", properties.getProperty("spring.jpa.hibernate.ddl-auto"));
         assertEquals("true", properties.getProperty("spring.flyway.enabled"));
     }
+    @Test
+    void demoCredentialsAreUnpredictableWithoutExplicitConfiguration() {
+        DataInitializer initializer = mock(DataInitializer.class, CALLS_REAL_METHODS);
+        ReflectionTestUtils.setField(initializer, "environment", new MockEnvironment());
+        String first = initializer.demoPassword();
+        String second = initializer.demoPassword();
+        assertNotNull(first);
+        assertTrue(first.length() >= 32);
+        assertNotEquals(first, second);
+    }
+
+    @Test
+    void demoCredentialsCanBeConfiguredOnlyThroughExternalProperty() {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty("onlyfilm.demo.password", "valor-local-de-prueba");
+        DataInitializer initializer = mock(DataInitializer.class, CALLS_REAL_METHODS);
+        ReflectionTestUtils.setField(initializer, "environment", environment);
+        assertEquals("valor-local-de-prueba", initializer.demoPassword());
+    }
+
 }

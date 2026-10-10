@@ -56,7 +56,7 @@ public class UserService implements UserDetailsService {
         user.setActive(true);
         // user.setPassword(form.getPassword()); // password en texto plano
         String encodedPassword = passwordEncoder.encode(form.getPassword());
-        user.setPassword(encodedPassword); // $2a$10$u7/W/ivh4XDB40YBjdE9o.wTRaXFitlUrXSUorudG1IdZs/mL2DHu
+        user.setPassword(encodedPassword);
         return userRepository.save(user);
     }
     //Utilizamos el Service para llamar desde aqui el repository que antes lo haciamos desde el controller
