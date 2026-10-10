@@ -1,6 +1,9 @@
 package com.demo.controller;
 
 import com.demo.model.Ticket;
+import com.demo.dto.TicketAdminForm;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 import com.demo.model.User;
 import com.demo.model.enums.Role;
 import com.demo.model.enums.BuyStatus;
@@ -70,9 +73,15 @@ public class TicketController {
     //  Edición de ticket (admin)
     @GetMapping("tickets/edit/{id}")
     public String editTicket(@PathVariable Long id, Model model) {
-        model.addAttribute("ticket", ticketService.findById(id).orElseThrow());
-        model.addAttribute("users", userRepository.findAll());
-        model.addAttribute("sessions", sessionRepository.findAll());
+        Ticket ticket = ticketService.findById(id).orElseThrow();
+        if (ticket.getStatus() != BuyStatus.LIBRE) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solo se pueden editar entradas libres");
+        }
+        TicketAdminForm form = new TicketAdminForm();
+        form.setId(ticket.getId());
+        form.setDiscount(ticket.getDiscount() == null ? 0.0 : ticket.getDiscount());
+        model.addAttribute("ticket", form);
+        model.addAttribute("ticketDetails", ticket);
         return "tickets/ticket-form";
     }
 
@@ -128,10 +137,16 @@ public class TicketController {
 
     // POST tickets/save
     @PostMapping("tickets/save")
-    public String saveTicket(@ModelAttribute Ticket ticket) {
-
-        ticketService.save(ticket);
-
+    public String saveTicket(@Valid @ModelAttribute("ticket") TicketAdminForm form,
+                             BindingResult bindingResult, Model model) {
+        if (form.getId() == null) {
+            throw new IllegalArgumentException("Solo se pueden editar entradas existentes");
+        }
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("ticketDetails", ticketService.findById(form.getId()).orElseThrow());
+            return "tickets/ticket-form";
+        }
+        ticketService.updateAdminDiscount(form);
         return "redirect:/tickets";
     }
 }

@@ -105,30 +105,35 @@ public class TicketServiceTest {
     }
 
     @Test
-    @DisplayName("save: ticket válido -> guarda ticket")
-    public void save_validTicket_savesTicket() {
-        // Arrange
-        Ticket ticket = Ticket.builder()
-                .row("C")
-                .seat("3")
-                .price(9.50)
-                .status(BuyStatus.LIBRE)
-                .build();
-
+    @DisplayName("admin: descuento permitido solo en entrada libre")
+    public void updateAdminDiscount_changesOnlyFreeTicketDiscount() {
+        Ticket ticket = Ticket.builder().id(1L).row("C").seat("3")
+                .price(9.50).discount(0.0).status(BuyStatus.LIBRE).build();
+        com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
+        form.setId(1L);
+        form.setDiscount(2.0);
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
         when(ticketRepository.save(ticket)).thenReturn(ticket);
 
-        // Act
-        Ticket saved = ticketService.save(ticket);
+        Ticket updated = ticketService.updateAdminDiscount(form);
 
-        // Assert
-        assertNotNull(saved);
-        assertEquals("C", saved.getRow());
-        assertEquals("3", saved.getSeat());
-        assertEquals(9.50, saved.getPrice());
-        assertEquals(BuyStatus.LIBRE, saved.getStatus());
+        assertEquals(2.0, updated.getDiscount());
+        assertEquals("C", updated.getRow());
+        assertEquals(9.50, updated.getPrice());
+        assertEquals(BuyStatus.LIBRE, updated.getStatus());
+        verify(ticketRepository).save(ticket);
+    }
 
-        verify(ticketRepository, times(1)).save(ticket);
-        verifyNoMoreInteractions(ticketRepository, roomRepository);
+    @Test
+    @DisplayName("admin: entrada pagada no admite cambios")
+    public void updateAdminDiscount_rejectsPaidTicket() {
+        Ticket ticket = Ticket.builder().id(1L).price(9.5).status(BuyStatus.PAGADO).build();
+        com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
+        form.setId(1L);
+        form.setDiscount(1.0);
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
+        assertThrows(IllegalStateException.class, () -> ticketService.updateAdminDiscount(form));
+        verify(ticketRepository, never()).save(any());
     }
 
     @Test

@@ -1,109 +1,39 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/head :: head('Formulario de Ticket— Only Film')}"></head>
-
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/head :: head('Editar descuento de entrada — Only Film')}"></head>
 <body class="bg-light">
-
 <nav th:replace="~{layout/navbar :: navbar}"></nav>
-
-<main class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow border-0">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fa-solid fa-ticket me-2"></i> Registro de Ticket</h4>
+<main class="container my-4" style="max-width: 720px">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white"><h4 class="mb-0">Editar descuento de entrada libre</h4></div>
+        <div class="card-body p-4">
+            <p class="text-secondary">Los asientos, la sesión, el precio, el estado y el código QR se gestionan desde el inventario y el checkout. No se pueden modificar aquí.</p>
+            <dl class="row" th:if="${ticketDetails != null}">
+                <dt class="col-sm-4">Butaca</dt>
+                <dd class="col-sm-8" th:text="${ticketDetails.row + '-' + ticketDetails.seat}"></dd>
+                <dt class="col-sm-4">Precio</dt>
+                <dd class="col-sm-8" th:text="${ticketDetails.price}"></dd>
+                <dt class="col-sm-4">Estado</dt>
+                <dd class="col-sm-8" th:text="${ticketDetails.status}"></dd>
+            </dl>
+            <form th:action="@{/tickets/save}" th:object="${ticket}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="mb-3">
+                    <label for="discount" class="form-label">Descuento (€)</label>
+                    <input id="discount" type="number" step="0.01" min="0" class="form-control"
+                           th:classappend="${#fields.hasErrors('discount')} ? ' is-invalid' : ''"
+                           th:field="*{discount}" required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('discount')}" th:errors="*{discount}"></div>
                 </div>
-                <div class="card-body p-4">
-
-                    <form th:action="@{/tickets/save}" th:object="${ticket}" method="post">
-                        <input type="hidden" th:field="*{id}">
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Fila</label>
-                                <input type="text" th:field="*{row}" class="form-control" placeholder="Ej: A" maxlength="2" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Asiento</label>
-                                <input type="text" th:field="*{seat}" class="form-control" placeholder="Ej: 12" maxlength="3" required>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Precio (€)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fa-solid fa-euro-sign"></i></span>
-                                    <input type="number" step="0.01" th:field="*{price}" class="form-control" required>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Descuento</label>
-                                <input type="number" step="0.01" th:field="*{discount}" class="form-control" placeholder="0.00">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Estado</label>
-                                <select th:field="*{status}" class="form-select">
-                                    <option th:each="status : ${T(com.demo.model.enums.BuyStatus).values()}"
-                                            th:value="${status}" th:text="${status}"></option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Sesión / Función</label>
-                                <select th:field="*{session}" class="form-select" required>
-                                    <option value="">Seleccione una sesión...</option>
-                                    <option th:each="s : ${sessions}"
-                                            th:value="${s.id}"
-                                            th:text="${s.movie.title + ' - ' + s.room.name}"></option>
-                                </select>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Usuario</label>
-                                <select th:field="*{user}" class="form-select">
-                                    <option value="">Seleccione un usuario...</option>
-                                    <option th:each="u : ${users}"
-                                            th:value="${u.id}"
-                                            th:text="${u.email}"></option>
-                                </select>
-                            </div>
-<!--                            <div class="col-12">-->
-<!--                                <label class="form-label fw-bold">Comida</label>-->
-<!--                                <select th:field="*{foodPrice}" class="form-select">-->
-<!--                                    <option value="">Selecciona qué combo quieres de comida...</option>-->
-<!--                                    <option value="5">Combo S (palomitas)</option>-->
-<!--                                    <option value="7">Combo M (palomitas + refresco)</option>-->
-<!--                                    <option value="10">Combo L (palomitas + refresco + bacardí)</option>-->
-<!--                                </select>-->
-<!--                            </div>-->
-
-
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Código QR</label>
-                                <input type="text" th:field="*{qrCode}" class="form-control" placeholder="URL o Hash del código QR">
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <div class="d-flex justify-content-end">
-                            <a th:href="@{/tickets}" class="btn btn-outline-secondary me-2">Cancelar</a>
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="fa-solid fa-save me-1"></i> Guardar Ticket
-                            </button>
-                        </div>
-                    </form>
-
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/tickets}" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar descuento</button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </main>
-
 <footer th:replace="~{layout/footer :: footer}"></footer>
 <div th:replace="~{layout/footer :: scripts}"></div>
-
 </body>
 </html>
