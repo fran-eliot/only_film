@@ -18,7 +18,7 @@ GROUP BY session_id, fila, seat
 HAVING COUNT(*) > 1;
 ```
 
-La consulta debe devolver **cero filas**. Si devuelve colisiones, investigar individualmente qué entradas están pagadas y resolverlas **con aprobación funcional**, sin borrar registros o alterar referencias automáticamente. V2 incluye una verificación defensiva que falla la migración antes del `ALTER TABLE` si encuentra duplicados.
+La consulta debe devolver **cero filas**. Si devuelve colisiones, investigar individualmente qué entradas están pagadas y resolverlas **con aprobación funcional**, sin borrar registros o alterar referencias automáticamente. Si hay duplicados y se intenta aplicar V2, la sentencia `ALTER TABLE ... UNIQUE` falla de forma atómica; no elimina ni modifica registros. La auditoría previa permite diagnosticar la causa antes del despliegue.
 
 Para auditar datos incompletos (fuera del alcance de la unicidad):
 
