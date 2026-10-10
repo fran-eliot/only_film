@@ -121,12 +121,12 @@ public class UserControllerTest {
         mockMvc.perform(get("/admin/users/new").with(user(admin)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(containsString("autofocus"))))
-                .andExpect(content().string(containsString("for=\\"username\\"")));
+                .andExpect(content().string(containsString("for=\"username\"")));
 
         mockMvc.perform(get("/profile/edit").with(user(normalUser)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(containsString("autofocus"))))
-                .andExpect(content().string(containsString("for=\\"username\\"")));
+                .andExpect(content().string(containsString("for=\"username\"")));
     }
 
     @Test
