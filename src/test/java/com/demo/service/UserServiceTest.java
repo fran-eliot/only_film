@@ -248,75 +248,82 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("update: usuario válido sin nueva password -> conserva password anterior")
-    void update_withoutNewPassword_keepsCurrentPassword() {
-        User userDB = User.builder()
-                .id(1L)
-                .username("old")
-                .email("old@example.com")
-                .password("encodedOldPassword")
-                .role(Role.ROLE_USER)
-                .active(true)
-                .build();
+    @DisplayName("profile: ignora ID, rol, estado e imagen inyectados")
+    void updateProfile_ignoresPrivilegedAndForgedFields() {
+        User persisted = User.builder().id(1L).username("old")
+                .email("old@example.com").password("encoded")
+                .role(Role.ROLE_USER).active(true).imageUrl("/uploads/existing.png").build();
+        User forged = User.builder().id(999L).username("updated")
+                .email("updated@example.com").password("")
+                .role(Role.ROLE_ADMIN).active(false)
+                .imageUrl("/uploads/malicious.png").build();
 
-        User userForm = User.builder()
-                .id(1L)
-                .username("updated")
-                .email("updated@example.com")
-                .password("")
-                .role(Role.ROLE_ADMIN)
-                .active(true)
-                .imageUrl("/img/avatar.png")
-                .build();
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userDB));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(persisted));
         when(userRepository.findByUsername("updated")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("updated@example.com")).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User result = userService.update(userForm, 99L);
-
-        assertEquals("updated", result.getUsername());
-        assertEquals("updated@example.com", result.getEmail());
-        assertEquals(Role.ROLE_ADMIN, result.getRole());
-        assertEquals("encodedOldPassword", result.getPassword());
-        assertEquals("/img/avatar.png", result.getImageUrl());
-
+        // The service accepts a path only if it has been validated and passed by its caller.
+        // Identity and permissions always come from the saved user.
+        User updated = userService.updateProfile(forged, 1L);
+        assertEquals(1L, updated.getId());
+        assertEquals(Role.ROLE_USER, updated.getRole());
+        assertTrue(updated.getActive());
+        assertEquals("updated", updated.getUsername());
+        assertEquals("encoded", updated.getPassword());
         verify(passwordEncoder, never()).encode(anyString());
-        verify(userRepository).save(userDB);
     }
 
     @Test
-    @DisplayName("update: admin no puede desactivarse a sí mismo")
-    void update_adminTryingToDeactivateHimself_throwsException() {
-        User userDB = User.builder()
-                .id(1L)
-                .username("admin")
-                .email("admin@example.com")
-                .password("encoded")
-                .role(Role.ROLE_ADMIN)
-                .active(true)
-                .build();
+    @DisplayName("admin: impide desactivación o degradación del propio administrador")
+    void updateAdmin_preventsSelfLockout() {
+        User admin = User.builder().id(1L).username("admin")
+                .email("admin@example.com").password("encoded")
+                .role(Role.ROLE_ADMIN).active(true).build();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(admin));
 
-        User userForm = User.builder()
-                .id(1L)
-                .username("admin")
-                .email("admin@example.com")
-                .role(Role.ROLE_ADMIN)
-                .active(false)
-                .build();
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(userDB));
-        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(userDB));
-        when(userRepository.findByEmail("admin@example.com")).thenReturn(Optional.of(userDB));
-
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> userService.update(userForm, 1L)
-        );
-
-        assertTrue(ex.getMessage().contains("administrador"));
+        for (User requested : List.of(
+                User.builder().id(1L).role(Role.ROLE_ADMIN).active(false).build(),
+                User.builder().id(1L).role(Role.ROLE_USER).active(true).build(),
+                User.builder().id(1L).role(Role.ROLE_USER).active(false).build()
+        )) {
+            assertThrows(IllegalArgumentException.class, () -> userService.updateAdmin(requested, 1L));
+        }
+        assertEquals(Role.ROLE_ADMIN, admin.getRole());
+        assertTrue(admin.getActive());
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("admin: un usuario normal no puede invocar actualización administrativa")
+    void updateAdmin_rejectsNormalUser() {
+        User actor = User.builder().id(4L).role(Role.ROLE_USER).active(true).build();
+        when(userRepository.findById(4L)).thenReturn(Optional.of(actor));
+        User request = User.builder().id(5L).role(Role.ROLE_ADMIN).active(true).build();
+        assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                () -> userService.updateAdmin(request, 4L));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("admin: puede editar otro usuario, conservando contraseña sin cambio")
+    void updateAdmin_otherUserPreservesPassword() {
+        User actor = User.builder().id(1L).role(Role.ROLE_ADMIN).active(true).build();
+        User persisted = User.builder().id(2L).username("old").email("old@example.com")
+                .password("encodedOldPassword").role(Role.ROLE_USER).active(true).build();
+        User request = User.builder().id(2L).username("changed").email("changed@example.com")
+                .password("").role(Role.ROLE_ADMIN).active(true).build();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(actor));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(persisted));
+        when(userRepository.findByUsername("changed")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("changed@example.com")).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User result = userService.updateAdmin(request, 1L);
+        assertEquals("changed", result.getUsername());
+        assertEquals(Role.ROLE_ADMIN, result.getRole());
+        assertEquals("encodedOldPassword", result.getPassword());
+        verify(passwordEncoder, never()).encode(anyString());
     }
 
     @Test
