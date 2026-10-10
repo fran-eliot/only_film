@@ -53,12 +53,10 @@
 
                 <!-- Estrellas -->
                 <div class="mb-4">
-                    <label class="form-label fw-semibold d-block">
-                        Puntuación <span class="text-danger">*</span>
-                    </label>
+                    <span id="ratingLabel" class="form-label fw-semibold d-block">Puntuación <span class="text-danger">*</span></span>
 
-                    <div class="star-rating d-flex gap-1" id="starRating">
-                        <i class="fa-regular fa-star" data-value="1" aria-label="1 estrella" role="button" tabindex="0"></i>
+                    <div class="star-rating d-flex gap-1" id="starRating" role="group" aria-labelledby="ratingLabel">
+                        <button type="button" class="rating-star" data-value="1" aria-label="1 estrella" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
                         <i class="fa-regular fa-star" data-value="2" aria-label="2 estrellas" role="button" tabindex="0"></i>
                         <i class="fa-regular fa-star" data-value="3" aria-label="3 estrellas" role="button" tabindex="0"></i>
                         <i class="fa-regular fa-star" data-value="4" aria-label="4 estrellas" role="button" tabindex="0"></i>
@@ -93,17 +91,27 @@
 <footer th:replace="~{layout/footer :: footer}"></footer>
 
 <style>
-    .star-rating i {
+    .star-rating .rating-star {
+        background: transparent;
+        border: 0;
+        padding: 0.25rem;
+        line-height: 1;
+    }
+    .star-rating .rating-star:focus-visible {
+        outline: 2px solid var(--cinema-accent-gold);
+        outline-offset: 3px;
+    }
+    .star-rating .rating-star i {
         font-size: 1.8rem;
         color: var(--cinema-text-secondary);
         cursor: pointer;
         transition: color 0.1s ease, transform 0.1s ease;
     }
-    .star-rating i.filled {
+    .star-rating .rating-star i.filled {
         color: var(--cinema-accent-gold);
         font-weight: 700;
     }
-    .star-rating i:hover {
+    .star-rating .rating-star:hover i {
         transform: scale(1.15);
         color: var(--cinema-accent-gold);
     }
@@ -112,7 +120,7 @@
 <script th:replace="~{layout/footer :: scripts}"></script>
 
 <script>
-    const stars      = document.querySelectorAll('#starRating i');
+    const stars      = document.querySelectorAll('#starRating .rating-star');
     const hidden     = document.getElementById('ratingHidden');
     const ratingText = document.getElementById('ratingText');
     const ratingError= document.getElementById('ratingError');
@@ -124,11 +132,11 @@
     function paintStars(upTo) {
         stars.forEach((s, i) => {
             if (i < upTo) {
-                s.classList.replace('fa-regular', 'fa-solid');
-                s.classList.add('filled');
+                s.querySelector('i').classList.replace('fa-regular', 'fa-solid');
+                s.querySelector('i').classList.add('filled');
             } else {
-                s.classList.replace('fa-solid', 'fa-regular');
-                s.classList.remove('filled');
+                s.querySelector('i').classList.replace('fa-solid', 'fa-regular');
+                s.querySelector('i').classList.remove('filled');
             }
         });
     }
@@ -136,6 +144,15 @@
     // Pintar estado inicial si venimos de edición
     paintStars(selected);
     if (selected > 0) ratingText.textContent = selected + ' / 5 — ' + labels[selected];
+
+    function chooseRating(val) {
+        selected = val;
+        hidden.value = val;
+        ratingError.style.display = 'none';
+        stars.forEach(star => star.setAttribute('aria-pressed', String(Number(star.dataset.value) === val)));
+        paintStars(selected);
+        ratingText.textContent = selected + ' / 5 — ' + labels[selected];
+    }
 
     stars.forEach(star => {
         const val = parseInt(star.dataset.value);
@@ -154,27 +171,7 @@
                 : 'Selecciona una puntuación';
         });
 
-        // Click: fijar selección
-        star.addEventListener('click', () => {
-            selected = val;
-            hidden.value = val;
-            ratingError.style.display = 'none';
-
-            paintStars(selected);
-            ratingText.textContent =
-                selected + ' / 5 — ' + labels[selected];
-        });
-
-        // Accesibilidad: teclado
-        star.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                selected = val;
-                hidden.value = val;
-                ratingError.style.display = 'none';
-                paintStars(selected);
-            }
-        });
+        star.addEventListener('click', () => chooseRating(val));
     });
 
     // Validación al enviar

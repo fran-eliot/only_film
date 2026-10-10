@@ -154,6 +154,22 @@ class ReviewControllerTest {
                 .andExpect(model().attribute("review", org.hamcrest.Matchers.instanceOf(ReviewFormDTO.class)));
     }
 
+    @Test
+    void reviewFormRendersAccessibleRatingButtonsAndNavigation() throws Exception {
+        mockMvc.perform(get("/reviews/new")
+                        .param("movieId", movie.getId().toString())
+                        .with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("aria-label=\"Navegación principal\"")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("aria-labelledby=\"ratingLabel\"")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("aria-label=\"5 estrellas\"")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("aria-pressed=\"false\"")));
+    }
+
     // Verificamos que POST /reviews guarda una nueva review en BD
     @Test
     void saveReview_shouldCreateReview() throws Exception {
