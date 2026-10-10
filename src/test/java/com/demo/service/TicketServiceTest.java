@@ -374,7 +374,7 @@ public class TicketServiceTest {
         assertNotNull(ticket.getQrCode());
         assertTrue(ticket.getQrCode().startsWith("ONLYFILM-1-"));
 
-        verify(ticketRepository, times(1)).findById(1L);
+        verify(ticketRepository, times(1)).findByIdForCheckout(1L);
         verify(ticketRepository, times(1)).save(ticket);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
@@ -411,7 +411,7 @@ public class TicketServiceTest {
         assertNotNull(ticket.getQrCode());
         assertTrue(ticket.getQrCode().startsWith("ONLYFILM-1-"));
 
-        verify(ticketRepository, times(1)).findById(1L);
+        verify(ticketRepository, times(1)).findByIdForCheckout(1L);
         verify(ticketRepository, times(1)).save(ticket);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
@@ -435,7 +435,7 @@ public class TicketServiceTest {
                 )
         );
 
-        verify(ticketRepository, times(1)).findById(99L);
+        verify(ticketRepository, times(1)).findByIdForCheckout(99L);
         verify(ticketRepository, never()).save(any());
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
@@ -507,7 +507,7 @@ public class TicketServiceTest {
         assertNotNull(ticket.getQrCode());
         assertTrue(ticket.getQrCode().startsWith("ONLYFILM-10-"));
 
-        verify(ticketRepository).findById(10L);
+        verify(ticketRepository).findByIdForCheckout(10L);
         verify(ticketRepository).save(ticket);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
