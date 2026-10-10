@@ -8,6 +8,7 @@ import com.demo.repository.UserRepository;
 import com.demo.service.TicketService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +54,13 @@ public class TicketController {
 
     //  Detalle de un ticket
     @GetMapping("tickets/{id}")
-    public String ticketDetail(@PathVariable Long id, Model model) {
-        model.addAttribute("ticket", ticketService.findById(id).orElseThrow());
+    public String ticketDetail(@PathVariable Long id, Model model, @AuthenticationPrincipal User user) {
+        Ticket ticket = ticketService.findById(id).orElseThrow();
+        if (user == null || (user.getRole() != Role.ROLE_ADMIN
+                && (ticket.getUser() == null || !ticket.getUser().getId().equals(user.getId())))) {
+            throw new AccessDeniedException("No puedes consultar esta entrada");
+        }
+        model.addAttribute("ticket", ticket);
         return "tickets/ticket-detail";
     }
 
