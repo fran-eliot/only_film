@@ -38,6 +38,15 @@ public class AuthControllerTest {
     }
 
     @Test
+    void registerFormDoesNotStealInitialFocus() throws Exception {
+        mockMvc.perform(get("/register"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("autofocus"))))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("for=\"username\"")));
+    }
+
+    @Test
     public void registerTest() throws Exception {
         when(userService.register(any(RegisterForm.class))).thenReturn(User.builder().username("elpepe").build());
 

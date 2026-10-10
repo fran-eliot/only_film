@@ -18,7 +18,7 @@
 
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="username"
-                           placeholder="" required th:field="*{username}" minlength="3" maxlength="20" autofocus
+                           placeholder="" required th:field="*{username}" minlength="3" maxlength="20"
                             th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'">
                     <label for="username">Username</label>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
