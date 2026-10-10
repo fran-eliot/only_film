@@ -9,6 +9,8 @@ import com.demo.service.TicketService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +21,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-@Profile("!test & !postgres")
+@Profile("!test & (!postgres | demo)")
 public class DataInitializer implements CommandLineRunner {
 
     private RoomRepository roomRepo;
@@ -30,9 +32,22 @@ public class DataInitializer implements CommandLineRunner {
     private ReviewRepository reviewRepo;
     private TicketService ticketService;
     private PasswordEncoder passwordEncoder;
+    private Environment environment;
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
+        // PostgreSQL demo data is deliberately opt-in and may only seed an empty database.
+        if (java.util.Arrays.asList(environment.getActiveProfiles()).contains("postgres")) {
+            boolean empty = movieRepo.count() == 0 && roomRepo.count() == 0
+                    && sessionRepo.count() == 0 && ticketRepo.count() == 0
+                    && userRepo.count() == 0 && reviewRepo.count() == 0;
+            if (!empty) {
+                System.out.println("-> Demo seeding skipped: database is not empty.");
+                return;
+            }
+            System.out.println("-> WARNING: creating demonstration accounts with known passwords. Local use only.");
+        }
         System.out.println("-> Inicializando datos de prueba...");
 
         //Datos de prueba de las PELICULAS

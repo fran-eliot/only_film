@@ -86,3 +86,15 @@ El workflow `postgres-migration.yml` ejecuta los tests habituales con H2 y arran
 El job `postgres-schema` comprueba tanto el arranque inicial como el reinicio de Spring Boot sobre la misma instancia PostgreSQL: inserta un registro de prueba, reinicia el contenedor PostgreSQL y la aplicación, y confirma que el registro permanece y que la migración V1 figura una sola vez como completada en `flyway_schema_history`. Consulta la última ejecución del workflow para confirmar su resultado.
 
 La integración JPA con PostgreSQL y las pruebas de concurrencia se implementaron en la issue #5. El workflow `compose-smoke.yml` comprueba además el arranque conjunto de contenedores y la persistencia tras reinicios.
+
+## Datos de demostración opcionales (issue #10)
+
+El perfil PostgreSQL **no** genera datos de muestra por defecto. Para poblar una base **nueva y vacía** con películas, salas, sesiones, tickets y cuentas ficticias, activa expresamente los dos perfiles:
+
+```bash
+SPRING_PROFILES_ACTIVE=postgres,demo DB_URL=jdbc:postgresql://localhost:5432/onlyfilm DB_USERNAME=onlyfilm DB_PASSWORD='<contraseña-local>' ./mvnw spring-boot:run
+```
+
+En Docker Compose, añade temporalmente `SPRING_PROFILES_ACTIVE=postgres,demo` al servicio `app` en un archivo override local **no versionado**; después de sembrar, vuelve a `postgres` y recrea el servicio.
+
+El sembrado se omite si **cualquiera** de las seis tablas de negocio tiene registros. El proceso está envuelto en una transacción para evitar conjuntos parciales tras errores. Al reiniciar con `postgres,demo` no se duplican registros. **Solo para desarrollo local:** las cuentas demo tienen contraseñas conocidas dentro del código, por lo que no deben activarse en entornos accesibles públicamente. No ejecutes este procedimiento contra una base con datos reales.
