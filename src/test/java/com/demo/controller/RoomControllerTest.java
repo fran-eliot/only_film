@@ -177,4 +177,18 @@ class RoomControllerTest {
         assertEquals(ScreenType.IMAX, roomAfter.getScreenType());
         assertEquals(true, roomAfter.getActive());
     }
+    @Test
+    void editingRoomCannotAlterActiveThroughHiddenField() throws Exception {
+        mockMvc.perform(post("/salas")
+                        .param("id", room.getId().toString())
+                        .param("name", "Sala segura")
+                        .param("capacity", "90")
+                        .param("screenType", "IMAX")
+                        .param("active", "false"))
+                .andExpect(status().is3xxRedirection());
+        Room persisted = roomRepository.findById(room.getId()).orElseThrow();
+        assertTrue(persisted.getActive());
+        assertEquals("Sala segura", persisted.getName());
+    }
+
 }
