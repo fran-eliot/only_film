@@ -2,6 +2,8 @@ package com.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +21,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, Environment environment) throws Exception {
 
         // En Spring Security 6+ HttpSessionRequestCache solo devuelve la petición guardada
         // si la URL contiene el parámetro "continue". Al ponerlo a null desactivamos ese check
@@ -28,9 +30,13 @@ public class SecurityConfig {
         requestCache.setMatchingRequestParameterName(null);
         http.requestCache(cache -> cache.requestCache(requestCache));
 
-        //permitir h2-console
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
-        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+        // H2 console uses frames and POST without CSRF; allow it ONLY in explicit local dev.
+        // Do not bypass CSRF or relax frame protections in standard/PostgreSQL execution.
+        if (environment.acceptsProfiles(Profiles.of("dev"))
+                && !environment.acceptsProfiles(Profiles.of("postgres"))) {
+            http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+            http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+        }
 
         //protección de rutas
         http.authorizeHttpRequests(auth -> auth
