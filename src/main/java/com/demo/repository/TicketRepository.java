@@ -3,10 +3,17 @@ package com.demo.repository;
 import com.demo.model.Ticket;
 import com.demo.model.enums.BuyStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
+import java.util.Optional;
 
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select t from Ticket t where t.id = :id")
+    Optional<Ticket> findByIdForCheckout(@org.springframework.data.repository.query.Param("id") Long id);
+
     List<Ticket> findBySession_Id(Long id);
 
     List<Ticket> findBySession_Movie_Id(Long id);

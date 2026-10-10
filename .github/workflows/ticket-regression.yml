@@ -1,0 +1,42 @@
+name: Ticket security regression tests
+
+on:
+  push:
+    branches:
+      - fix/ticket-security-checkout
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  existing-unit-and-web-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Run existing repository, service, controller and security tests
+        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest' -Dsurefire.failIfNoSpecifiedTests=false -DrerunFailingTestsCount=0
+
+  ticket-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Run ticket regression tests
+        run: mvn -B -ntp test -Dtest=TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest -DrerunFailingTestsCount=0

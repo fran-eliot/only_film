@@ -352,7 +352,7 @@ public class TicketServiceTest {
                 .status(BuyStatus.LIBRE)
                 .build();
 
-        when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
 
         // Act
         ticketService.processCheckout(
@@ -374,7 +374,7 @@ public class TicketServiceTest {
         assertNotNull(ticket.getQrCode());
         assertTrue(ticket.getQrCode().startsWith("ONLYFILM-1-"));
 
-        verify(ticketRepository, times(1)).findById(1L);
+        verify(ticketRepository, times(1)).findByIdForCheckout(1L);
         verify(ticketRepository, times(1)).save(ticket);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
@@ -389,7 +389,7 @@ public class TicketServiceTest {
                 .status(BuyStatus.LIBRE)
                 .build();
 
-        when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
 
         // Act
         ticketService.processCheckout(
@@ -411,7 +411,7 @@ public class TicketServiceTest {
         assertNotNull(ticket.getQrCode());
         assertTrue(ticket.getQrCode().startsWith("ONLYFILM-1-"));
 
-        verify(ticketRepository, times(1)).findById(1L);
+        verify(ticketRepository, times(1)).findByIdForCheckout(1L);
         verify(ticketRepository, times(1)).save(ticket);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
@@ -420,7 +420,7 @@ public class TicketServiceTest {
     @DisplayName("processCheckout: ticket inexistente -> lanza NoSuchElementException")
     public void processCheckout_nonExistingTicket_throwsNoSuchElementException() {
         // Arrange
-        when(ticketRepository.findById(99L)).thenReturn(Optional.empty());
+        when(ticketRepository.findByIdForCheckout(99L)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NoSuchElementException.class, () ->
@@ -435,7 +435,7 @@ public class TicketServiceTest {
                 )
         );
 
-        verify(ticketRepository, times(1)).findById(99L);
+        verify(ticketRepository, times(1)).findByIdForCheckout(99L);
         verify(ticketRepository, never()).save(any());
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
@@ -489,7 +489,7 @@ public class TicketServiceTest {
                 .status(BuyStatus.LIBRE)
                 .build();
 
-        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdForCheckout(10L)).thenReturn(Optional.of(ticket));
 
         ticketService.processCheckout(
                 10L,
@@ -507,7 +507,7 @@ public class TicketServiceTest {
         assertNotNull(ticket.getQrCode());
         assertTrue(ticket.getQrCode().startsWith("ONLYFILM-10-"));
 
-        verify(ticketRepository).findById(10L);
+        verify(ticketRepository).findByIdForCheckout(10L);
         verify(ticketRepository).save(ticket);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
