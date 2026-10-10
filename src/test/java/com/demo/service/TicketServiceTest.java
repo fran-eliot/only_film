@@ -352,7 +352,7 @@ public class TicketServiceTest {
                 .status(BuyStatus.LIBRE)
                 .build();
 
-        when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
 
         // Act
         ticketService.processCheckout(
@@ -389,7 +389,7 @@ public class TicketServiceTest {
                 .status(BuyStatus.LIBRE)
                 .build();
 
-        when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
 
         // Act
         ticketService.processCheckout(
@@ -420,7 +420,7 @@ public class TicketServiceTest {
     @DisplayName("processCheckout: ticket inexistente -> lanza NoSuchElementException")
     public void processCheckout_nonExistingTicket_throwsNoSuchElementException() {
         // Arrange
-        when(ticketRepository.findById(99L)).thenReturn(Optional.empty());
+        when(ticketRepository.findByIdForCheckout(99L)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NoSuchElementException.class, () ->
@@ -489,7 +489,7 @@ public class TicketServiceTest {
                 .status(BuyStatus.LIBRE)
                 .build();
 
-        when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.findByIdForCheckout(10L)).thenReturn(Optional.of(ticket));
 
         ticketService.processCheckout(
                 10L,
