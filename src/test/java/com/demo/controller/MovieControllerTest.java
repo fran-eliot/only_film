@@ -69,7 +69,7 @@ public class MovieControllerTest {
 
         Long id = movieToDeactivate.getId();
 
-        mockMvc.perform(get("/movies/deactivate/" + id))
+        mockMvc.perform(post("/movies/deactivate/" + id))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/movies"));
         //Traemos una movie de BD para comprobar que el estado de active es false
