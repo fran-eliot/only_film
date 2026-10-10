@@ -285,7 +285,7 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("discount")));
         assertTrue(driver.getPageSource().contains("Editar descuento de entrada libre"));
         assertEquals("0", driver.findElement(By.id("discount")).getAttribute("value").replaceFirst("\\.0$", ""));
-        assertTrue(driver.findElement(By.cssSelector("button[type='submit']")).getText().contains("Guardar descuento"));
+        assertTrue(driver.findElement(By.cssSelector("form[action='/tickets/save'] button[type='submit']")).getText().contains("Guardar descuento"));
 
         // Los datos de inventario y checkout no pueden alterarse desde el formulario.
         for (String protectedField : List.of("row", "seat", "price", "status", "session", "user", "qrCode")) {
