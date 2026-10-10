@@ -2,6 +2,7 @@ package com.demo.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,12 +17,15 @@ import java.util.UUID;
 public class FileService {
     public static final String UPLOAD_DIR = "uploads";
 
+    @Value("${onlyfilm.upload-dir:uploads}")
+    private String uploadDir = UPLOAD_DIR;
+
     public String store(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;
         }
         try {
-            Path dir = Paths.get(UPLOAD_DIR).toAbsolutePath().normalize();
+            Path dir = Paths.get(uploadDir).toAbsolutePath().normalize();
             Files.createDirectories(dir); // crea la carpeta si no existe
             String original = StringUtils.cleanPath(file.getOriginalFilename());
             String ext = "";
