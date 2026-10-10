@@ -122,7 +122,7 @@ public class TicketService {
             int qtyComboFamiliar
     ) {
 
-        Ticket ticket = ticketRepository.findById(ticketId)
+        Ticket ticket = ticketRepository.findByIdForCheckout(ticketId)
                 .orElseThrow();
 
         if (ticket.getStatus() != BuyStatus.LIBRE) {
