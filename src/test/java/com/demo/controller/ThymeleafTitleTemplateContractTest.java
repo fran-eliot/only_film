@@ -98,4 +98,10 @@ class ThymeleafTitleTemplateContractTest {
                     () -> "Missing error alert role in " + path);
         }
     }
+    @Test
+    void userListFeedbackUsesAccessibleRoles() throws IOException {
+        String html = template("users/user-list.html");
+        assertTrue(html.contains("th:if=\"${message}\" class=\"alert alert-success mt-3\" role=\"status\""));
+        assertTrue(html.contains("th:if=\"${error}\"   class=\"alert alert-danger  mt-3\" role=\"alert\""));
+    }
 }
