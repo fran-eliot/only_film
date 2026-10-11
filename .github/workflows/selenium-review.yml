@@ -1,4 +1,4 @@
-name: Selenium review and movie headless regression
+name: Selenium review, movie and ticket headless regression
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   review-selenium:
-    name: Review and Movie Selenium (Chrome headless)
+    name: Review, Movie and Ticket Selenium (Chrome headless)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -28,16 +28,16 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: Run ReviewSeleniumTest and MovieSeleniumTest without retries
+      - name: Run ReviewSeleniumTest, MovieSeleniumTest and TicketSeleniumTest without retries
         env:
           CI: 'true'
-        run: mvn -B -ntp test -Dtest=ReviewSeleniumTest,MovieSeleniumTest -DrerunFailingTestsCount=0
+        run: mvn -B -ntp test -Dtest=ReviewSeleniumTest,MovieSeleniumTest,TicketSeleniumTest -DrerunFailingTestsCount=0
 
       - name: Upload Selenium failure evidence
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: selenium-review-movie-failure-evidence
+          name: selenium-review-movie-ticket-failure-evidence
           path: |
             target/surefire-reports/
             target/screenshots/
