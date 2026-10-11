@@ -104,4 +104,11 @@ class ThymeleafTitleTemplateContractTest {
         assertTrue(html.contains("th:if=\"${message}\" class=\"alert alert-success mt-3\" role=\"status\""));
         assertTrue(html.contains("th:if=\"${error}\"   class=\"alert alert-danger  mt-3\" role=\"alert\""));
     }
+    @Test
+    void missingReviewRatingAnnouncesErrorAndFocusesFirstStar() throws IOException {
+        String html = template("reviews/review-form.html");
+        assertTrue(html.contains("id=\"starRating\" aria-describedby=\"ratingText ratingError\""));
+        assertTrue(html.contains("id=\"ratingError\" role=\"alert\""));
+        assertTrue(html.contains("ratingError.style.display = 'block';\n            stars[0].focus();"));
+    }
 }
