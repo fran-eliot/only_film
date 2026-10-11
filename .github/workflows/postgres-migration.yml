@@ -171,4 +171,4 @@ jobs:
           DB_URL: jdbc:postgresql://localhost:5432/onlyfilm
           DB_USERNAME: onlyfilm
           DB_PASSWORD: ci-only-password
-        run: mvn -B -ntp test -Dtest=PostgresPersistenceIntegrationTest -DrerunFailingTestsCount=0
+        run: mvn -B -ntp test -Dtest=PostgresPersistenceIntegrationTest -Dsurefire.rerunFailingTestsCount=0
