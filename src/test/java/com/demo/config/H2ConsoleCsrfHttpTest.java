@@ -34,6 +34,13 @@ class H2ConsoleCsrfHttpTest {
     }
 
     @Test
+    void localH2OptInUsesSameOriginFrameHeaderOnApplicationPages() throws Exception {
+        mockMvc.perform(get("/movies"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Frame-Options", "SAMEORIGIN"));
+    }
+
+    @Test
     void normalMutationStillRequiresCsrfWithH2ConsoleEnabled() throws Exception {
         mockMvc.perform(post("/movies/deactivate/1").with(user("dev-admin").roles("ADMIN")))
                 .andExpect(status().isForbidden());
