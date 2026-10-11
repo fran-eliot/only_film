@@ -45,19 +45,27 @@ public class DataInitializer implements CommandLineRunner {
                 : java.util.UUID.randomUUID().toString();
     }
 
+    // PostgreSQL demo data is opt-in and must never overwrite an existing database.
+    private boolean skipNonEmptyPostgresDatabase() {
+        if (!java.util.Arrays.asList(environment.getActiveProfiles()).contains("postgres")) {
+            return false;
+        }
+        boolean empty = movieRepo.count() == 0 && roomRepo.count() == 0
+                && sessionRepo.count() == 0 && ticketRepo.count() == 0
+                && userRepo.count() == 0 && reviewRepo.count() == 0;
+        if (!empty) {
+            System.out.println("-> Demo seeding skipped: database is not empty.");
+            return true;
+        }
+        System.out.println("-> WARNING: creating demonstration accounts with known passwords. Local use only.");
+        return false;
+    }
+
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void run(String... args) throws Exception {
-        // PostgreSQL demo data is deliberately opt-in and may only seed an empty database.
-        if (java.util.Arrays.asList(environment.getActiveProfiles()).contains("postgres")) {
-            boolean empty = movieRepo.count() == 0 && roomRepo.count() == 0
-                    && sessionRepo.count() == 0 && ticketRepo.count() == 0
-                    && userRepo.count() == 0 && reviewRepo.count() == 0;
-            if (!empty) {
-                System.out.println("-> Demo seeding skipped: database is not empty.");
-                return;
-            }
-            System.out.println("-> WARNING: creating demonstration accounts with known passwords. Local use only.");
+        if (skipNonEmptyPostgresDatabase()) {
+            return;
         }
         System.out.println("-> Inicializando datos de prueba...");
 
