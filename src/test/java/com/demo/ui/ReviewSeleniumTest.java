@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -276,15 +275,6 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
         waitForPageLoad();
     }
 
-    private void clickSafely(WebElement element) {
-        try {
-            wait.until(ExpectedConditions.elementToBeClickable(element));
-            element.click();
-        } catch (ElementClickInterceptedException e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-        }
-    }
-
     private void scrollToViewAndClick(WebElement element) {
         // Scroll el elemento a la vista
         ((JavascriptExecutor) driver).executeScript(
@@ -292,31 +282,12 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
                 element
         );
 
-        // Esperar a que el elemento esté listo para recibir el click
-        wait.until(ExpectedConditions.elementToBeClickable(element));
-
-        // Intentar click simple
-        try {
-            element.click();
-        } catch (Exception e1) {
-            // Si falla, usar JavaScript click
-            try {
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-            } catch (Exception e2) {
-                throw new RuntimeException("No se pudo hacer click en el elemento después de scroll", e2);
-            }
-        }
+        clickWithInterceptFallback(element);
     }
 
     private void clickStarSafely(WebElement star) {
         // Las estrellas están dentro de la pantalla del formulario
-        wait.until(ExpectedConditions.elementToBeClickable(star));
-
-        try {
-            star.click();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", star);
-        }
+        clickWithInterceptFallback(star);
     }
 
     private void waitForPageLoad() {
