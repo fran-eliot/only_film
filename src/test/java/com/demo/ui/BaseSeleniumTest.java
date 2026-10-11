@@ -20,7 +20,7 @@ import java.util.Map;
 //Ponemos un puerto aleatorio para no tener problema con el puerto 8080 que estamos utilizando porque podria fallar el test
 @ExtendWith(ScreenshotOnFailure.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BaseSeleniumTest {
+public abstract class BaseSeleniumTest {
     @LocalServerPort
     int port; //Inyectamos el puerto aleatorio
 
