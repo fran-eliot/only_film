@@ -35,16 +35,7 @@ public class MovieSeleniumTest extends BaseSeleniumTest{
         //Al hacer click en el boton más información estamos verificando que navegamos al movie-detail
         //el linkText busca la etiqueta <a> con el texto exacto que le pasamos
         //el getCurrentUrl es la url actual del navegador
-//        new Actions(driver).moveToElement(driver.findElement(By.id("viewMovie-" + movieAction.getId()))).click().perform();
         new Actions(driver).moveToElement(driver.findElement(By.cssSelector("a[href='/movies/" + movieAction.getId() + "']"))).click().perform();
-//        new Actions(driver).moveToElement(driver.findElement(By.cssSelector("a[href=\"/movies/" + movieAction.getId() + "\"]"))).click().perform();
-
-//        new Actions(driver).moveToElement(
-//                driver.findElements(By.linkText("Más información")).getFirst()
-//        ).click().perform();
-
-//        firstCard.findElement(By.linkText("Más información")).click();
-//        assertEquals(baseUrl + "movies/" + movieAction.getId(), driver.getCurrentUrl());
         wait.until(driver -> driver.getCurrentUrl().matches(".*/movies/\\d+$"));
 
     }
