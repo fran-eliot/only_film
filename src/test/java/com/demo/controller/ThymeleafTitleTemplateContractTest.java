@@ -65,4 +65,20 @@ class ThymeleafTitleTemplateContractTest {
         assertTrue(html.contains("vacío para conservar la misma contraseña."));
     }
 
+    @Test
+    void registrationFieldErrorsAreAssociatedWithTheirInputs() throws IOException {
+        String html = template("auth/register.html");
+        for (String field : new String[] {
+                "username", "firstName", "lastName", "email", "password", "passwordConfirm"
+        }) {
+            String condition = "#fields.hasErrors('" + field + "')";
+            assertTrue(html.contains("th:aria-invalid=\"${" + condition + "}\""),
+                    () -> "Missing invalid state for " + field);
+            assertTrue(html.contains("th:aria-describedby=\"${" + condition + " ? '" + field + "Error' : null}\""),
+                    () -> "Missing error association for " + field);
+            assertTrue(html.contains("id=\"" + field + "Error\" class=\"invalid-feedback\""),
+                    () -> "Missing feedback id for " + field);
+        }
+    }
+
 }
