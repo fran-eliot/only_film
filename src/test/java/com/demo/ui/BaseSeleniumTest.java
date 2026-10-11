@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -102,6 +104,15 @@ public abstract class BaseSeleniumTest {
 
         return wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.cssSelector("button[type='submit']")));
+    }
+
+    void clickWithInterceptFallback(WebElement element) {
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+        try {
+            element.click();
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        }
     }
 
     //Siempre cerramos para que no queden procesos abiertos
