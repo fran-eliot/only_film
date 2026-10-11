@@ -109,7 +109,9 @@ public class SecurityConfig {
     }
     static boolean isLocalH2ConsoleAllowed(Environment environment) {
         return environment.acceptsProfiles(Profiles.of("dev"))
-                && !environment.acceptsProfiles(Profiles.of("postgres", "prod"));
+                && !environment.acceptsProfiles(Profiles.of("postgres", "prod"))
+                && environment.getProperty("spring.h2.console.enabled", Boolean.class, false)
+                && "127.0.0.1".equals(environment.getProperty("server.address"));
     }
 
     @Bean

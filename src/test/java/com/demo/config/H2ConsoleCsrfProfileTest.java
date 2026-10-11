@@ -18,7 +18,28 @@ class H2ConsoleCsrfProfileTest {
     void explicitDevelopmentProfileAllowsH2CsrfException() {
         MockEnvironment environment = new MockEnvironment();
         environment.setActiveProfiles("dev");
+        assertFalse(SecurityConfig.isLocalH2ConsoleAllowed(environment));
+        environment.withProperty("spring.h2.console.enabled", "true")
+                .withProperty("server.address", "127.0.0.1");
         assertTrue(SecurityConfig.isLocalH2ConsoleAllowed(environment));
+    }
+
+    @Test
+    void publicBindingRejectsH2CsrfExceptionEvenWithDevelopmentProfile() {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty("spring.h2.console.enabled", "true")
+                .withProperty("server.address", "0.0.0.0");
+        environment.setActiveProfiles("dev");
+        assertFalse(SecurityConfig.isLocalH2ConsoleAllowed(environment));
+    }
+
+    @Test
+    void consoleDisabledRejectsH2CsrfException() {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty("spring.h2.console.enabled", "false")
+                .withProperty("server.address", "127.0.0.1");
+        environment.setActiveProfiles("dev");
+        assertFalse(SecurityConfig.isLocalH2ConsoleAllowed(environment));
     }
 
     @Test
