@@ -86,7 +86,6 @@ public class SecurityConfig {
                 // 7. Cualquier otra ruta no especificada requerirá estar autenticado
                 .anyRequest().authenticated()
         );
-        //http.exceptionHandling(exception -> exception.accessDeniedPage("/movies"));
 
         http.exceptionHandling(ex -> ex
                 .accessDeniedHandler((request, response, e) ->
