@@ -5,9 +5,12 @@ import com.demo.repository.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -88,6 +91,17 @@ public abstract class BaseSeleniumTest {
         }
         driver = new ChromeDriver(chromeOptions);
         wait = new WebDriverWait(driver, Duration.ofSeconds(30L));
+    }
+
+    WebElement prepareLoginForm(String username, String password) {
+        driver.get(baseUrl + "login");
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")))
+                .sendKeys(username);
+        driver.findElement(By.id("password")).sendKeys(password);
+
+        return wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector("button[type='submit']")));
     }
 
     //Siempre cerramos para que no queden procesos abiertos

@@ -265,18 +265,8 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
     }
 
     private void login(String username, String password) {
-        driver.get(baseUrl + "login");
+        WebElement submitButton = prepareLoginForm(username, password);
         waitForPageLoad();
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")))
-                .sendKeys(username);
-
-        driver.findElement(By.id("password")).sendKeys(password);
-
-        WebElement submitButton = wait.until(
-                ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type='submit']"))
-        );
-
         scrollToViewAndClick(submitButton);
 
         wait.until(ExpectedConditions.not(
