@@ -19,6 +19,8 @@ package com.demo.controller;
 @Controller
     @AllArgsConstructor
     public class SessionController {
+    private static final String MODEL_SESSION = "proyeccion";
+
 
         private final SessionRepository sessionRepository;
         private final MovieRepository movieRepository;
@@ -37,7 +39,7 @@ public String listSessions(Model model) {
     // Formulario nueva sesión
     @GetMapping("/sessions/new")
     public String newSession(Model model) {
-        model.addAttribute("proyeccion", new SessionForm());
+        model.addAttribute(MODEL_SESSION, new SessionForm());
         model.addAttribute("movies", movieRepository.findAll()); // Todas las películas
         model.addAttribute("rooms", roomRepository.findAll()); // Todas las salas
         return "sessions/session-form";
@@ -48,7 +50,7 @@ public String listSessions(Model model) {
     public String sessionDetail(Model model, @PathVariable Long id) {
         int capacity = sessionRepository.findById(id).orElseThrow().getRoom().getCapacity();
         int seatsPerRow = (int) Math.ceil(Math.sqrt(capacity));
-        model.addAttribute("proyeccion", sessionRepository.findById(id).orElseThrow());
+        model.addAttribute(MODEL_SESSION, sessionRepository.findById(id).orElseThrow());
         model.addAttribute("tickets", ticketRepository.findBySession_Id(id)); // Cargar los tickets de esta sesión
         model.addAttribute("seatsPerRow", seatsPerRow);
         return "sessions/session-detail";
@@ -57,7 +59,7 @@ public String listSessions(Model model) {
     // Formulario editar sesión
     @GetMapping("/sessions/edit/{id}")
     public String editSession(Model model, @PathVariable Long id) {
-        model.addAttribute("proyeccion", SessionForm.from(sessionRepository.findById(id).orElseThrow()));
+        model.addAttribute(MODEL_SESSION, SessionForm.from(sessionRepository.findById(id).orElseThrow()));
         model.addAttribute("movies", movieRepository.findAll());
         model.addAttribute("rooms", roomRepository.findAll());
         return "sessions/session-form";
@@ -65,7 +67,7 @@ public String listSessions(Model model) {
 
     // POST: Guardar (crear o actualizar)
     @PostMapping("/sessions")
-    public String saveSession(@ModelAttribute("proyeccion") SessionForm form) {
+    public String saveSession(@ModelAttribute(MODEL_SESSION) SessionForm form) {
         sessionManagementService.save(form);
         return "redirect:/sessions";
     }
