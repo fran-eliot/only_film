@@ -35,4 +35,14 @@ class ThymeleafTitleTemplateContractTest {
                     () -> "Missing shared head fragment in " + page);
         }
     }
+    @Test
+    void userTableHasAccessibleCaptionAndColumnHeaders() throws IOException {
+        String html = template("users/user-list.html");
+        assertTrue(html.contains("<caption class=\"visually-hidden\">Usuarios del sistema</caption>"));
+        for (String column : new String[] {"Id", "Username", "Email", "Rol", "Activo", "Acciones"}) {
+            assertTrue(html.contains("<th scope=\"col\">" + column + "</th>"),
+                    () -> "Missing scoped header: " + column);
+        }
+    }
+
 }
