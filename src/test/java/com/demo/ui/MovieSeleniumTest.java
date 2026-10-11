@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +41,7 @@ public class MovieSeleniumTest extends BaseSeleniumTest{
 
         //Verifica que hay cards de películas
         //Esta buscando por clase de CSS
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.className("movie-card")));
         List<WebElement> cards = driver.findElements(By.className("movie-card"));
         assertFalse(cards.isEmpty());
 
@@ -62,6 +64,8 @@ public class MovieSeleniumTest extends BaseSeleniumTest{
 
         //Estamos comprobando que el título de la película aparece en la card
         //el .cssSelector es la clase compuesta de css
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(
+                By.tagName("h1"), movieAction.getTitle()));
         String titulo = driver.findElement(By.tagName("h1")).getText();
         assertEquals(movieAction.getTitle(), titulo);
 
