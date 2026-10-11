@@ -27,6 +27,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @AllArgsConstructor
 @Controller
 public class UserController {
+    private static final String LOG_EVENT_DETAILS = "{} {}";
+
 
     private static final String ATTR_USER = "user";
     private static final String ATTR_USERS = "users";
@@ -125,18 +127,18 @@ public class UserController {
             if (user.getId() == null) {
                 User saved = userService.create(user.toUser());
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_CREATED);
-                log.info("{} {}", MSG_USER_CREATED, saved.getUsername());
+                log.info(LOG_EVENT_DETAILS, MSG_USER_CREATED, saved.getUsername());
             } else {
                 User saved = userService.updateAdmin(user.toUser(), currentUser.getId(), imageUrl);
                 redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MSG_USER_UPDATED);
-                log.info("{} {}", MSG_USER_UPDATED, saved.getUsername());
+                log.info(LOG_EVENT_DETAILS, MSG_USER_UPDATED, saved.getUsername());
             }
 
             // Tanto para CREAR como ACTUALIZAR redirige al listado de usuarios.
             return REDIRECT_USERS;
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute(ATTR_ERROR, MSG_USER_CREATE_ERROR);
-            log.error("{} {}", MSG_USER_CREATE_ERROR, e.getMessage());
+            log.error(LOG_EVENT_DETAILS, MSG_USER_CREATE_ERROR, e.getMessage());
 
             return user.getId() == null
                     ? REDIRECT_USER_NEW
