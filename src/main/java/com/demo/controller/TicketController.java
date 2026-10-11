@@ -28,7 +28,6 @@ public class TicketController {
     private static final String MODEL_TICKET = "ticket";
 
 
-    //private final TicketRepository ticketRepository;
     private final TicketService ticketService;
 
     private final UserRepository userRepository;
