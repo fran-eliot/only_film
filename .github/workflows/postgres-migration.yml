@@ -30,7 +30,7 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Run existing H2 regression tests
-        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest,MutationCsrfSecurityTest,EnvironmentHardeningTest,H2ConsoleCsrfProfileTest,H2ConsoleCsrfHttpTest,ThymeleafHeadTitleContractTest,SessionManagementRollbackTest,SessionEditInvariantsTest,MvcErrorContractTest' -DrerunFailingTestsCount=0
+        run: mvn -B -ntp test -Dtest='*RepositoryTest,*ServiceTest,*ControllerTest,*SecurityConfigTest,TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest,MutationCsrfSecurityTest,EnvironmentHardeningTest,H2ConsoleCsrfProfileTest,H2ConsoleCsrfHttpTest,RenderedPageTitleTest,ThymeleafHeadTitleContractTest,SessionManagementRollbackTest,SessionEditInvariantsTest,MvcErrorContractTest' -Dsurefire.rerunFailingTestsCount=0
       - name: Upload JaCoCo H2 regression coverage
         if: always()
         uses: actions/upload-artifact@v4
