@@ -55,7 +55,7 @@
                 <fieldset class="mb-4">
                     <legend class="form-label fw-semibold">Puntuación <span class="text-danger">*</span></legend>
 
-                    <div class="star-rating d-flex gap-1" id="starRating">
+                    <div class="star-rating d-flex gap-1" id="starRating" aria-describedby="ratingText ratingError">
                         <button type="button" class="rating-star" data-value="1" aria-label="1 estrella" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
                         <button type="button" class="rating-star" data-value="2" aria-label="2 estrellas" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
                         <button type="button" class="rating-star" data-value="3" aria-label="3 estrellas" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
@@ -64,7 +64,7 @@
                     </div>
 
                     <small class="text-muted mt-1 d-block" id="ratingText">Selecciona una puntuación</small>
-                    <div class="text-danger small mt-1" id="ratingError" style="display:none">
+                    <div class="text-danger small mt-1" id="ratingError" role="alert" style="display:none">
                         <i class="fa-solid fa-circle-exclamation me-1" aria-hidden="true"></i>Por favor selecciona una puntuación.
                     </div>
                 </fieldset>
@@ -180,6 +180,7 @@
         if (selected < 1) {
             e.preventDefault();
             ratingError.style.display = 'block';
+            stars[0].focus();
         }
     });
 </script>
