@@ -358,150 +358,11 @@ public class DataInitializer implements CommandLineRunner {
             ticketService.generarTickets(s);
         }
 
-        // MARCAR TICKETS COMPRADOS (historial de user1)
-        // pasada1 → user1 compró 1 entradas (La odisea, hace 7 días)
-        List<Ticket> tPasada1 = ticketRepo.findBySession_Id(pasada1.getId());
-        if (tPasada1.size() >= 2) {
-            tPasada1.get(0).setStatus(BuyStatus.PAGADO);
-            tPasada1.get(0).setUser(user);
-            tPasada1.get(0).setBuyDateTime(pasada1.getStartTime().minusHours(2));
-            //tPasada1.get(1).setStatus(BuyStatus.PAGADO);
-            //tPasada1.get(1).setUser(user1);
-           //tPasada1.get(1).setBuyDateTime(pasada1.getStartTime().minusHours(2));
-            //ticketRepo.saveAll(List.of(tPasada1.get(0), tPasada1.get(1)));
-            ticketRepo.save(tPasada1.get(0));
-        }
-
-        // pasada2 → user1 compró 1 entrada (Proyecto salvación, hace 5 días)
-        List<Ticket> tPasada2 = ticketRepo.findBySession_Id(pasada2.getId());
-        if (!tPasada2.isEmpty()) {
-            tPasada2.get(0).setStatus(BuyStatus.PAGADO);
-            tPasada2.get(0).setUser(user);
-            tPasada2.get(0).setBuyDateTime(pasada2.getStartTime().minusDays(1));
-            ticketRepo.save(tPasada2.get(0));
-        }
-
-        // pasada3 → user1 compró 3 entradas (The Mandalorian, hace 3 días)
-        List<Ticket> tPasada3 = ticketRepo.findBySession_Id(pasada3.getId());
-        if (!tPasada3.isEmpty()) {
-            tPasada3.get(0).setStatus(BuyStatus.PAGADO);
-            tPasada3.get(0).setUser(user);
-            tPasada3.get(0).setBuyDateTime(pasada2.getStartTime().minusDays(1));
-            ticketRepo.save(tPasada3.get(0));
-        }
-        /*
-        if (tPasada3.size() >= 3) {
-            for (int i = 0; i < 3; i++) {
-                tPasada3.get(i).setStatus(BuyStatus.PAGADO);
-                tPasada3.get(i).setUser(user1);
-                tPasada3.get(i).setBuyDateTime(pasada3.getStartTime().minusHours(6));
-            }
-            ticketRepo.saveAll(tPasada3.subList(0, 3));
-        }*/
-
-        // sesAgotada → TODOS los tickets PAGADO (demuestra el futuro badge "Agotada")
-        List<Ticket> tAgotados = ticketRepo.findBySession_Id(sesAgotada.getId());
-        tAgotados.forEach(t -> t.setStatus(BuyStatus.PAGADO));
-        ticketRepo.saveAll(tAgotados);
-
-
-        // COMPRADORES FRECUENTES
-        // Sala 1 · La odisea 4DX · hoy 16:30
-        List<Ticket> ts0 = ticketRepo.findBySession_Id(todayOdisea4dx.getId());
-        if (ts0.size() > 65) {
-            ts0.get(1).setStatus(BuyStatus.PAGADO);  ts0.get(1).setUser(carlosR);
-            ts0.get(1).setBuyDateTime(LocalDateTime.now().minusHours(4));
-            ts0.get(12).setStatus(BuyStatus.PAGADO); ts0.get(12).setUser(lauraS);
-            ts0.get(12).setBuyDateTime(LocalDateTime.now().minusHours(6));
-            ts0.get(34).setStatus(BuyStatus.PAGADO); ts0.get(34).setUser(pabloG);
-            ts0.get(34).setBuyDateTime(LocalDateTime.now().minusDays(1));
-            ts0.get(65).setStatus(BuyStatus.PAGADO); ts0.get(65).setUser(sofiaL);
-            ts0.get(65).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(2));
-            ticketRepo.saveAll(List.of(ts0.get(1), ts0.get(12), ts0.get(34), ts0.get(65)));
-        }
-
-        // Sala 1 · Mandalorian 4DX · hoy 19:00
-        List<Ticket> ts1 = ticketRepo.findBySession_Id(todayMandalorian4dx.getId());
-        if (ts1.size() > 55) {
-            ts1.get(3).setStatus(BuyStatus.PAGADO);  ts1.get(3).setUser(elenaM);
-            ts1.get(3).setBuyDateTime(LocalDateTime.now().minusHours(3));
-            ts1.get(22).setStatus(BuyStatus.PAGADO); ts1.get(22).setUser(javierT);
-            ts1.get(22).setBuyDateTime(LocalDateTime.now().minusHours(5));
-            ts1.get(55).setStatus(BuyStatus.PAGADO); ts1.get(55).setUser(user2);
-            ts1.get(55).setBuyDateTime(LocalDateTime.now().minusDays(1));
-            ticketRepo.saveAll(List.of(ts1.get(3), ts1.get(22), ts1.get(55)));
-        }
-
-        // Sala 1 · Proyecto salvación 4DX · hoy 21:30
-        List<Ticket> ts2 = ticketRepo.findBySession_Id(todayProyecto4dx.getId());
-        if (ts2.size() > 47) {
-            ts2.get(9).setStatus(BuyStatus.PAGADO);  ts2.get(9).setUser(sofiaL);
-            ts2.get(9).setBuyDateTime(LocalDateTime.now().minusHours(2));
-            ts2.get(47).setStatus(BuyStatus.PAGADO); ts2.get(47).setUser(carlosR);
-            ts2.get(47).setBuyDateTime(LocalDateTime.now().minusHours(7));
-            ticketRepo.saveAll(List.of(ts2.get(9), ts2.get(47)));
-        }
-
-        // Sala 2 · Super Mario IMAX · hoy 16:00
-        List<Ticket> ts3 = ticketRepo.findBySession_Id(todayMario_imax.getId());
-        if (ts3.size() > 120) {
-            ts3.get(2).setStatus(BuyStatus.PAGADO);   ts3.get(2).setUser(pabloG);
-            ts3.get(2).setBuyDateTime(LocalDateTime.now().minusHours(2));
-            ts3.get(25).setStatus(BuyStatus.PAGADO);  ts3.get(25).setUser(lauraS);
-            ts3.get(25).setBuyDateTime(LocalDateTime.now().minusDays(1));
-            ts3.get(63).setStatus(BuyStatus.PAGADO);  ts3.get(63).setUser(elenaM);
-            ts3.get(63).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(3));
-            ts3.get(98).setStatus(BuyStatus.PAGADO);  ts3.get(98).setUser(javierT);
-            ts3.get(98).setBuyDateTime(LocalDateTime.now().minusDays(2));
-            ts3.get(120).setStatus(BuyStatus.PAGADO); ts3.get(120).setUser(user2);
-            ts3.get(120).setBuyDateTime(LocalDateTime.now().minusDays(2).minusHours(4));
-            ticketRepo.saveAll(List.of(ts3.get(2), ts3.get(25), ts3.get(63), ts3.get(98), ts3.get(120)));
-        }
-
-        // Sala 2 · La odisea IMAX · hoy 18:30
-        List<Ticket> ts4 = ticketRepo.findBySession_Id(todayOdisea_imax.getId());
-        if (ts4.size() > 88) {
-            ts4.get(14).setStatus(BuyStatus.PAGADO); ts4.get(14).setUser(user2);
-            ts4.get(14).setBuyDateTime(LocalDateTime.now().minusHours(1));
-            ts4.get(37).setStatus(BuyStatus.PAGADO); ts4.get(37).setUser(carlosR);
-            ts4.get(37).setBuyDateTime(LocalDateTime.now().minusHours(8));
-            ts4.get(88).setStatus(BuyStatus.PAGADO); ts4.get(88).setUser(sofiaL);
-            ts4.get(88).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(1));
-            ticketRepo.saveAll(List.of(ts4.get(14), ts4.get(37), ts4.get(88)));
-        }
-
-        // Sala 2 · Top Gun IMAX · hoy 21:00
-        List<Ticket> ts5 = ticketRepo.findBySession_Id(todayTopgun_imax.getId());
-        if (ts5.size() > 115) {
-            ts5.get(4).setStatus(BuyStatus.PAGADO);   ts5.get(4).setUser(javierT);
-            ts5.get(4).setBuyDateTime(LocalDateTime.now().minusHours(3));
-            ts5.get(52).setStatus(BuyStatus.PAGADO);  ts5.get(52).setUser(pabloG);
-            ts5.get(52).setBuyDateTime(LocalDateTime.now().minusHours(5));
-            ts5.get(100).setStatus(BuyStatus.PAGADO); ts5.get(100).setUser(lauraS);
-            ts5.get(100).setBuyDateTime(LocalDateTime.now().minusDays(1));
-            ts5.get(115).setStatus(BuyStatus.PAGADO); ts5.get(115).setUser(elenaM);
-            ts5.get(115).setBuyDateTime(LocalDateTime.now().minusDays(2));
-            ticketRepo.saveAll(List.of(ts5.get(4), ts5.get(52), ts5.get(100), ts5.get(115)));
-        }
-
-        // Sala 6 · Top Gun STANDARD · hoy 19:00
-        List<Ticket> ts6 = ticketRepo.findBySession_Id(todayTopgun_std.getId());
-        if (ts6.size() > 30) {
-            ts6.get(5).setStatus(BuyStatus.PAGADO);  ts6.get(5).setUser(user);
-            ts6.get(5).setBuyDateTime(LocalDateTime.now().minusHours(2));
-            ts6.get(30).setStatus(BuyStatus.PAGADO); ts6.get(30).setUser(user2);
-            ts6.get(30).setBuyDateTime(LocalDateTime.now().minusHours(4));
-            ticketRepo.saveAll(List.of(ts6.get(5), ts6.get(30)));
-        }
-
-        // Sala 6 · Playa de lobos STANDARD · hoy 21:30
-        List<Ticket> ts7 = ticketRepo.findBySession_Id(todayPlaya_std.getId());
-        if (ts7.size() > 20) {
-            ts7.get(8).setStatus(BuyStatus.PAGADO); ts7.get(8).setUser(carlosR);
-            ts7.get(8).setBuyDateTime(LocalDateTime.now().minusHours(1));
-            ticketRepo.save(ts7.get(8));
-        }
-
+        seedPastPurchases(pasada1, pasada2, pasada3, sesAgotada, user);
+        seedTodayPurchases(
+                new Session[]{todayOdisea4dx, todayMandalorian4dx, todayProyecto4dx,
+                        todayMario_imax, todayOdisea_imax, todayTopgun_imax, todayTopgun_std, todayPlaya_std},
+                new User[]{user, user2, carlosR, lauraS, pabloG, elenaM, javierT, sofiaL});
 
         // REVIEWS
         // — La odisea (m5) —
@@ -697,4 +558,173 @@ public class DataInitializer implements CommandLineRunner {
                 sessionRepo.count() + " sesiones, " +
                 ticketRepo.count() + " tickets.");
     }
+    private void seedPastPurchases(Session pasada1, Session pasada2, Session pasada3,
+                                   Session sesAgotada, User user) {
+        // MARCAR TICKETS COMPRADOS (historial de user1)
+        // pasada1 → user1 compró 1 entradas (La odisea, hace 7 días)
+        List<Ticket> tPasada1 = ticketRepo.findBySession_Id(pasada1.getId());
+        if (tPasada1.size() >= 2) {
+            tPasada1.get(0).setStatus(BuyStatus.PAGADO);
+            tPasada1.get(0).setUser(user);
+            tPasada1.get(0).setBuyDateTime(pasada1.getStartTime().minusHours(2));
+            //tPasada1.get(1).setStatus(BuyStatus.PAGADO);
+            //tPasada1.get(1).setUser(user1);
+           //tPasada1.get(1).setBuyDateTime(pasada1.getStartTime().minusHours(2));
+            //ticketRepo.saveAll(List.of(tPasada1.get(0), tPasada1.get(1)));
+            ticketRepo.save(tPasada1.get(0));
+        }
+
+        // pasada2 → user1 compró 1 entrada (Proyecto salvación, hace 5 días)
+        List<Ticket> tPasada2 = ticketRepo.findBySession_Id(pasada2.getId());
+        if (!tPasada2.isEmpty()) {
+            tPasada2.get(0).setStatus(BuyStatus.PAGADO);
+            tPasada2.get(0).setUser(user);
+            tPasada2.get(0).setBuyDateTime(pasada2.getStartTime().minusDays(1));
+            ticketRepo.save(tPasada2.get(0));
+        }
+
+        // pasada3 → user1 compró 3 entradas (The Mandalorian, hace 3 días)
+        List<Ticket> tPasada3 = ticketRepo.findBySession_Id(pasada3.getId());
+        if (!tPasada3.isEmpty()) {
+            tPasada3.get(0).setStatus(BuyStatus.PAGADO);
+            tPasada3.get(0).setUser(user);
+            tPasada3.get(0).setBuyDateTime(pasada2.getStartTime().minusDays(1));
+            ticketRepo.save(tPasada3.get(0));
+        }
+        /*
+        if (tPasada3.size() >= 3) {
+            for (int i = 0; i < 3; i++) {
+                tPasada3.get(i).setStatus(BuyStatus.PAGADO);
+                tPasada3.get(i).setUser(user1);
+                tPasada3.get(i).setBuyDateTime(pasada3.getStartTime().minusHours(6));
+            }
+            ticketRepo.saveAll(tPasada3.subList(0, 3));
+        }*/
+
+        // sesAgotada → TODOS los tickets PAGADO (demuestra el futuro badge "Agotada")
+        List<Ticket> tAgotados = ticketRepo.findBySession_Id(sesAgotada.getId());
+        tAgotados.forEach(t -> t.setStatus(BuyStatus.PAGADO));
+        ticketRepo.saveAll(tAgotados);
+
+
+    }
+
+    private void seedTodayPurchases(Session[] sessions, User[] users) {
+        Session todayOdisea4dx = sessions[0];
+        Session todayMandalorian4dx = sessions[1];
+        Session todayProyecto4dx = sessions[2];
+        Session todayMario_imax = sessions[3];
+        Session todayOdisea_imax = sessions[4];
+        Session todayTopgun_imax = sessions[5];
+        Session todayTopgun_std = sessions[6];
+        Session todayPlaya_std = sessions[7];
+        User user = users[0];
+        User user2 = users[1];
+        User carlosR = users[2];
+        User lauraS = users[3];
+        User pabloG = users[4];
+        User elenaM = users[5];
+        User javierT = users[6];
+        User sofiaL = users[7];
+
+        // COMPRADORES FRECUENTES
+        // Sala 1 · La odisea 4DX · hoy 16:30
+        List<Ticket> ts0 = ticketRepo.findBySession_Id(todayOdisea4dx.getId());
+        if (ts0.size() > 65) {
+            ts0.get(1).setStatus(BuyStatus.PAGADO);  ts0.get(1).setUser(carlosR);
+            ts0.get(1).setBuyDateTime(LocalDateTime.now().minusHours(4));
+            ts0.get(12).setStatus(BuyStatus.PAGADO); ts0.get(12).setUser(lauraS);
+            ts0.get(12).setBuyDateTime(LocalDateTime.now().minusHours(6));
+            ts0.get(34).setStatus(BuyStatus.PAGADO); ts0.get(34).setUser(pabloG);
+            ts0.get(34).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ts0.get(65).setStatus(BuyStatus.PAGADO); ts0.get(65).setUser(sofiaL);
+            ts0.get(65).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(2));
+            ticketRepo.saveAll(List.of(ts0.get(1), ts0.get(12), ts0.get(34), ts0.get(65)));
+        }
+
+        // Sala 1 · Mandalorian 4DX · hoy 19:00
+        List<Ticket> ts1 = ticketRepo.findBySession_Id(todayMandalorian4dx.getId());
+        if (ts1.size() > 55) {
+            ts1.get(3).setStatus(BuyStatus.PAGADO);  ts1.get(3).setUser(elenaM);
+            ts1.get(3).setBuyDateTime(LocalDateTime.now().minusHours(3));
+            ts1.get(22).setStatus(BuyStatus.PAGADO); ts1.get(22).setUser(javierT);
+            ts1.get(22).setBuyDateTime(LocalDateTime.now().minusHours(5));
+            ts1.get(55).setStatus(BuyStatus.PAGADO); ts1.get(55).setUser(user2);
+            ts1.get(55).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ticketRepo.saveAll(List.of(ts1.get(3), ts1.get(22), ts1.get(55)));
+        }
+
+        // Sala 1 · Proyecto salvación 4DX · hoy 21:30
+        List<Ticket> ts2 = ticketRepo.findBySession_Id(todayProyecto4dx.getId());
+        if (ts2.size() > 47) {
+            ts2.get(9).setStatus(BuyStatus.PAGADO);  ts2.get(9).setUser(sofiaL);
+            ts2.get(9).setBuyDateTime(LocalDateTime.now().minusHours(2));
+            ts2.get(47).setStatus(BuyStatus.PAGADO); ts2.get(47).setUser(carlosR);
+            ts2.get(47).setBuyDateTime(LocalDateTime.now().minusHours(7));
+            ticketRepo.saveAll(List.of(ts2.get(9), ts2.get(47)));
+        }
+
+        // Sala 2 · Super Mario IMAX · hoy 16:00
+        List<Ticket> ts3 = ticketRepo.findBySession_Id(todayMario_imax.getId());
+        if (ts3.size() > 120) {
+            ts3.get(2).setStatus(BuyStatus.PAGADO);   ts3.get(2).setUser(pabloG);
+            ts3.get(2).setBuyDateTime(LocalDateTime.now().minusHours(2));
+            ts3.get(25).setStatus(BuyStatus.PAGADO);  ts3.get(25).setUser(lauraS);
+            ts3.get(25).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ts3.get(63).setStatus(BuyStatus.PAGADO);  ts3.get(63).setUser(elenaM);
+            ts3.get(63).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(3));
+            ts3.get(98).setStatus(BuyStatus.PAGADO);  ts3.get(98).setUser(javierT);
+            ts3.get(98).setBuyDateTime(LocalDateTime.now().minusDays(2));
+            ts3.get(120).setStatus(BuyStatus.PAGADO); ts3.get(120).setUser(user2);
+            ts3.get(120).setBuyDateTime(LocalDateTime.now().minusDays(2).minusHours(4));
+            ticketRepo.saveAll(List.of(ts3.get(2), ts3.get(25), ts3.get(63), ts3.get(98), ts3.get(120)));
+        }
+
+        // Sala 2 · La odisea IMAX · hoy 18:30
+        List<Ticket> ts4 = ticketRepo.findBySession_Id(todayOdisea_imax.getId());
+        if (ts4.size() > 88) {
+            ts4.get(14).setStatus(BuyStatus.PAGADO); ts4.get(14).setUser(user2);
+            ts4.get(14).setBuyDateTime(LocalDateTime.now().minusHours(1));
+            ts4.get(37).setStatus(BuyStatus.PAGADO); ts4.get(37).setUser(carlosR);
+            ts4.get(37).setBuyDateTime(LocalDateTime.now().minusHours(8));
+            ts4.get(88).setStatus(BuyStatus.PAGADO); ts4.get(88).setUser(sofiaL);
+            ts4.get(88).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(1));
+            ticketRepo.saveAll(List.of(ts4.get(14), ts4.get(37), ts4.get(88)));
+        }
+
+        // Sala 2 · Top Gun IMAX · hoy 21:00
+        List<Ticket> ts5 = ticketRepo.findBySession_Id(todayTopgun_imax.getId());
+        if (ts5.size() > 115) {
+            ts5.get(4).setStatus(BuyStatus.PAGADO);   ts5.get(4).setUser(javierT);
+            ts5.get(4).setBuyDateTime(LocalDateTime.now().minusHours(3));
+            ts5.get(52).setStatus(BuyStatus.PAGADO);  ts5.get(52).setUser(pabloG);
+            ts5.get(52).setBuyDateTime(LocalDateTime.now().minusHours(5));
+            ts5.get(100).setStatus(BuyStatus.PAGADO); ts5.get(100).setUser(lauraS);
+            ts5.get(100).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ts5.get(115).setStatus(BuyStatus.PAGADO); ts5.get(115).setUser(elenaM);
+            ts5.get(115).setBuyDateTime(LocalDateTime.now().minusDays(2));
+            ticketRepo.saveAll(List.of(ts5.get(4), ts5.get(52), ts5.get(100), ts5.get(115)));
+        }
+
+        // Sala 6 · Top Gun STANDARD · hoy 19:00
+        List<Ticket> ts6 = ticketRepo.findBySession_Id(todayTopgun_std.getId());
+        if (ts6.size() > 30) {
+            ts6.get(5).setStatus(BuyStatus.PAGADO);  ts6.get(5).setUser(user);
+            ts6.get(5).setBuyDateTime(LocalDateTime.now().minusHours(2));
+            ts6.get(30).setStatus(BuyStatus.PAGADO); ts6.get(30).setUser(user2);
+            ts6.get(30).setBuyDateTime(LocalDateTime.now().minusHours(4));
+            ticketRepo.saveAll(List.of(ts6.get(5), ts6.get(30)));
+        }
+
+        // Sala 6 · Playa de lobos STANDARD · hoy 21:30
+        List<Ticket> ts7 = ticketRepo.findBySession_Id(todayPlaya_std.getId());
+        if (ts7.size() > 20) {
+            ts7.get(8).setStatus(BuyStatus.PAGADO); ts7.get(8).setUser(carlosR);
+            ts7.get(8).setBuyDateTime(LocalDateTime.now().minusHours(1));
+            ticketRepo.save(ts7.get(8));
+        }
+
+
+    }
+
 }
