@@ -57,4 +57,12 @@ class ThymeleafTitleTemplateContractTest {
         }
     }
 
+    @Test
+    void profilePasswordFieldReferencesItsHelpText() throws IOException {
+        String html = template("users/profile-form.html");
+        assertTrue(html.contains("aria-describedby=\"passwordHelp\""));
+        assertTrue(html.contains("<small id=\"passwordHelp\""));
+        assertTrue(html.contains("vacío para conservar la misma contraseña."));
+    }
+
 }
