@@ -45,4 +45,16 @@ class ThymeleafTitleTemplateContractTest {
                     () -> "Missing scoped header: " + column);
         }
     }
+    @Test
+    void roomAndSessionTablesHaveAccessibleCaptions() throws IOException {
+        for (String[] table : new String[][] {
+                {"rooms/room-list.html", "Salas del cine"},
+                {"sessions/session-list.html", "Proyecciones del cine"}
+        }) {
+            String html = template(table[0]);
+            assertTrue(html.contains("<caption class=\"visually-hidden\">" + table[1] + "</caption>"),
+                    () -> "Missing accessible table caption in " + table[0]);
+        }
+    }
+
 }
