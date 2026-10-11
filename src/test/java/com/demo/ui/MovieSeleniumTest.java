@@ -1,5 +1,7 @@
 package com.demo.ui;
 
+import com.demo.model.Movie;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -9,6 +11,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MovieSeleniumTest extends BaseSeleniumTest{
+    private Movie movieAction;
+    private Movie movieRomance;
+
+    @BeforeEach
+    void setUpMovies() {
+        movieAction = movieRepository.save(
+                Movie.builder().active(true).title("The Bourne Identity").genre("Action")
+                        .durationMinutes(119).releaseYear(2002).director("Doug Liman").build()
+        );
+        movieRomance = movieRepository.save(
+                Movie.builder().active(true).title("The Age of Adaline").genre("Romance")
+                        .durationMinutes(112).releaseYear(2015).director("Lee Toland Krieger").build()
+        );
+    }
     @Test
     void movieList(){
         driver.get(baseUrl + "movies");
