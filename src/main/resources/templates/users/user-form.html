@@ -10,7 +10,7 @@
         <span th:text="${edit} ? 'Editar usuario' : 'Crear usuario'"></span>
     </h1>
 
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
 
     <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
         <div class="card-body p-4">
