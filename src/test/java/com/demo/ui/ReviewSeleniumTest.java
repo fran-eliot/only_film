@@ -298,16 +298,12 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
     private void scrollToViewAndClick(WebElement element) {
         // Scroll el elemento a la vista
         ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+                "arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});",
                 element
         );
 
-        // Esperar a que se estabilice el scroll
-        try {
-            Thread.sleep(800);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // Esperar a que el elemento esté listo para recibir el click
+        wait.until(ExpectedConditions.elementToBeClickable(element));
 
         // Intentar click simple
         try {
@@ -323,12 +319,8 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
     }
 
     private void clickStarSafely(WebElement star) {
-        // Las estrellas no necesitan scroll porque están dentro de la pantalla del formulario
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // Las estrellas están dentro de la pantalla del formulario
+        wait.until(ExpectedConditions.elementToBeClickable(star));
 
         try {
             star.click();
@@ -338,27 +330,11 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
     }
 
     private void waitForPageLoad() {
-        // Esperar a que jQuery esté listo si está disponible
-        try {
-            wait.until(driver -> {
-                try {
-                    return ((JavascriptExecutor) driver).executeScript(
-                            "return typeof jQuery == 'undefined' || jQuery.active == 0"
-                    ).equals(true);
-                } catch (Exception e) {
-                    return true;
-                }
-            });
-        } catch (Exception e) {
-            // Si hay error, simplemente continuamos
-        }
-
-        // Pequeña pausa adicional para asegurar que la página esté completamente cargada
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // Esperar la carga completa del documento y las peticiones jQuery, si existe.
+        wait.until(driver -> Boolean.TRUE.equals(((JavascriptExecutor) driver).executeScript(
+                "return document.readyState === 'complete' " +
+                "&& (typeof jQuery === 'undefined' || jQuery.active === 0);"
+        )));
     }
 }
 
