@@ -22,8 +22,8 @@
 
     </div>
 
-    <div th:if="${message}" class="alert alert-success mt-3" th:text="${message}"></div>
-    <div th:if="${error}"   class="alert alert-danger  mt-3" th:text="${error}"></div>
+    <div th:if="${message}" class="alert alert-success mt-3" role="status" th:text="${message}"></div>
+    <div th:if="${error}"   class="alert alert-danger  mt-3" role="alert" th:text="${error}"></div>
 
     <div class="table-responsive mt-4">
         <table class="table table-dark table-hover align-middle border-gold w-100">
