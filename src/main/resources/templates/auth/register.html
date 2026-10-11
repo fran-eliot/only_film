@@ -19,50 +19,62 @@
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="username"
                            placeholder="" required th:field="*{username}" minlength="3" maxlength="20"
-                            th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'">
+                            th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'"
+                           th:aria-invalid="${#fields.hasErrors('username')}"
+                           th:aria-describedby="${#fields.hasErrors('username') ? 'usernameError' : null}">
                     <label for="username">Username</label>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                    <div id="usernameError" class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                 </div>
 
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="firstName"
                            placeholder="" required th:field="*{firstName}" minlength="3" maxlength="20"
-                           th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid'">
+                           th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid'"
+                           th:aria-invalid="${#fields.hasErrors('firstName')}"
+                           th:aria-describedby="${#fields.hasErrors('firstName') ? 'firstNameError' : null}">
                     <label for="firstName">Nombre</label>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+                    <div id="firstNameError" class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
                 </div>
 
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="lastName"
                            placeholder="" required th:field="*{lastName}" minlength="3" maxlength="20"
-                           th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid'">
+                           th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid'"
+                           th:aria-invalid="${#fields.hasErrors('lastName')}"
+                           th:aria-describedby="${#fields.hasErrors('lastName') ? 'lastNameError' : null}">
                     <label for="lastName">Apellido</label>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                    <div id="lastNameError" class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
                 </div>
 
 
                 <div class="form-floating mb-3">
                     <input type="email" class="form-control" id="email"
                            placeholder="" required th:field="*{email}"
-                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
+                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                           th:aria-invalid="${#fields.hasErrors('email')}"
+                           th:aria-describedby="${#fields.hasErrors('email') ? 'emailError' : null}">
                     <label for="email">Email</label>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    <div id="emailError" class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                 </div>
 
                 <div class="form-floating mb-3">
                     <input type="password" th:field="*{password}"
                            th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                           th:aria-invalid="${#fields.hasErrors('password')}"
+                           th:aria-describedby="${#fields.hasErrors('password') ? 'passwordError' : null}"
                            class="form-control" id="password" required minlength="4" maxlength="100">
                     <label for="password">Contraseña</label>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    <div id="passwordError" class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                 </div>
 
                 <div class="form-floating mb-3">
                     <input type="password" th:field="*{passwordConfirm}"
                            th:classappend="${#fields.hasErrors('passwordConfirm')} ? 'is-invalid'"
+                           th:aria-invalid="${#fields.hasErrors('passwordConfirm')}"
+                           th:aria-describedby="${#fields.hasErrors('passwordConfirm') ? 'passwordConfirmError' : null}"
                            class="form-control" id="passwordConfirm" required minlength="4" maxlength="40">
                     <label for="passwordConfirm">Repite la contraseña</label>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"></div>
+                    <div id="passwordConfirmError" class="invalid-feedback" th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"></div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Crear cuenta</button>
