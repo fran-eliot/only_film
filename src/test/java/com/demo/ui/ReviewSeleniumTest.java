@@ -38,13 +38,6 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
 
     @BeforeEach
     void setUpReview() {
-        ticketRepository.deleteAll();
-        reviewRepository.deleteAll();
-        sessionRepository.deleteAll();
-        roomRepository.deleteAll();
-        movieRepository.deleteAll();
-        userRepository.deleteAll();
-
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         // Crear usuario que escribirá la reseña
