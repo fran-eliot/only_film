@@ -12,9 +12,9 @@
                     <h1 class="h3 mt-3 fw-normal">Ingresa con tu cuenta</h1>
                 </div>
 
-                <div th:if="${param.error}" class="alert alert-danger">Credenciales incorrectas.</div>
-                <div th:if="${param.logout}" class="alert alert-success">Sesión cerrada correctamente, hasta pronto.</div>
-                <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">Credenciales incorrectas.</div>
+                <div th:if="${param.logout}" class="alert alert-success" role="status">Sesión cerrada correctamente, hasta pronto.</div>
+                <div th:if="${message}" class="alert alert-success" role="status" th:text="${message}"></div>
 
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="username" name="username"
