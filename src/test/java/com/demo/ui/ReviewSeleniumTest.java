@@ -163,7 +163,8 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
         wait.until(ExpectedConditions.urlMatches(".*/movies/\\d+.*"));
         waitForPageLoad();
 
-        // Verificar que aparezca la reseña en la página de la película
+        // Esperar a que la reseña guardada aparezca tras la redirección
+        wait.until(driver -> driver.getPageSource().contains(reviewTitle));
         assertTrue(driver.getPageSource().contains(reviewTitle));
         assertTrue(driver.getPageSource().contains(reviewDescription));
     }
@@ -244,8 +245,10 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
         for (int i = 0; i < stars.size(); i++) {
             clickStarSafely(stars.get(i));
 
-            String ratingText = driver.findElement(By.id("ratingText")).getText();
             int expectedRating = i + 1;
+            wait.until(ExpectedConditions.textToBePresentInElementLocated(
+                    By.id("ratingText"), expectedRating + " / 5"));
+            String ratingText = driver.findElement(By.id("ratingText")).getText();
 
             assertTrue(ratingText.contains(expectedRating + " / 5"),
                     "La puntuación debería ser " + expectedRating + " / 5");
