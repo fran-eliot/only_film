@@ -24,6 +24,9 @@ import java.util.Optional;
 @Controller
 @AllArgsConstructor
 public class MovieController {
+    private static final String REDIRECT_MOVIES = "redirect:/movies";
+    private static final String MODEL_MOVIE = "movie";
+
     //Inyectar el repositorio de movie
     private final MovieRepository movieRepository;
     private final FileService fileService;
@@ -34,7 +37,7 @@ public class MovieController {
     //Redirect raíz a /movies
     @GetMapping("/")
     public String home() {
-        return "redirect:/movies";
+        return REDIRECT_MOVIES;
     }
 
     //GetMapping de peliculas
@@ -62,7 +65,7 @@ public class MovieController {
         Optional<Movie> movieOptional = movieRepository.findById(id);
         if(movieOptional.isPresent()){
             Movie movie = movieOptional.get();
-            model.addAttribute("movie", movie);
+            model.addAttribute(MODEL_MOVIE, movie);
             model.addAttribute("sessions", sessionRepository.findByMovie_IdAndActiveTrueOrderByStartTimeAsc(id));
             model.addAttribute("reviews", reviewRepository.findByMovieIdOrderByCreationDateDesc(id));
             model.addAttribute("esLocale", new java.util.Locale("es"));     // Lo puse en el HTML pero se queja, la solucion: sacarlo fuera al controlador y pasarle el atributo
@@ -73,7 +76,7 @@ public class MovieController {
 
             return "movies/movie-detail";
         }
-        return"redirect:/movies";
+        return REDIRECT_MOVIES;
 
     }
     //Desactivar una pelicula
@@ -86,13 +89,13 @@ public class MovieController {
             movieDeactivate.setActive(false);
             movieRepository.save(movieDeactivate);
         }
-        return "redirect:/movies";
+        return REDIRECT_MOVIES;
     }
 
     //Creamos una pelicula
     @GetMapping("movies/new")
     public String newMovie(Model model){
-        model.addAttribute("movie", new MovieForm());
+        model.addAttribute(MODEL_MOVIE, new MovieForm());
         return "movies/movie-form";
     }
 
@@ -100,12 +103,12 @@ public class MovieController {
     @GetMapping("movies/edit/{id}")
     public String editMovie(@PathVariable Long id, Model model){
         //Se pude hacer tambien con el Optional
-        model.addAttribute("movie", MovieForm.from(movieRepository.findById(id).orElseThrow()));
+        model.addAttribute(MODEL_MOVIE, MovieForm.from(movieRepository.findById(id).orElseThrow()));
         return "movies/movie-form";
     }
 
     @PostMapping("movies")
-    public String createMovie(@ModelAttribute("movie") MovieForm form,
+    public String createMovie(@ModelAttribute(MODEL_MOVIE) MovieForm form,
                               @RequestParam("imageFile") MultipartFile imageFile,
                               RedirectAttributes redirectAttributes) {
         String imageUrl;

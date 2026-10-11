@@ -18,6 +18,8 @@ import java.util.Optional;
 @Controller
 @AllArgsConstructor
 public class RoomController {
+    private static final String REDIRECT_ROOMS = "redirect:/salas";
+
 
     //repositorio de room (salas)
     private final RoomRepository roomRepository;
@@ -40,7 +42,7 @@ public class RoomController {
             // Redirect para que /salas cargue correctamente el modelo con "rooms"
             // Si devolviéramos "rooms/room-list" directamente sin añadir "rooms" al modelo,
             // Thymeleaf lanzaría un error al intentar hacer #lists.size(rooms) con null
-            return "redirect:/salas";
+            return REDIRECT_ROOMS;
         }
     }
 
@@ -61,7 +63,7 @@ public class RoomController {
             room.setActive(false);
             roomRepository.save(room);
         });
-        return "redirect:/salas";
+        return REDIRECT_ROOMS;
     }
 
 
@@ -87,7 +89,7 @@ public class RoomController {
         // Preserve the persisted active flag; never accept the hidden form field.
         if (form.getId() == null) room.setActive(true);
         roomRepository.save(room);
-        return "redirect:/salas";
+        return REDIRECT_ROOMS;
     }
 
     @GetMapping ("salas/edit/{id}")

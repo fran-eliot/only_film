@@ -25,6 +25,8 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 public class TicketController {
+    private static final String MODEL_TICKET = "ticket";
+
 
     //private final TicketRepository ticketRepository;
     private final TicketService ticketService;
@@ -66,7 +68,7 @@ public class TicketController {
                 && (ticket.getUser() == null || !ticket.getUser().getId().equals(user.getId())))) {
             throw new AccessDeniedException("No puedes consultar esta entrada");
         }
-        model.addAttribute("ticket", ticket);
+        model.addAttribute(MODEL_TICKET, ticket);
         return "tickets/ticket-detail";
     }
 
@@ -80,7 +82,7 @@ public class TicketController {
         TicketAdminForm form = new TicketAdminForm();
         form.setId(ticket.getId());
         form.setDiscount(ticket.getDiscount() == null ? 0.0 : ticket.getDiscount());
-        model.addAttribute("ticket", form);
+        model.addAttribute(MODEL_TICKET, form);
         model.addAttribute("ticketDetails", ticket);
         return "tickets/ticket-form";
     }
@@ -92,7 +94,7 @@ public class TicketController {
         if (ticket.getStatus() != BuyStatus.LIBRE) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La entrada ya no está disponible");
         }
-        model.addAttribute("ticket", ticket);
+        model.addAttribute(MODEL_TICKET, ticket);
         return "tickets/ticket-checkout";
     }
 
@@ -137,7 +139,7 @@ public class TicketController {
 
     // POST tickets/save
     @PostMapping("tickets/save")
-    public String saveTicket(@Valid @ModelAttribute("ticket") TicketAdminForm form,
+    public String saveTicket(@Valid @ModelAttribute(MODEL_TICKET) TicketAdminForm form,
                              BindingResult bindingResult, Model model) {
         if (form.getId() == null) {
             throw new IllegalArgumentException("Solo se pueden editar entradas existentes");
