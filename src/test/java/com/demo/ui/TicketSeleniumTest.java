@@ -132,12 +132,12 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
         assertTrue(driver.getPageSource().contains(room.getName()));
         assertTrue(driver.getPageSource().contains(BuyStatus.PAGADO.name()));
 
-        List<WebElement> detailButtons = driver.findElements(By.linkText("Detalles del Ticket"));
-        assertFalse(detailButtons.isEmpty());
+        By detailLink = By.cssSelector("a[href='/tickets/" + paidTicket.getId() + "']");
+        WebElement detailButton = wait.until(ExpectedConditions.elementToBeClickable(detailLink));
+        assertEquals("Detalles del Ticket", detailButton.getText().trim());
+        detailButton.click();
 
-        clickSafely(detailButtons.getFirst());
-
-        // Esperar a que la navegación termine antes de comprobar la URL (evita flaky)
+        // Esperar a que la navegación termine antes de comprobar la URL
         wait.until(ExpectedConditions.urlToBe(baseUrl + "tickets/" + paidTicket.getId()));
         assertEquals(baseUrl + "tickets/" + paidTicket.getId(), driver.getCurrentUrl());
     }
