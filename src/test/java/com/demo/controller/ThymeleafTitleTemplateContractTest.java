@@ -81,4 +81,14 @@ class ThymeleafTitleTemplateContractTest {
         }
     }
 
+    @Test
+    void authenticationMessagesHaveAccessibleRoles() throws IOException {
+        String login = template("auth/login.html");
+        assertTrue(login.contains("th:if=\"${param.error}\" class=\"alert alert-danger\" role=\"alert\""));
+        assertTrue(login.contains("th:if=\"${param.logout}\" class=\"alert alert-success\" role=\"status\""));
+        assertTrue(login.contains("th:if=\"${message}\" class=\"alert alert-success\" role=\"status\""));
+
+        String register = template("auth/register.html");
+        assertTrue(register.contains("th:if=\"${error}\" class=\"alert alert-danger\" role=\"alert\""));
+    }
 }
