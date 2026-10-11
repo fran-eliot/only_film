@@ -8,6 +8,8 @@ La consola H2 no se habilita con el perfil `dev` por sí solo. En `application-d
 
 Para trabajar localmente con la consola: activar el perfil `dev` y establecer la variable de entorno `ONLYFILM_H2_CONSOLE_ENABLED=true`. Se presupone que la aplicación se ejecuta en la máquina de desarrollo, sin publicar un túnel/proxy inverso que exponga la consola.
 
+La cabecera `X-Frame-Options` tiene alcance de **toda la cadena de filtros**: al habilitar la consola local se usa `SAMEORIGIN` también en las páginas ordinarias (por ejemplo `/movies`), no solo en `/h2-console/**`. Sin la excepción, el valor normal es `DENY`. Esto queda cubierto por pruebas MockMvc en perfiles `dev` y `test`.
+
 **Limitaciones:** un operador puede sobrescribir propiedades de configuración, publicar puertos mediante proxy/túnel, o añadir perfiles de forma inapropiada. Comprobar siempre la configuración efectiva y exposición de red del despliegue; el nombre de perfil `dev` no certifica que la máquina sea segura. La consola H2 es una herramienta exclusivamente local y nunca debe habilitarse en servidores públicos.
 
 Pruebas: `H2ConsoleCsrfProfileTest` comprueba el opt-in local y rechaza ausencia de opt-in, consola deshabilitada, binding público, y perfiles de producción/PostgreSQL. `EnvironmentHardeningTest` comprueba las propiedades comprometidas. El estado de `java:S4502` en SonarCloud no se deduce de estos cambios.

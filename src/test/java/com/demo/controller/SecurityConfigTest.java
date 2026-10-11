@@ -69,6 +69,13 @@ public class SecurityConfigTest {
     }
 
     @Test
+    void defaultTestProfileKeepsDenyFrameProtection() throws Exception {
+        mockMvc.perform(get("/movies"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("X-Frame-Options", "DENY"));
+    }
+
+    @Test
     void h2ConsoleEndpointDoesNotBypassCsrfInTestOrDefaultProfile() throws Exception {
         mockMvc.perform(post("/h2-console/login.do").with(user(adminUser)))
                 .andExpect(status().isForbidden());
