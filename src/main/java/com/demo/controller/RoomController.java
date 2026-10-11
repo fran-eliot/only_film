@@ -18,6 +18,8 @@ import java.util.Optional;
 @Controller
 @AllArgsConstructor
 public class RoomController {
+    private static final String VIEW_ROOM_FORM = "rooms/room-form";
+
     private static final String REDIRECT_ROOMS = "redirect:/salas";
 
 
@@ -70,13 +72,13 @@ public class RoomController {
     @GetMapping ("salas/new")
     public String create(Model model){
         model.addAttribute("room", new RoomForm());
-        return "rooms/room-form";
+        return VIEW_ROOM_FORM;
     }
 
     @PostMapping("salas")
     public String guardar(@Valid @ModelAttribute("room") RoomForm form, BindingResult bindingresult) {
         if (bindingresult.hasErrors()) {
-            return "rooms/room-form";
+            return VIEW_ROOM_FORM;
         }
         Room room = form.getId() == null
                 ? new Room()
@@ -95,7 +97,7 @@ public class RoomController {
     @GetMapping ("salas/edit/{id}")
     public String edit(Model model, @PathVariable Long id){
         model.addAttribute("room", RoomForm.from(roomRepository.findById(id).orElseThrow()));
-        return "rooms/room-form";
+        return VIEW_ROOM_FORM;
     }
 
 }
