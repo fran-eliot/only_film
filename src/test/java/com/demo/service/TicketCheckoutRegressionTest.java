@@ -33,8 +33,9 @@ class TicketCheckoutRegressionTest {
     void paidTicketCannotBePurchasedAgain() {
         when(ticketRepository.findByIdForCheckout(1L))
                 .thenReturn(Optional.of(ticket(1L, BuyStatus.PAGADO)));
+        User buyer = User.builder().id(2L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(1L, User.builder().id(2L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(1L, buyer, 0, 0, 0, 0, 0));
         verify(ticketRepository, never()).save(any());
     }
 
@@ -42,8 +43,9 @@ class TicketCheckoutRegressionTest {
     void cancelledTicketCannotBePurchased() {
         when(ticketRepository.findByIdForCheckout(2L))
                 .thenReturn(Optional.of(ticket(2L, BuyStatus.CANCELADO)));
+        User buyer = User.builder().id(3L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(2L, User.builder().id(3L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(2L, buyer, 0, 0, 0, 0, 0));
         verify(ticketRepository, never()).save(any());
     }
 
@@ -51,8 +53,9 @@ class TicketCheckoutRegressionTest {
     void negativeSnackQuantityIsRejected() {
         when(ticketRepository.findByIdForCheckout(3L))
                 .thenReturn(Optional.of(ticket(3L, BuyStatus.LIBRE)));
+        User buyer = User.builder().id(4L).build();
         assertThrows(IllegalArgumentException.class,
-                () -> ticketService.processCheckout(3L, User.builder().id(4L).build(), -1, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(3L, buyer, -1, 0, 0, 0, 0));
         verify(ticketRepository, never()).save(any());
     }
 }
