@@ -29,6 +29,15 @@ class H2ConsoleCsrfProfileTest {
     }
 
     @Test
+    void testAndDemoProfilesAloneDoNotAllowH2CsrfException() {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setActiveProfiles("test");
+        assertFalse(SecurityConfig.isLocalH2ConsoleAllowed(environment));
+        environment.setActiveProfiles("demo");
+        assertFalse(SecurityConfig.isLocalH2ConsoleAllowed(environment));
+    }
+
+    @Test
     void postgresWinsOverDevelopmentProfile() {
         MockEnvironment environment = new MockEnvironment();
         environment.setActiveProfiles("dev", "postgres");
