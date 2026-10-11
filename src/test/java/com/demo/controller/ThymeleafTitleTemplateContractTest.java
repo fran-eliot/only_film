@@ -91,4 +91,11 @@ class ThymeleafTitleTemplateContractTest {
         String register = template("auth/register.html");
         assertTrue(register.contains("th:if=\"${error}\" class=\"alert alert-danger\" role=\"alert\""));
     }
+    @Test
+    void userFormErrorsHaveAccessibleAlertRoles() throws IOException {
+        for (String path : new String[] {"users/profile-form.html", "users/user-form.html"}) {
+            assertTrue(template(path).contains("th:if=\"${error}\" class=\"alert alert-danger\" role=\"alert\""),
+                    () -> "Missing error alert role in " + path);
+        }
+    }
 }
