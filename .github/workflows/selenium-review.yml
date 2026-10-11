@@ -31,7 +31,7 @@ jobs:
       - name: Run ReviewSeleniumTest, MovieSeleniumTest and TicketSeleniumTest without retries
         env:
           CI: 'true'
-        run: mvn -B -ntp test -Dtest=ReviewSeleniumTest,MovieSeleniumTest,TicketSeleniumTest -DrerunFailingTestsCount=0
+        run: mvn -B -ntp test -Dtest=ReviewSeleniumTest,MovieSeleniumTest,TicketSeleniumTest -Dsurefire.rerunFailingTestsCount=0
 
       - name: Upload Selenium failure evidence
         if: ${{ failure() }}
