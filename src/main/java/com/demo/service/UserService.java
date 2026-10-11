@@ -44,8 +44,6 @@ public class UserService implements UserDetailsService {
         if (! form.getPassword().equals(form.getPasswordConfirm()))
             throw new IllegalArgumentException("Las contraseñas no coinciden");
 
-//        if (!form.getAcceptRGPD())
-//            throw new IllegalArgumentException("Debes aceptar la política de privacidad");
 
         User user = new User();
         user.setUsername(form.getUsername());
@@ -54,7 +52,6 @@ public class UserService implements UserDetailsService {
         user.setFirstName(form.getFirstName());
         user.setLastName(form.getLastName());
         user.setActive(true);
-        // user.setPassword(form.getPassword()); // password en texto plano
         String encodedPassword = passwordEncoder.encode(form.getPassword());
         user.setPassword(encodedPassword);
         return userRepository.save(user);
@@ -78,8 +75,6 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByEmail(user.getEmail())){
             throw new IllegalArgumentException("Este email ya está ocupado");
         }
-//        if (user.getPassword() == null || user.getPassword().isBlank())
-//            throw new IllegalArgumentException("La contraseña es obligatoria");
 
         //Si usamos Spring
         if (!StringUtils.hasText(user.getPassword()))

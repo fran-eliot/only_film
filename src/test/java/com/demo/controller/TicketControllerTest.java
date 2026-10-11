@@ -67,13 +67,6 @@ public class TicketControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Limpieza de datos respetando restricciones de integridad referencial
-//        ticketRepository.deleteAll();
-//        sessionRepository.deleteAll();
-//        roomRepository.deleteAll();
-//        movieRepository.deleteAll();
-//        userRepository.deleteAll();
-
         // 1. Crear entidades requeridas de apoyo
         Movie movie = movieRepository.save(Movie.builder().title("Batman").active(true).build());
         Room room = roomRepository.save(Room.builder().name("Sala 1").capacity(50).active(true).build());

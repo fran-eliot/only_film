@@ -7,7 +7,6 @@ import com.demo.repository.TicketRepository;
 import com.demo.model.Movie;
 import com.demo.model.Room;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,14 +31,6 @@ public class SessionControllerTest {
     TicketRepository ticketRepository;
     @Autowired
     MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp() {
-//        ticketRepository.deleteAll();
-//        sessionRepository.deleteAll();
-//        movieRepository.deleteAll();
-//        roomRepository.deleteAll();
-    }
 
     @Test
     void listTableHeadersUseCssWidths() throws Exception {
