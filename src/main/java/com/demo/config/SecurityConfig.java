@@ -109,7 +109,7 @@ public class SecurityConfig {
     }
     static boolean isLocalH2ConsoleAllowed(Environment environment) {
         return environment.acceptsProfiles(Profiles.of("dev"))
-                && !environment.acceptsProfiles(Profiles.of("postgres"));
+                && !environment.acceptsProfiles(Profiles.of("postgres", "prod"));
     }
 
     @Bean
