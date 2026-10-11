@@ -54,6 +54,14 @@ public class SecurityConfigTest {
     }
 
     @Test
+    void movieListRendersPageTitleFromSharedThymeleafHead() throws Exception {
+        mockMvc.perform(get("/movies"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "<title>Cartelera — Only Film</title>")));
+    }
+
+    @Test
     void anonymousUserIsRedirectedFromNewMovieForm() throws Exception {
         // Simula un usuario anónimo intentando crear una película
         mockMvc.perform(get("/movies/new"))
