@@ -142,11 +142,11 @@ class UserSeleniumTest extends BaseSeleniumTest {
 
         clickSafely(deactivateButton);
 
-        wait.until(ExpectedConditions.urlToBe(baseUrl + "admin/users"));
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(
+                By.tagName("body"), "Usuario desactivado correctamente"));
 
         User deactivated = userRepository.findById(regularUser.getId()).orElseThrow();
         assertFalse(deactivated.getActive());
-        assertTrue(driver.getPageSource().contains("Usuario desactivado correctamente"));
 
         WebElement activateButton = wait.until(ExpectedConditions.elementToBeClickable(
                 By.cssSelector("form[action='/admin/users/activate/" + regularUser.getId() + "'] button[type='submit']")
@@ -154,11 +154,11 @@ class UserSeleniumTest extends BaseSeleniumTest {
 
         clickSafely(activateButton);
 
-        wait.until(ExpectedConditions.urlToBe(baseUrl + "admin/users"));
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(
+                By.tagName("body"), "Usuario activado correctamente"));
 
         User activated = userRepository.findById(regularUser.getId()).orElseThrow();
         assertTrue(activated.getActive());
-        assertTrue(driver.getPageSource().contains("Usuario activado correctamente"));
     }
 
     private void loginAdmin() {

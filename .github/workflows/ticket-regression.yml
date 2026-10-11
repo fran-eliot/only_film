@@ -26,4 +26,4 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Run ticket regression tests
-        run: mvn -B -ntp test -Dtest=TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest -DrerunFailingTestsCount=0
+        run: mvn -B -ntp test -Dtest=TicketSecurityRegressionTest,TicketCheckoutRegressionTest,TicketCheckoutConcurrencyTest -Dsurefire.rerunFailingTestsCount=0
