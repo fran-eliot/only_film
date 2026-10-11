@@ -48,6 +48,33 @@ class SessionEditInvariantsTest {
     }
 
     @Test
+    void creationRejectsInactiveMovieAndRoom() {
+        Movie inactive = movies.save(Movie.builder().title("Inactive").active(false).build());
+        Room validRoom = rooms.save(Room.builder().name("Valid room").active(true).capacity(10).build());
+        SessionForm form = new SessionForm();
+        form.setMovieId(inactive.getId());
+        form.setRoomId(validRoom.getId());
+        form.setPrice(8.0);
+
+        long before = sessions.count();
+        assertThrows(IllegalArgumentException.class, () -> management.save(form));
+
+        Movie active = movies.save(Movie.builder().title("Active").active(true).build());
+        Room inactiveRoom = rooms.save(Room.builder().name("Inactive room").active(false).capacity(10).build());
+        form.setMovieId(active.getId());
+        form.setRoomId(inactiveRoom.getId());
+        assertThrows(IllegalArgumentException.class, () -> management.save(form));
+        assertEquals(before, sessions.count());
+    }
+
+    @Test
+    void creationRequiresMovieAndRoom() {
+        SessionForm form = new SessionForm();
+        form.setPrice(8.0);
+        assertThrows(IllegalArgumentException.class, () -> management.save(form));
+    }
+
+    @Test
     void unsoldInventoryAllowsMovieTimePriceAndLanguageUpdates() {
         Session original = prepareSession();
         List<Ticket> seats = tickets.findBySession_Id(original.getId());

@@ -31,9 +31,7 @@ public class SessionManagementService {
 
     @Transactional
     public Session save(SessionForm form) {
-        if (form.getPrice() == null || !Double.isFinite(form.getPrice()) || form.getPrice() < 0) {
-            throw new IllegalArgumentException("El precio debe ser un número no negativo");
-        }
+        validatePrice(form.getPrice());
         boolean creating = form.getId() == null;
         Session session = creating ? new Session() : sessionRepository.findById(form.getId()).orElseThrow();
 
@@ -42,57 +40,71 @@ public class SessionManagementService {
         Room room = form.getRoomId() == null
                 ? session.getRoom() : roomRepository.findById(form.getRoomId()).orElseThrow();
 
-        if (creating && (movie == null || room == null)) {
-            throw new IllegalArgumentException("Selecciona una película y una sala");
-        }
-
         if (creating) {
-            if (!Boolean.TRUE.equals(movie.getActive()) || !Boolean.TRUE.equals(room.getActive())) {
-                throw new IllegalArgumentException("La película y la sala deben estar activas");
-            }
-            if (room.getCapacity() == null || room.getCapacity() < 1 || room.getCapacity() > 300) {
-                throw new IllegalArgumentException("Capacidad de sala inválida");
-            }
+            validateCreation(movie, room);
         } else {
-            // Lock all seats before checking sales: checkout holds the same per-ticket
-            // PESSIMISTIC_WRITE lock, so changes cannot race with a purchase.
-            List<Ticket> inventory = ticketRepository.findBySessionIdForUpdate(session.getId());
-            boolean hasInventory = !inventory.isEmpty();
-            boolean hasSales = inventory.stream().anyMatch(t -> t.getStatus() != BuyStatus.LIBRE);
-            boolean roomChanged = !Objects.equals(idOf(session.getRoom()), idOf(room));
-            if (hasInventory && roomChanged) {
-                throw new IllegalStateException("No se puede cambiar la sala con entradas generadas");
-            }
-
-            boolean essentialChange =
-                    (form.getStartTime() != null && !Objects.equals(form.getStartTime(), session.getStartTime()))
-                    || !Objects.equals(form.getPrice(), session.getPrice())
-                    || !Objects.equals(idOf(movie), idOf(session.getMovie()))
-                    || !Objects.equals(form.getLanguage(), session.getLanguage())
-                    || !Objects.equals(form.getAdMinutes(), session.getAdMinutes());
-            if (hasSales && essentialChange) {
-                throw new IllegalStateException("No se pueden cambiar los datos de una sesión con entradas vendidas");
-            }
-
-            // The ticket catalogue shows its current face price. Keep prices for
-            // unsold seats in sync when an administrator changes the session price.
-            if (!hasSales && !Objects.equals(form.getPrice(), session.getPrice())) {
-                inventory.forEach(t -> t.setPrice(form.getPrice()));
-            }
+            validateAndSynchronizeEdit(form, session, movie, room);
         }
 
-        if (form.getStartTime() != null) session.setStartTime(form.getStartTime());
-        session.setPrice(form.getPrice());
-        session.setLanguage(form.getLanguage());
-        session.setAdMinutes(form.getAdMinutes());
-
-        session.setMovie(movie);
-        session.setRoom(room);
+        applyFields(form, session, movie, room);
         if (creating) session.setActive(true);
         Session saved = sessionRepository.save(session);
         if (creating) ticketService.generarTickets(saved);
         return saved;
     }
+
+    private static void validatePrice(Double price) {
+        if (price == null || !Double.isFinite(price) || price < 0) {
+            throw new IllegalArgumentException("El precio debe ser un número no negativo");
+        }
+    }
+
+    private static void validateCreation(Movie movie, Room room) {
+        if (movie == null || room == null) {
+            throw new IllegalArgumentException("Selecciona una película y una sala");
+        }
+        if (!Boolean.TRUE.equals(movie.getActive()) || !Boolean.TRUE.equals(room.getActive())) {
+            throw new IllegalArgumentException("La película y la sala deben estar activas");
+        }
+        if (room.getCapacity() == null || room.getCapacity() < 1 || room.getCapacity() > 300) {
+            throw new IllegalArgumentException("Capacidad de sala inválida");
+        }
+    }
+
+    private void validateAndSynchronizeEdit(SessionForm form, Session session, Movie movie, Room room) {
+        // Checkout locks each ticket with PESSIMISTIC_WRITE too; retain the same lock order.
+        List<Ticket> inventory = ticketRepository.findBySessionIdForUpdate(session.getId());
+        boolean hasSales = inventory.stream().anyMatch(t -> t.getStatus() != BuyStatus.LIBRE);
+        boolean roomChanged = !Objects.equals(idOf(session.getRoom()), idOf(room));
+
+        if (!inventory.isEmpty() && roomChanged) {
+            throw new IllegalStateException("No se puede cambiar la sala con entradas generadas");
+        }
+        if (hasSales && hasEssentialChange(form, session, movie)) {
+            throw new IllegalStateException("No se pueden cambiar los datos de una sesión con entradas vendidas");
+        }
+        if (!hasSales && !Objects.equals(form.getPrice(), session.getPrice())) {
+            inventory.forEach(t -> t.setPrice(form.getPrice()));
+        }
+    }
+
+    private static boolean hasEssentialChange(SessionForm form, Session session, Movie movie) {
+        return (form.getStartTime() != null && !Objects.equals(form.getStartTime(), session.getStartTime()))
+                || !Objects.equals(form.getPrice(), session.getPrice())
+                || !Objects.equals(idOf(movie), idOf(session.getMovie()))
+                || !Objects.equals(form.getLanguage(), session.getLanguage())
+                || !Objects.equals(form.getAdMinutes(), session.getAdMinutes());
+    }
+
+    private static void applyFields(SessionForm form, Session session, Movie movie, Room room) {
+        if (form.getStartTime() != null) session.setStartTime(form.getStartTime());
+        session.setPrice(form.getPrice());
+        session.setLanguage(form.getLanguage());
+        session.setAdMinutes(form.getAdMinutes());
+        session.setMovie(movie);
+        session.setRoom(room);
+    }
+
     private static Long idOf(Movie movie) { return movie == null ? null : movie.getId(); }
     private static Long idOf(Room room) { return room == null ? null : room.getId(); }
 }
