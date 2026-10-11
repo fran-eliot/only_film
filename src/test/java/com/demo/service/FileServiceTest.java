@@ -87,15 +87,16 @@ class FileServiceTest {
     @Test
     void rejectsUnsupportedBmp() throws Exception {
         configureDirectory();
-        assertThrows(IllegalArgumentException.class, () -> fileService.store(
-                new MockMultipartFile("file", "foo.bmp", "image/bmp", image("bmp"))));
+        MockMultipartFile bmp = new MockMultipartFile("file", "foo.bmp", "image/bmp", image("bmp"));
+        assertThrows(IllegalArgumentException.class, () -> fileService.store(bmp));
     }
 
     @Test
     void rejectsMoreThanTenMegabytesBeforeDecoding() throws Exception {
         configureDirectory();
-        assertThrows(IllegalArgumentException.class, () -> fileService.store(
-                new MockMultipartFile("file", "big.png", "image/png", new byte[10 * 1024 * 1024 + 1])));
+        MockMultipartFile oversized = new MockMultipartFile(
+                "file", "big.png", "image/png", new byte[10 * 1024 * 1024 + 1]);
+        assertThrows(IllegalArgumentException.class, () -> fileService.store(oversized));
     }
 
     @Test
@@ -104,8 +105,8 @@ class FileServiceTest {
         BufferedImage img = new BufferedImage(6001, 1, BufferedImage.TYPE_INT_RGB);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         assertTrue(ImageIO.write(img, "png", out));
-        assertThrows(IllegalArgumentException.class, () -> fileService.store(
-                new MockMultipartFile("file", "huge.png", "image/png", out.toByteArray())));
+        MockMultipartFile huge = new MockMultipartFile("file", "huge.png", "image/png", out.toByteArray());
+        assertThrows(IllegalArgumentException.class, () -> fileService.store(huge));
     }
 
     @Test
