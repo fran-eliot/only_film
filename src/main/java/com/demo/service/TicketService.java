@@ -97,7 +97,6 @@ public class TicketService {
             return List.of();
         }
 
-        //int seatsPerRow = 15;
         int seatsPerRow = (int) Math.ceil(Math.sqrt(capacity));
 
         List<Ticket> tickets = new ArrayList<>(capacity);

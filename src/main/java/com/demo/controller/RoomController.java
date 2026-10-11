@@ -51,16 +51,6 @@ public class RoomController {
     @PostMapping("salas/deactivate/{id}")
     public String deactivateSala(@PathVariable Long id, Model model) {
 
-        // forma 1:
-//        Optional<Restaurant> restaurantOptional = restaurantRepository.findById(id);
-//        if (restaurantOptional.isPresent()) {
-//            Restaurant restaurant = restaurantOptional.get();
-//            restaurant.setActive(false);
-//            restaurantRepository.save(restaurant);
-//        }
-//        return "redirect:/restaurants";
-
-        // forma 2 (opcional):
         roomRepository.findById(id).ifPresent(room -> {
             room.setActive(false);
             roomRepository.save(room);
