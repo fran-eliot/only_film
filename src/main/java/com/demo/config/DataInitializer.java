@@ -7,6 +7,8 @@ import com.demo.model.enums.ScreenType;
 import com.demo.repository.*;
 import com.demo.service.TicketService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
@@ -23,6 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @Profile("!test & (!postgres | demo)")
 public class DataInitializer implements CommandLineRunner {
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
     private static final String LANGUAGE_DUBBED = "doblada";
 
     private static final String GENRE_ROMANCE = "Romance";
@@ -59,10 +62,10 @@ public class DataInitializer implements CommandLineRunner {
                 && sessionRepo.count() == 0 && ticketRepo.count() == 0
                 && userRepo.count() == 0 && reviewRepo.count() == 0;
         if (!empty) {
-            System.out.println("-> Demo seeding skipped: database is not empty.");
+            log.info("-> Demo seeding skipped: database is not empty.");
             return true;
         }
-        System.out.println("-> WARNING: creating demonstration accounts with known passwords. Local use only.");
+        log.warn("-> WARNING: creating demonstration accounts with known passwords. Local use only.");
         return false;
     }
 
@@ -72,7 +75,7 @@ public class DataInitializer implements CommandLineRunner {
         if (skipNonEmptyPostgresDatabase()) {
             return;
         }
-        System.out.println("-> Inicializando datos de prueba...");
+        log.info("-> Inicializando datos de prueba...");
 
         //Datos de prueba de las PELICULAS
         Movie m0 = movieRepo.save(Movie.builder().title("Top Gun: Ídolos del aire - (40 Aniversario)").director("Tony Scott").active(true).releaseYear(1986)
@@ -565,11 +568,8 @@ public class DataInitializer implements CommandLineRunner {
                 .rating(5).movie(m9).user(pabloG)
                 .creationDate(hoy.minusDays(7).atTime(23, 30)).build());
 
-        System.out.println("DataInitializer completado - " +
-                movieRepo.count() + " películas, " +
-                roomRepo.count() + " salas, " +
-                sessionRepo.count() + " sesiones, " +
-                ticketRepo.count() + " tickets.");
+        log.info("DataInitializer completado - {} películas, {} salas, {} sesiones, {} tickets.",
+                movieRepo.count(), roomRepo.count(), sessionRepo.count(), ticketRepo.count());
     }
     private void seedPastPurchases(Session pasada1, Session pasada2, Session pasada3,
                                    Session sesAgotada, User user) {
