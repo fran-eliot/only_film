@@ -14,6 +14,9 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 @Configuration
 public class SecurityConfig {
+    private static final String ADMIN_ROLE = "ADMIN";
+    private static final String MOVIES_PATH = "/movies";
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -49,36 +52,36 @@ public class SecurityConfig {
                 // "/movies/new" también matchea con "/movies/{id}" (id="new"), así que si
                 // "/movies/{id}" va primero con permitAll(), "/movies/new" quedaría público
                 // sin pasar nunca por la regla hasRole("ADMIN").
-                .requestMatchers("/movies/new", "/movies/edit/**", "/movies/deactivate/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/movies", "/movies/{id}").permitAll()
-                .requestMatchers(HttpMethod.POST, "/movies").hasRole("ADMIN")
+                .requestMatchers("/movies/new", "/movies/edit/**", "/movies/deactivate/**").hasRole(ADMIN_ROLE)
+                .requestMatchers(HttpMethod.GET, MOVIES_PATH, "/movies/{id}").permitAll()
+                .requestMatchers(HttpMethod.POST, MOVIES_PATH).hasRole(ADMIN_ROLE)
 
                 // 3. Control de Salas (RoomController)
-                .requestMatchers(HttpMethod.GET, "/salas", "/salas/{id}").hasRole("ADMIN")
-                .requestMatchers("/salas/new", "/salas/edit/**", "/salas/deactivate/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/salas").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/salas", "/salas/{id}").hasRole(ADMIN_ROLE)
+                .requestMatchers("/salas/new", "/salas/edit/**", "/salas/deactivate/**").hasRole(ADMIN_ROLE)
+                .requestMatchers(HttpMethod.POST, "/salas").hasRole(ADMIN_ROLE)
 
                 // 4. Control de Sesiones / Proyecciones (SessionController - ¡Faltaba!)
                 .requestMatchers(HttpMethod.GET, "/sessions", "/sessions/{id}").permitAll() // Público para que vean la cartelera/horarios
-                .requestMatchers("/sessions/new", "/sessions/edit/**", "/sessions/delete/**", "/sessions/deactivate/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/sessions").hasRole("ADMIN")
+                .requestMatchers("/sessions/new", "/sessions/edit/**", "/sessions/delete/**", "/sessions/deactivate/**").hasRole(ADMIN_ROLE)
+                .requestMatchers(HttpMethod.POST, "/sessions").hasRole(ADMIN_ROLE)
 
                 // 5. Control de Reseñas (ReviewController)
                 .requestMatchers(HttpMethod.GET, "/reviews").permitAll()
-                .requestMatchers(HttpMethod.GET, "/reviews/new").hasAnyRole("ADMIN", "USER") // debe ir ANTES que /reviews/{id} !!
+                .requestMatchers(HttpMethod.GET, "/reviews/new").hasAnyRole(ADMIN_ROLE, "USER") // debe ir ANTES que /reviews/{id} !!
                 .requestMatchers(HttpMethod.GET, "/reviews/{id}").permitAll()
-                .requestMatchers("/reviews/edit/**").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.POST, "/reviews").hasAnyRole("ADMIN", "USER")
-                .requestMatchers("/reviews/disable/**", "/reviews/delete/**").hasRole("ADMIN")
+                .requestMatchers("/reviews/edit/**").hasAnyRole(ADMIN_ROLE, "USER")
+                .requestMatchers(HttpMethod.POST, "/reviews").hasAnyRole(ADMIN_ROLE, "USER")
+                .requestMatchers("/reviews/disable/**", "/reviews/delete/**").hasRole(ADMIN_ROLE)
 
                 // 6. Control de Tickets / Compras (TicketController y Órdenes)
                 .requestMatchers(HttpMethod.GET, "/tickets", "/tickets/{id}").authenticated() // Ver todos los tickets es de Admin
-                .requestMatchers("/tickets/edit/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/tickets/save").hasRole("ADMIN")
+                .requestMatchers("/tickets/edit/**").hasRole(ADMIN_ROLE)
+                .requestMatchers(HttpMethod.POST, "/tickets/save").hasRole(ADMIN_ROLE)
                 .requestMatchers("/tickets/buy/**").authenticated() // Comprar requiere estar logueado
 
                 // (paso 6.5) panel de usuarios para admins
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole(ADMIN_ROLE)
 
                 // 7. Cualquier otra ruta no especificada requerirá estar autenticado
                 .anyRequest().authenticated()
@@ -118,7 +121,7 @@ public class SecurityConfig {
         // directamente a /login sin venir de otra página protegida
         //y no venía de ninguna página protegida
         // -> después del login lo envío a /movies
-        successHandler.setDefaultTargetUrl("/movies");
+        successHandler.setDefaultTargetUrl(MOVIES_PATH);
 
         // esto es opcional, parámetro en la URL para forzar redirección
         successHandler.setTargetUrlParameter("redirectTo");
