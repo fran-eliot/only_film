@@ -1,6 +1,5 @@
 package com.demo.ui;
 
-import com.demo.model.Movie;
 import com.demo.repository.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,9 +53,6 @@ public abstract class BaseSeleniumTest {
     WebDriver driver;
     WebDriverWait wait;
 
-    Movie movieAction;
-    Movie movieRomance;
-
     @BeforeEach
     void setUp() {
         ticketRepository.deleteAll();
@@ -65,15 +61,6 @@ public abstract class BaseSeleniumTest {
         roomRepository.deleteAll();
         movieRepository.deleteAll();
         userRepository.deleteAll();
-
-        movieAction = movieRepository.save(
-                Movie.builder().active(true).title("The Bourne Identity").genre("Action")
-                        .durationMinutes(119).releaseYear(2002).director("Doug Liman").build()
-        );
-        movieRomance = movieRepository.save(
-                Movie.builder().active(true).title("The Age of Adaline").genre("Romance")
-                        .durationMinutes(112).releaseYear(2015).director("Lee Toland Krieger").build()
-        );
 
         // inicializar y configuración de driver
         baseUrl = "http://localhost:" + port + "/";

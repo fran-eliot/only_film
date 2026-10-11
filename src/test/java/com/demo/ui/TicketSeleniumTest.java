@@ -39,13 +39,6 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
 
     @BeforeEach
     void setUpTickets() {
-        ticketRepository.deleteAll();
-        reviewRepository.deleteAll();
-        sessionRepository.deleteAll();
-        roomRepository.deleteAll();
-        movieRepository.deleteAll();
-        userRepository.deleteAll();
-
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         user = userRepository.save(User.builder()
