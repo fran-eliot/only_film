@@ -33,11 +33,11 @@ jobs:
           CI: 'true'
         run: mvn -B -ntp test -Dtest=ReviewSeleniumTest,MovieSeleniumTest,TicketSeleniumTest -Dsurefire.rerunFailingTestsCount=0
 
-      - name: Upload Selenium failure evidence
-        if: ${{ failure() }}
+      - name: Upload Selenium test reports and failure screenshots
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: selenium-review-movie-ticket-failure-evidence
+          name: selenium-review-movie-ticket-reports
           path: |
             target/surefire-reports/
             target/screenshots/
