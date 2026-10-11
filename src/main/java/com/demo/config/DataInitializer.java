@@ -580,10 +580,6 @@ public class DataInitializer implements CommandLineRunner {
             tPasada1.get(0).setStatus(BuyStatus.PAGADO);
             tPasada1.get(0).setUser(user);
             tPasada1.get(0).setBuyDateTime(pasada1.getStartTime().minusHours(2));
-            //tPasada1.get(1).setStatus(BuyStatus.PAGADO);
-            //tPasada1.get(1).setUser(user1);
-           //tPasada1.get(1).setBuyDateTime(pasada1.getStartTime().minusHours(2));
-            //ticketRepo.saveAll(List.of(tPasada1.get(0), tPasada1.get(1)));
             ticketRepo.save(tPasada1.get(0));
         }
 
@@ -604,15 +600,6 @@ public class DataInitializer implements CommandLineRunner {
             tPasada3.get(0).setBuyDateTime(pasada2.getStartTime().minusDays(1));
             ticketRepo.save(tPasada3.get(0));
         }
-        /*
-        if (tPasada3.size() >= 3) {
-            for (int i = 0; i < 3; i++) {
-                tPasada3.get(i).setStatus(BuyStatus.PAGADO);
-                tPasada3.get(i).setUser(user1);
-                tPasada3.get(i).setBuyDateTime(pasada3.getStartTime().minusHours(6));
-            }
-            ticketRepo.saveAll(tPasada3.subList(0, 3));
-        }*/
 
         // sesAgotada → TODOS los tickets PAGADO (demuestra el futuro badge "Agotada")
         List<Ticket> tAgotados = ticketRepo.findBySession_Id(sesAgotada.getId());
