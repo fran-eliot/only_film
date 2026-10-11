@@ -19,6 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @AllArgsConstructor
 public class ReviewController {
+    private static final String REDIRECT_MOVIE_DETAIL = "redirect:/movies/";
+    private static final String MODEL_REVIEW = "review";
+
 
     // inyectar el repositorio de reviews
     private final ReviewRepository reviewRepository;
@@ -35,7 +38,7 @@ public class ReviewController {
     @GetMapping("/reviews/{id}")
     public String reviewDetail(Model model, @PathVariable Long id,
                                @RequestParam(required = false) String returnUrl) {
-        model.addAttribute("review", reviewRepository.findById(id).orElseThrow());
+        model.addAttribute(MODEL_REVIEW, reviewRepository.findById(id).orElseThrow());
         // Seguridad -> solo aceptamos rutas internas (empiezan por /)
         String backUrl = (returnUrl != null && returnUrl.startsWith("/")) ? returnUrl : "/reviews";
         model.addAttribute("returnUrl", backUrl);
@@ -51,10 +54,10 @@ public class ReviewController {
         if (movieId == null ||
                 !ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(currentUser.getId(), movieId, BuyStatus.PAGADO)) {
             ra.addFlashAttribute("error", "Debes haber comprado una entrada de esta película para reseñarla.");
-            return movieId != null ? "redirect:/movies/" + movieId : "redirect:/movies";
+            return movieId != null ? REDIRECT_MOVIE_DETAIL + movieId : "redirect:/movies";
         }
 
-        model.addAttribute("review", new ReviewFormDTO());
+        model.addAttribute(MODEL_REVIEW, new ReviewFormDTO());
         model.addAttribute("movie", movieRepository.findById(movieId).orElseThrow());
         return "reviews/review-form";
     }
@@ -72,7 +75,7 @@ public class ReviewController {
         if (!isAdmin && !isOwner)
             return "redirect:/reviews/" + id;
 
-        model.addAttribute("review", ReviewFormDTO.from(review));
+        model.addAttribute(MODEL_REVIEW, ReviewFormDTO.from(review));
         model.addAttribute("movie", review.getMovie());
         return "reviews/review-form";
     }
@@ -106,7 +109,7 @@ public class ReviewController {
                     !ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(
                             currentUser.getId(), movieId, BuyStatus.PAGADO)) {
                 ra.addFlashAttribute("error", "Debes haber comprado una entrada de esta película para reseñarla.");
-                return movieId != null ? "redirect:/movies/" + movieId : "redirect:/movies";
+                return movieId != null ? REDIRECT_MOVIE_DETAIL + movieId : "redirect:/movies";
             }
 
             persisted = new Review();
@@ -120,7 +123,7 @@ public class ReviewController {
         reviewRepository.save(persisted);
 
         if (persisted.getMovie() != null)
-            return "redirect:/movies/" + persisted.getMovie().getId() + "#reviews";
+            return REDIRECT_MOVIE_DETAIL + persisted.getMovie().getId() + "#reviews";
         return "redirect:/reviews";
     }
 
