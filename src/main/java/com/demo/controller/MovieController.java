@@ -76,7 +76,7 @@ public class MovieController {
 
             return "movies/movie-detail";
         }
-        returnREDIRECT_MOVIES;
+        return REDIRECT_MOVIES;
 
     }
     //Desactivar una pelicula
