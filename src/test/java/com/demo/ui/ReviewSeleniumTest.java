@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -198,6 +199,20 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
 
         assertTrue(ratingError.isDisplayed());
         assertTrue(ratingError.getText().contains("selecciona una puntuación"));
+        assertEquals("alert", ratingError.getAttribute("role"));
+        assertTrue(driver.getCurrentUrl().contains("/reviews/new?movieId=" + movieToReview.getId()),
+                "El formulario debe permanecer abierto al faltar la puntuación");
+
+        WebElement firstStar = driver.findElement(By.cssSelector("#starRating .rating-star[data-value='1']"));
+        wait.until(driver -> firstStar.equals(driver.switchTo().activeElement()));
+        assertEquals("false", firstStar.getAttribute("aria-pressed"));
+
+        // Corregir el error sin utilizar el ratón.
+        firstStar.sendKeys(Keys.SPACE);
+        wait.until(driver -> "1".equals(driver.findElement(By.id("ratingHidden")).getAttribute("value")));
+        assertEquals("true", firstStar.getAttribute("aria-pressed"));
+        assertFalse(ratingError.isDisplayed(), "El mensaje de error debe ocultarse tras seleccionar una estrella");
+        assertTrue(driver.findElement(By.id("ratingText")).getText().contains("1 / 5"));
     }
 
     @Test
