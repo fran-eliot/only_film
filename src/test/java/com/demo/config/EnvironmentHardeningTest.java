@@ -40,7 +40,8 @@ class EnvironmentHardeningTest {
     @Test
     void developmentConveniencesRequireExplicitProfile() throws Exception {
         Properties properties = load("application-dev.properties");
-        assertEquals("true", properties.getProperty("spring.h2.console.enabled"));
+        assertEquals("${ONLYFILM_H2_CONSOLE_ENABLED:false}", properties.getProperty("spring.h2.console.enabled"));
+        assertEquals("127.0.0.1", properties.getProperty("server.address"));
         assertEquals("true", properties.getProperty("spring.jpa.show-sql"));
     }
 
