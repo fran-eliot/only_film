@@ -71,27 +71,6 @@
                             <i class="fa-solid fa-angle-left me-1"></i>Volver
                         </a>
 
-                        <!-- Autenticado CON entrada comprada: puede escribir reseña
-                        <a sec:authorize="isAuthenticated()" th:if="${canReview}"
-                           th:href="@{/reviews/new(movieId=${movie.id})}"
-                           class="btn btn-outline-light ms-auto">
-                            <i class="fa-regular fa-comment me-1"></i> Escribir reseña
-                        </a> -->
-
-                        <!-- Autenticado SIN entrada comprada: botón deshabilitado con tooltip
-                        <span sec:authorize="isAuthenticated()" th:unless="${canReview}"
-                              class="btn btn-outline-light ms-auto disabled"
-                              title="Debes haber comprado una entrada de esta película para reseñarla">
-                            <i class="fa-regular fa-comment me-1"></i> Escribir reseña
-                        </span> -->
-
-                        <!-- Anónimo: invitación a iniciar sesión
-                        <a sec:authorize="!isAuthenticated()"
-                           th:href="@{/login}"
-                           class="btn btn-outline-light ms-auto"
-                           title="Inicia sesión para escribir una reseña">
-                            <i class="fa-regular fa-comment me-1"></i> Escribe una reseña
-                        </a> -->
                     </div>
                 </div>
             </div>
