@@ -115,6 +115,7 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
         loginUser();
 
         driver.get(baseUrl + "tickets");
+        wait.until(driver -> driver.getPageSource().contains(movie.getTitle()));
 
 //        assertEquals("Mis Tickets", driver.findElement(By.tagName("h1")).getText());
 
@@ -139,6 +140,7 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
         loginUser();
 
         driver.get(baseUrl + "tickets/" + paidTicket.getId());
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".ticket-qr-img")));
 
         assertTrue(driver.getPageSource().contains(movie.getTitle()));
         assertTrue(driver.getPageSource().contains(room.getName()));
@@ -160,6 +162,7 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
         loginUser();
 
         driver.get(baseUrl + "tickets/" + freeTicket.getId() + "/checkout");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("cardHolder")));
 
         assertTrue(driver.getPageSource().contains("Tu entrada"));
         assertTrue(driver.getPageSource().contains(movie.getTitle()));
@@ -234,6 +237,7 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
 
         wait.until(ExpectedConditions.urlToBe(baseUrl + "tickets/" + freeTicket.getId()));
 
+        wait.until(driver -> driver.getPageSource().contains("¡Entrada confirmada!"));
         String page = driver.getPageSource();
 
         assertTrue(page.contains("¡Entrada confirmada!"));
@@ -264,6 +268,7 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
         ));
 
         assertEquals(baseUrl + "tickets/" + freeTicket.getId() + "/checkout", driver.getCurrentUrl());
+        wait.until(driver -> driver.getPageSource().contains("Tu entrada"));
         assertTrue(driver.getPageSource().contains("Tu entrada"));
         assertTrue(driver.getPageSource().contains(movie.getTitle()));
     }
