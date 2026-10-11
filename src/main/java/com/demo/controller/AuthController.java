@@ -16,13 +16,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @AllArgsConstructor
 public class AuthController {
+    private static final String VIEW_REGISTER = "auth/register";
+
 
     private final UserService userService;
 
     @GetMapping("register")
     public String register(Model model) {
         model.addAttribute("user", new RegisterForm());
-        return "auth/register";
+        return VIEW_REGISTER;
     }
 
     @PostMapping("register")
@@ -39,7 +41,7 @@ public class AuthController {
 
         // (Si hay errores de coincidencia), vuelve al formulario
         if (bindingResult.hasErrors()) {
-            return "auth/register";   // NO redirect, para que se mantengan los errores
+            return VIEW_REGISTER;   // NO redirect, para que se mantengan los errores
         }
 
         try {
@@ -49,7 +51,7 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             // Si el username/email ya existe lo mostramos como error general y mantenemos lo que habia puesto el usuario
             model.addAttribute("error", e.getMessage());
-            return "auth/register";
+            return VIEW_REGISTER;
         }
     }
 
