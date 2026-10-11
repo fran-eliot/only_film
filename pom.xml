@@ -29,6 +29,7 @@
     <properties>
         <java.version>25</java.version>
         <selenium.version>4.44.0</selenium.version>
+        <surefire.rerunFailingTestsCount>2</surefire.rerunFailingTestsCount>
         <sonar.organization>fran-eliot</sonar.organization>
         <sonar.projectKey>fran-eliot_only_film</sonar.projectKey>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -211,7 +212,7 @@
                     <!-- Reintentar los tests que fallan: los Selenium E2E son intermitentes
                          en headless/CI (un click o un render que no llega a tiempo). Solo se
                          reintentan los que fallan; si pasan al reintento, el build queda verde. -->
-                    <rerunFailingTestsCount>2</rerunFailingTestsCount>
+                    <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
                 </configuration>
             </plugin>
         </plugins>
