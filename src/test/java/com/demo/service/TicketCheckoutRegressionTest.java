@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -58,4 +59,35 @@ class TicketCheckoutRegressionTest {
                 () -> ticketService.processCheckout(3L, buyer, -1, 0, 0, 0, 0));
         verify(ticketRepository, never()).save(any());
     }
+    @Test
+    void excessiveSnackQuantityIsRejectedBeforeSaving() {
+        when(ticketRepository.findByIdForCheckout(4L))
+                .thenReturn(Optional.of(ticket(4L, BuyStatus.LIBRE)));
+        assertThrows(IllegalArgumentException.class,
+                () -> ticketService.processCheckout(4L, User.builder().id(5L).build(), 0, 101, 0, 0, 0));
+        verify(ticketRepository, never()).save(any());
+    }
+
+    @Test
+    void maxIntegerSnackQuantityIsRejectedWithoutMutation() {
+        Ticket freeTicket = ticket(5L, BuyStatus.LIBRE);
+        when(ticketRepository.findByIdForCheckout(5L))
+                .thenReturn(Optional.of(freeTicket));
+        assertThrows(IllegalArgumentException.class,
+                () -> ticketService.processCheckout(5L, User.builder().id(6L).build(), 0, 0, Integer.MAX_VALUE, 0, 0));
+        assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
+        verify(ticketRepository, never()).save(any());
+    }
+
+    @Test
+    void maximumAllowedSnackQuantityCanBePurchased() {
+        Ticket freeTicket = ticket(6L, BuyStatus.LIBRE);
+        when(ticketRepository.findByIdForCheckout(6L))
+                .thenReturn(Optional.of(freeTicket));
+        ticketService.processCheckout(6L, User.builder().id(7L).build(), 100, 0, 0, 0, 0);
+        assertEquals(BuyStatus.PAGADO, freeTicket.getStatus());
+        assertEquals(450.0, freeTicket.getSnackPrice());
+        verify(ticketRepository).save(freeTicket);
+    }
+
 }
