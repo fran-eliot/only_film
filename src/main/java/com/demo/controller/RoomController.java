@@ -3,6 +3,9 @@ package com.demo.controller;
 import com.demo.model.Room;
 import com.demo.dto.RoomForm;
 import com.demo.repository.RoomRepository;
+import com.demo.repository.SessionRepository;
+import org.springframework.validation.FieldError;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +28,7 @@ public class RoomController {
 
     //repositorio de room (salas)
     private final RoomRepository roomRepository;
+    private final SessionRepository sessionRepository;
 
     @GetMapping("salas")
     public String rooms(Model model) {
@@ -67,6 +71,14 @@ public class RoomController {
 
     @PostMapping("salas")
     public String guardar(@Valid @ModelAttribute("room") RoomForm form, BindingResult bindingresult) {
+        if (form.getId() != null) {
+            Room current = roomRepository.findById(form.getId()).orElseThrow();
+            if (!Objects.equals(current.getCapacity(), form.getCapacity())
+                    && sessionRepository.existsByRoom_Id(current.getId())) {
+                bindingresult.addError(new FieldError("room", "capacity", form.getCapacity(), false,
+                        null, null, "No se puede cambiar el aforo de una sala con sesiones asociadas"));
+            }
+        }
         if (bindingresult.hasErrors()) {
             return VIEW_ROOM_FORM;
         }

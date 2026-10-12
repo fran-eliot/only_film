@@ -199,4 +199,54 @@ class RoomControllerTest {
         assertEquals("Sala segura", persisted.getName());
     }
 
+    @Test
+    void changingCapacityWithAssociatedSessionIsRejectedWithoutPartialUpdate() throws Exception {
+        sessionRepository.save(com.demo.model.Session.builder()
+                .room(room).price(8.0).active(false).build());
+        long countBefore = roomRepository.count();
+        mockMvc.perform(post("/salas")
+                        .param("id", room.getId().toString())
+                        .param("name", "Nombre que no debe guardarse")
+                        .param("capacity", "150")
+                        .param("screenType", "IMAX"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("rooms/room-form"))
+                .andExpect(model().attributeHasFieldErrors("room", "capacity"))
+                .andExpect(content().string(containsString("No se puede cambiar el aforo")));
+        assertEquals(countBefore, roomRepository.count());
+        Room saved = roomRepository.findById(room.getId()).orElseThrow();
+        assertEquals(100, saved.getCapacity());
+        assertEquals("Sala 1", saved.getName());
+    }
+
+    @Test
+    void otherRoomDetailsRemainEditableWhenSessionsExist() throws Exception {
+        sessionRepository.save(com.demo.model.Session.builder()
+                .room(room).price(8.0).active(true).build());
+        mockMvc.perform(post("/salas")
+                        .param("id", room.getId().toString())
+                        .param("name", "Sala reformada")
+                        .param("capacity", "100")
+                        .param("screenType", "STANDARD")
+                        .param("floorNumber", "2"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/salas"));
+        Room saved = roomRepository.findById(room.getId()).orElseThrow();
+        assertEquals(100, saved.getCapacity());
+        assertEquals("Sala reformada", saved.getName());
+        assertEquals(2, saved.getFloorNumber());
+    }
+
+    @Test
+    void capacityCanChangeWhenNoSessionsReferenceTheRoom() throws Exception {
+        mockMvc.perform(post("/salas")
+                        .param("id", room.getId().toString())
+                        .param("name", "Sala 1")
+                        .param("capacity", "150")
+                        .param("screenType", "IMAX"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/salas"));
+        assertEquals(150, roomRepository.findById(room.getId()).orElseThrow().getCapacity());
+    }
+
 }
