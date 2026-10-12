@@ -213,6 +213,25 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
         assertEquals("true", firstStar.getAttribute("aria-pressed"));
         assertFalse(ratingError.isDisplayed(), "El mensaje de error debe ocultarse tras seleccionar una estrella");
         assertTrue(driver.findElement(By.id("ratingText")).getText().contains("1 / 5"));
+
+        // Navegar entre estrellas no debe cambiar la puntuación hasta confirmarla.
+        firstStar.sendKeys(Keys.ARROW_RIGHT);
+        WebElement secondStar = driver.findElement(By.cssSelector("#starRating .rating-star[data-value='2']"));
+        wait.until(driver -> secondStar.equals(driver.switchTo().activeElement()));
+        assertEquals("1", driver.findElement(By.id("ratingHidden")).getAttribute("value"));
+        assertEquals("false", secondStar.getAttribute("aria-pressed"));
+
+        secondStar.sendKeys(Keys.SPACE);
+        wait.until(driver -> "2".equals(driver.findElement(By.id("ratingHidden")).getAttribute("value")));
+        assertEquals("true", secondStar.getAttribute("aria-pressed"));
+        assertEquals("false", firstStar.getAttribute("aria-pressed"));
+
+        secondStar.sendKeys(Keys.END);
+        WebElement lastStar = driver.findElement(By.cssSelector("#starRating .rating-star[data-value='5']"));
+        wait.until(driver -> lastStar.equals(driver.switchTo().activeElement()));
+        lastStar.sendKeys(Keys.HOME);
+        wait.until(driver -> firstStar.equals(driver.switchTo().activeElement()));
+        assertEquals("2", driver.findElement(By.id("ratingHidden")).getAttribute("value"));
     }
 
     @Test
