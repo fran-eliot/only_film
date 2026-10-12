@@ -20,6 +20,9 @@
     <div class="card mb-5">
         <div class="card-body p-4 p-lg-5">
             <form th:action="@{/movies}" method="post" th:object="${movie}" enctype="multipart/form-data">
+                <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+                    Corrige los errores del formulario antes de guardar.
+                </div>
 
                 <!-- ID (oculto en crear, mostrado en editar) -->
                 <div class="mb-4" th:if="${isEdit}">
@@ -34,7 +37,8 @@
                         <i class="fa-solid fa-film me-2 text-gold"></i>Título
                     </label>
                     <input type="text" class="form-control" id="title"
-                           th:field="*{title}" placeholder="ej: Harry Potter y la piedra filosofal" required>
+                           th:field="*{title}" th:classappend="${#fields.hasErrors('title')} ? ' is-invalid' : ''" aria-describedby="titleError" placeholder="ej: Harry Potter y la piedra filosofal" required>
+                        <div id="titleError" class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
                 </div>
 
                 <!-- Director -->
@@ -43,7 +47,8 @@
                         <i class="fa-solid fa-person me-2 text-gold"></i>Director
                     </label>
                     <input type="text" class="form-control" id="director"
-                           th:field="*{director}" placeholder="ej: Chris Columbus" required>
+                           th:field="*{director}" th:classappend="${#fields.hasErrors('director')} ? ' is-invalid' : ''" aria-describedby="directorError" placeholder="ej: Chris Columbus" required>
+                        <div id="directorError" class="invalid-feedback" th:if="${#fields.hasErrors('director')}" th:errors="*{director}"></div>
                 </div>
 
                 <!-- Fila: Género, Año, Duración, Activa -->
@@ -61,7 +66,8 @@
                             <i class="fa-solid fa-calendar me-2 text-gold"></i>Año de lanzamiento
                         </label>
                         <input type="number" class="form-control" id="releaseYear"
-                               th:field="*{releaseYear}" step="1" min="1888" placeholder="2001">
+                               th:field="*{releaseYear}" th:classappend="${#fields.hasErrors('releaseYear')} ? ' is-invalid' : ''" aria-describedby="releaseYearError" step="1" min="1888" placeholder="2001">
+                        <div id="releaseYearError" class="invalid-feedback" th:if="${#fields.hasErrors('releaseYear')}" th:errors="*{releaseYear}"></div>
                     </div>
 
                     <div class="col-md-3">
@@ -69,7 +75,8 @@
                             <i class="fa-solid fa-clock me-2 text-gold"></i>Duración (minutos)
                         </label>
                         <input type="number" class="form-control" id="durationMinutes"
-                               th:field="*{durationMinutes}" step="1" min="60" placeholder="120">
+                               th:field="*{durationMinutes}" th:classappend="${#fields.hasErrors('durationMinutes')} ? ' is-invalid' : ''" aria-describedby="durationMinutesError" step="1" min="60" placeholder="120">
+                        <div id="durationMinutesError" class="invalid-feedback" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></div>
                     </div>
 
                     <div class="col-md-3 d-flex align-items-end">
@@ -86,8 +93,9 @@
                     <label for="sinopsis" class="form-label">
                         <i class="fa-solid fa-align-left me-2 text-gold"></i>Sinopsis
                     </label>
-                    <textarea class="form-control" id="sinopsis" th:field="*{sinopsis}"
+                    <textarea class="form-control" id="sinopsis" th:field="*{sinopsis}" th:classappend="${#fields.hasErrors('sinopsis')} ? ' is-invalid' : ''" aria-describedby="sinopsisError"
                               rows="4" maxlength="600" placeholder="Descripción breve de la película..."></textarea>
+                        <div id="sinopsisError" class="invalid-feedback" th:if="${#fields.hasErrors('sinopsis')}" th:errors="*{sinopsis}"></div>
                     <small class="text-muted d-block mt-2">Máximo 600 caracteres</small>
                 </div>
 
@@ -100,7 +108,10 @@
                     <!-- conserva la imagen guardada al editar si no subes una nueva -->
                     
 
-                    <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+                    <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*"
+                           th:classappend="${imageError != null} ? ' is-invalid' : ''"
+                           aria-describedby="imageFileError">
+                    <div id="imageFileError" class="invalid-feedback" th:if="${imageError != null}" th:text="${imageError}"></div>
 
                     <!-- EDITAR: muestra la guardada. CREAR: el JS la sustituye -->
                     <div class="mt-3">

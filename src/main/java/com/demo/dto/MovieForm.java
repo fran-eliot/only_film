@@ -1,6 +1,9 @@
 package com.demo.dto;
 
 import com.demo.model.Movie;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,12 +11,17 @@ import lombok.Setter;
 @Setter
 public class MovieForm {
     private Long id;
+    @NotBlank(message = "El título es obligatorio")
     private String title;
+    @NotBlank(message = "El director es obligatorio")
     private String director;
+    @Size(max = 600, message = "La sinopsis no puede superar 600 caracteres")
     private String sinopsis;
     private Boolean active;
+    @Min(value = 60, message = "La duración debe ser de al menos 60 minutos")
     private Integer durationMinutes;
     private String genre;
+    @Min(value = 1888, message = "El año de estreno no puede ser anterior a 1888")
     private Integer releaseYear;
     private String imageUrl;
 

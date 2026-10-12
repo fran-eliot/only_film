@@ -63,6 +63,77 @@ public class MovieControllerTest {
         assertEquals(now + 1, update);
     }
 
+
+    @Test
+    void invalidCreationPreservesFieldsAndDoesNotPersist() throws Exception {
+        long before = movieRepository.count();
+        mockMvc.perform(multipart("/movies").file("imageFile", new byte[0])
+                        .param("title", " ")
+                        .param("director", "Director de prueba")
+                        .param("durationMinutes", "59")
+                        .param("releaseYear", "1887")
+                        .param("sinopsis", "Sinopsis conservada"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("movies/movie-form"))
+                .andExpect(model().attributeHasFieldErrors("movie", "title", "durationMinutes", "releaseYear"))
+                .andExpect(model().attribute("movie", hasProperty("director", is("Director de prueba"))))
+                .andExpect(content().string(containsString("Sinopsis conservada")))
+                .andExpect(content().string(containsString("titleError")));
+        assertEquals(before, movieRepository.count());
+    }
+
+    @Test
+    void invalidEditKeepsOriginalAndStoredPoster() throws Exception {
+        Movie original = movieRepository.findAll().getFirst();
+        original.setImageUrl("/uploads/previous.png");
+        movieRepository.save(original);
+        long before = movieRepository.count();
+        mockMvc.perform(multipart("/movies").file("imageFile", new byte[0])
+                        .param("id", original.getId().toString())
+                        .param("title", "Nuevo título")
+                        .param("director", " ")
+                        .param("durationMinutes", "120"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("movies/movie-form"))
+                .andExpect(model().attributeHasFieldErrors("movie", "director"))
+                .andExpect(model().attribute("movie", hasProperty("imageUrl", is("/uploads/previous.png"))))
+                .andExpect(content().string(containsString("Nuevo título")));
+        assertEquals(before, movieRepository.count());
+        assertEquals(original.getTitle(), movieRepository.findById(original.getId()).orElseThrow().getTitle());
+    }
+
+    @Test
+    void oversizedSynopsisIsRejectedBeforePersistence() throws Exception {
+        long before = movieRepository.count();
+        mockMvc.perform(multipart("/movies").file("imageFile", new byte[0])
+                        .param("title", "Título válido")
+                        .param("director", "Director válido")
+                        .param("sinopsis", "a".repeat(601)))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasFieldErrors("movie", "sinopsis"));
+        assertEquals(before, movieRepository.count());
+    }
+
+    @Test
+    void invalidUploadDoesNotDiscardEditFieldsOrChangeMovie() throws Exception {
+        Movie original = movieRepository.findAll().getFirst();
+        original.setImageUrl("/uploads/previous.png");
+        movieRepository.save(original);
+        mockMvc.perform(multipart("/movies")
+                        .file(new org.springframework.mock.web.MockMultipartFile(
+                                "imageFile", "invalid.txt", "text/plain", "not an image".getBytes(java.nio.charset.StandardCharsets.UTF_8)))
+                        .param("id", original.getId().toString())
+                        .param("title", "Título editado")
+                        .param("director", "Director editado"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("movies/movie-form"))
+                .andExpect(model().attributeExists("imageError"))
+                .andExpect(model().attribute("movie", hasProperty("title", is("Título editado"))))
+                .andExpect(model().attribute("movie", hasProperty("imageUrl", is("/uploads/previous.png"))))
+                .andExpect(content().string(containsString("imageFileError")));
+        assertEquals(original.getTitle(), movieRepository.findById(original.getId()).orElseThrow().getTitle());
+    }
+
     @Test
     void deactivateMovie() throws Exception{
         assertTrue(movieToDeactivate.getActive());
