@@ -88,6 +88,10 @@ public class SessionManagementService {
             throw new IllegalArgumentException("No se puede asignar una película inactiva a la sesión");
         }
 
+        if (roomChanged && (room == null || !Boolean.TRUE.equals(room.getActive()))) {
+            throw new IllegalArgumentException("No se puede asignar una sala inactiva a la sesión");
+        }
+
         if (!inventory.isEmpty() && roomChanged) {
             throw new IllegalStateException("No se puede cambiar la sala con entradas generadas");
         }

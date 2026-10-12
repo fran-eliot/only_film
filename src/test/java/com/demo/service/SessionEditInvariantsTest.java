@@ -185,6 +185,37 @@ class SessionEditInvariantsTest {
     }
 
     @Test
+    void sessionWithoutInventoryCannotMoveToInactiveRoom() {
+        Room originalRoom = rooms.save(Room.builder().name("Sala original").capacity(10).active(true).build());
+        Room inactiveRoom = rooms.save(Room.builder().name("Sala retirada").capacity(10).active(false).build());
+        Session original = sessions.save(Session.builder().room(originalRoom).price(8.0).build());
+        SessionForm edit = editForm(original);
+        edit.setRoomId(inactiveRoom.getId());
+
+        assertThrows(IllegalArgumentException.class, () -> management.save(edit));
+
+        assertEquals(originalRoom.getId(), sessions.findById(original.getId()).orElseThrow().getRoom().getId());
+        assertTrue(tickets.findBySession_Id(original.getId()).isEmpty());
+    }
+
+    @Test
+    void sessionMayKeepItsRoomAfterRoomDeactivation() {
+        Session original = prepareSession();
+        Room assigned = original.getRoom();
+        assigned.setActive(false);
+        rooms.saveAndFlush(assigned);
+        SessionForm edit = editForm(original);
+        edit.setLanguage("VOSE");
+
+        management.save(edit);
+
+        Session updated = sessions.findById(original.getId()).orElseThrow();
+        assertEquals(assigned.getId(), updated.getRoom().getId());
+        assertEquals("VOSE", updated.getLanguage());
+        assertEquals(10, tickets.findBySession_Id(original.getId()).size());
+    }
+
+    @Test
     void creationRejectsNegativeAdvertisingMinutesWithoutGeneratingInventory() {
         Movie movie = movies.save(Movie.builder().title("Negative ads movie").active(true).build());
         Room room = rooms.save(Room.builder().name("Negative ads room").capacity(10).active(true).build());
