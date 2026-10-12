@@ -85,7 +85,7 @@ public class ReviewController {
 
     //movieId viene del campo hidden del formulario para asociar la película correctamente
     @PostMapping("/reviews")
-    public String saveReview(@Valid @ModelAttribute ReviewFormDTO review,
+    public String saveReview(@Valid @ModelAttribute("review") ReviewFormDTO review,
                              BindingResult bindingResult,
                              @RequestParam(required = false) Long movieId,
                              @AuthenticationPrincipal User currentUser,
