@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** HTTP contract for expected errors, independent of redirect-based UI flows. */
+/** HTTP and view contracts for expected errors, including recoverable form validation. */
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
@@ -32,9 +32,12 @@ class MvcErrorContractTest {
     }
 
     @Test
-    void invalidSessionCommandReturns400InsteadOf500() throws Exception {
+    void invalidSessionCommandRendersValidationErrors() throws Exception {
         mvc.perform(post("/sessions").param("price", "-1.0"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk())
+                .andExpect(view().name("sessions/session-form"))
+                .andExpect(model().attributeHasFieldErrors("proyeccion", "price"))
+                .andExpect(model().attributeExists("movies", "rooms"));
     }
 
     @Test
