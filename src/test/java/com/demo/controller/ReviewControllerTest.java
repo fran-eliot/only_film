@@ -418,7 +418,7 @@ class ReviewControllerTest {
                 .andExpect(model().attribute("review",
                         org.hamcrest.Matchers.hasProperty("title",
                                 org.hamcrest.Matchers.is("Título conservado"))))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Título conservado")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"T&iacute;tulo conservado\"")));
     }
 
 }
