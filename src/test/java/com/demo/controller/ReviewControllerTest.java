@@ -339,4 +339,28 @@ class ReviewControllerTest {
         assertThat(created.getCreationDate()).isAfter(java.time.LocalDateTime.of(2020, 1, 1, 0, 0));
     }
 
+    @Test
+    void reviewDetail_shouldPreserveSafeInternalReturnUrl() throws Exception {
+        mockMvc.perform(get("/reviews/" + review.getId())
+                        .param("returnUrl", "/movies/" + movie.getId())
+                        .with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("returnUrl", "/movies/" + movie.getId()));
+    }
+
+    @Test
+    void reviewDetail_shouldRejectExternalReturnUrls() throws Exception {
+        for (String unsafe : new String[] {
+                "//external.example/path",
+                "/\\\\external.example/path",
+                "https://external.example/path",
+                "relative/path"
+        }) {
+            mockMvc.perform(get("/reviews/" + review.getId())
+                            .param("returnUrl", unsafe)
+                            .with(user(user)))
+                    .andExpect(status().isOk())
+                    .andExpect(model().attribute("returnUrl", "/reviews"));
+        }
+    }
 }
