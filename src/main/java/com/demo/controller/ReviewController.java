@@ -11,8 +11,6 @@ import com.demo.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -91,11 +89,8 @@ public class ReviewController {
                              BindingResult bindingResult,
                              @RequestParam(required = false) Long movieId,
                              @AuthenticationPrincipal User currentUser,
-                             RedirectAttributes ra) {
-
-        if (bindingResult.hasErrors()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datos de reseña no válidos");
-        }
+                             RedirectAttributes ra,
+                             Model model) {
 
         Review persisted;
 
@@ -109,6 +104,11 @@ public class ReviewController {
                 throw new AccessDeniedException("No puedes modificar esta reseña");
             }
 
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("movie", persisted.getMovie());
+                return "reviews/review-form";
+            }
+
             // Only editable fields are copied: the original author, movie and date are immutable.
             persisted.setTitle(review.getTitle());
             persisted.setDescription(review.getDescription());
@@ -120,6 +120,11 @@ public class ReviewController {
                             currentUser.getId(), movieId, BuyStatus.PAGADO)) {
                 ra.addFlashAttribute("error", "Debes haber comprado una entrada de esta película para reseñarla.");
                 return movieId != null ? REDIRECT_MOVIE_DETAIL + movieId : "redirect:/movies";
+            }
+
+            if (bindingResult.hasErrors()) {
+                model.addAttribute("movie", movieRepository.findById(movieId).orElseThrow());
+                return "reviews/review-form";
             }
 
             persisted = new Review();
