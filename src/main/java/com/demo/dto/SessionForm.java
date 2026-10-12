@@ -1,6 +1,9 @@
 package com.demo.dto;
 
 import com.demo.model.Session;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +15,11 @@ public class SessionForm {
     private Long id;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTime;
+    @NotNull
+    @DecimalMin("0.0")
     private Double price;
     private String language;
+    @Min(0)
     private Integer adMinutes;
     private Long movieId;
     private Long roomId;

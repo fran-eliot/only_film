@@ -8,6 +8,8 @@ package com.demo.controller;
     import com.demo.repository.TicketRepository;
     import com.demo.service.SessionManagementService;
     import lombok.AllArgsConstructor;
+    import jakarta.validation.Valid;
+    import org.springframework.validation.BindingResult;
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.GetMapping;
@@ -67,7 +69,13 @@ public String listSessions(Model model) {
 
     // POST: Guardar (crear o actualizar)
     @PostMapping("/sessions")
-    public String saveSession(@ModelAttribute(MODEL_SESSION) SessionForm form) {
+    public String saveSession(@Valid @ModelAttribute(MODEL_SESSION) SessionForm form,
+                              BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("movies", movieRepository.findAll());
+            model.addAttribute("rooms", roomRepository.findAll());
+            return "sessions/session-form";
+        }
         sessionManagementService.save(form);
         return "redirect:/sessions";
     }
