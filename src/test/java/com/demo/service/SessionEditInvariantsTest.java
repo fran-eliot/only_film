@@ -151,4 +151,33 @@ class SessionEditInvariantsTest {
         assertEquals(10, tickets.findBySession_Id(original.getId()).size());
         assertNotEquals(other.getId(), original.getRoom().getId());
     }
+
+    @Test
+    void creationRejectsNegativeAdvertisingMinutesWithoutGeneratingInventory() {
+        Movie movie = movies.save(Movie.builder().title("Negative ads movie").active(true).build());
+        Room room = rooms.save(Room.builder().name("Negative ads room").capacity(10).active(true).build());
+        SessionForm form = new SessionForm();
+        form.setMovieId(movie.getId());
+        form.setRoomId(room.getId());
+        form.setPrice(10.0);
+        form.setAdMinutes(-1);
+
+        long sessionsBefore = sessions.count();
+        long ticketsBefore = tickets.count();
+        assertThrows(IllegalArgumentException.class, () -> management.save(form));
+        assertEquals(sessionsBefore, sessions.count());
+        assertEquals(ticketsBefore, tickets.count());
+    }
+
+    @Test
+    void editRejectsNegativeAdvertisingMinutesAndKeepsOriginalValue() {
+        Session original = prepareSession();
+        SessionForm edit = editForm(original);
+        edit.setAdMinutes(-5);
+        long ticketsBefore = tickets.count();
+
+        assertThrows(IllegalArgumentException.class, () -> management.save(edit));
+        assertEquals(5, sessions.findById(original.getId()).orElseThrow().getAdMinutes());
+        assertEquals(ticketsBefore, tickets.count());
+    }
 }

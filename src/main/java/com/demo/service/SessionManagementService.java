@@ -32,6 +32,7 @@ public class SessionManagementService {
     @Transactional
     public Session save(SessionForm form) {
         validatePrice(form.getPrice());
+        validateAdMinutes(form.getAdMinutes());
         boolean creating = form.getId() == null;
         Session session = creating ? new Session() : sessionRepository.findById(form.getId()).orElseThrow();
 
@@ -56,6 +57,12 @@ public class SessionManagementService {
     private static void validatePrice(Double price) {
         if (price == null || !Double.isFinite(price) || price < 0) {
             throw new IllegalArgumentException("El precio debe ser un número no negativo");
+        }
+    }
+
+    private static void validateAdMinutes(Integer adMinutes) {
+        if (adMinutes != null && adMinutes < 0) {
+            throw new IllegalArgumentException("Los minutos de publicidad no pueden ser negativos");
         }
     }
 
