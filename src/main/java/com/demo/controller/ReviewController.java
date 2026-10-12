@@ -40,7 +40,8 @@ public class ReviewController {
                                @RequestParam(required = false) String returnUrl) {
         model.addAttribute(MODEL_REVIEW, reviewRepository.findById(id).orElseThrow());
         // Seguridad -> solo aceptamos rutas internas (empiezan por /)
-        String backUrl = (returnUrl != null && returnUrl.startsWith("/")) ? returnUrl : "/reviews";
+        String backUrl = (returnUrl != null && returnUrl.startsWith("/")
+                && !returnUrl.startsWith("//") && !returnUrl.contains("\\")) ? returnUrl : "/reviews";
         model.addAttribute("returnUrl", backUrl);
         return "reviews/review-detail";
     }
