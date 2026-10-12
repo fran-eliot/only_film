@@ -363,4 +363,40 @@ class ReviewControllerTest {
                     .andExpect(model().attribute("returnUrl", "/reviews"));
         }
     }
+    @Test
+    void saveReview_shouldRejectInvalidNewReviewWithoutPersisting() throws Exception {
+        long initialCount = reviewRepository.count();
+        for (String[] invalid : new String[][] {
+                {"0", "Título", "Descripción"},
+                {"6", "Título", "Descripción"},
+                {"", "Título", "Descripción"},
+                {"3", " ", "Descripción"},
+                {"3", "Título", " "},
+                {"3", "X".repeat(256), "Descripción"},
+                {"3", "Título", "X".repeat(1001)}
+        }) {
+            mockMvc.perform(post("/reviews").with(user(user)).with(csrf())
+                            .param("movieId", movie.getId().toString())
+                            .param("rating", invalid[0])
+                            .param("title", invalid[1])
+                            .param("description", invalid[2]))
+                    .andExpect(status().isBadRequest());
+            assertEquals(initialCount, reviewRepository.count());
+        }
+    }
+
+    @Test
+    void saveReview_shouldRejectInvalidEditAndPreserveOriginal() throws Exception {
+        mockMvc.perform(post("/reviews").with(user(user)).with(csrf())
+                        .param("id", review.getId().toString())
+                        .param("rating", "9")
+                        .param("title", "Título alterado")
+                        .param("description", "Descripción alterada"))
+                .andExpect(status().isBadRequest());
+
+        Review persisted = reviewRepository.findById(review.getId()).orElseThrow();
+        assertEquals("Gran película", persisted.getTitle());
+        assertEquals("Muy recomendable", persisted.getDescription());
+        assertEquals(5, persisted.getRating());
+    }
 }
