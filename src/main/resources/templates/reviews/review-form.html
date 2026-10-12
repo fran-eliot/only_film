@@ -39,7 +39,11 @@
                     </label>
                     <input id="title" type="text" class="form-control"
                            th:field="*{title}" required maxlength="255"
+                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'"
+                           th:aria-invalid="${#fields.hasErrors('title')}"
+                           th:aria-describedby="${#fields.hasErrors('title') ? 'titleError' : null}"
                            placeholder="Escribe un título para tu reseña">
+                    <div id="titleError" class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
                 </div>
 
                 <div class="mb-4">
@@ -48,7 +52,11 @@
                     </label>
                     <textarea id="description" class="form-control" rows="5"
                               th:field="*{description}" required maxlength="1000"
+                              th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"
+                              th:aria-invalid="${#fields.hasErrors('description')}"
+                              th:aria-describedby="${#fields.hasErrors('description') ? 'descriptionError' : null}"
                               placeholder="Cuéntanos qué te ha parecido la película..."></textarea>
+                    <div id="descriptionError" class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
                 </div>
 
                 <!-- Estrellas -->
@@ -63,6 +71,8 @@
                         <button type="button" class="rating-star" data-value="5" aria-label="5 estrellas" aria-pressed="false"><i class="fa-regular fa-star" aria-hidden="true"></i></button>
                     </div>
 
+                    <div class="text-danger small mt-1" id="serverRatingError" role="alert"
+                         th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></div>
                     <small class="text-muted mt-1 d-block" id="ratingText">Selecciona una puntuación</small>
                     <div class="text-danger small mt-1" id="ratingError" role="alert" style="display:none">
                         <i class="fa-solid fa-circle-exclamation me-1" aria-hidden="true"></i>Por favor selecciona una puntuación.

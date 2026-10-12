@@ -380,7 +380,9 @@ class ReviewControllerTest {
                             .param("rating", invalid[0])
                             .param("title", invalid[1])
                             .param("description", invalid[2]))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isOk())
+                    .andExpect(view().name("reviews/review-form"))
+                    .andExpect(model().hasErrors());
             assertEquals(initialCount, reviewRepository.count());
         }
     }
@@ -392,11 +394,31 @@ class ReviewControllerTest {
                         .param("rating", "9")
                         .param("title", "Título alterado")
                         .param("description", "Descripción alterada"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk())
+                    .andExpect(view().name("reviews/review-form"))
+                    .andExpect(model().hasErrors());
 
         Review persisted = reviewRepository.findById(review.getId()).orElseThrow();
         assertEquals("Gran película", persisted.getTitle());
         assertEquals("Muy recomendable", persisted.getDescription());
         assertEquals(5, persisted.getRating());
     }
+
+    @Test
+    void invalidReviewKeepsSubmittedFieldsAndRelatedMovie() throws Exception {
+        mockMvc.perform(post("/reviews").with(user(user)).with(csrf())
+                        .param("movieId", movie.getId().toString())
+                        .param("rating", "0")
+                        .param("title", "Título conservado")
+                        .param("description", "Descripción conservada"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reviews/review-form"))
+                .andExpect(model().attributeHasFieldErrors("review", "rating"))
+                .andExpect(model().attribute("movie", movie))
+                .andExpect(model().attribute("review",
+                        org.hamcrest.Matchers.hasProperty("title",
+                                org.hamcrest.Matchers.is("Título conservado"))))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"T&iacute;tulo conservado\"")));
+    }
+
 }
