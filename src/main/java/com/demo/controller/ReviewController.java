@@ -9,6 +9,10 @@ import com.demo.model.enums.Role;
 import com.demo.repository.MovieRepository;
 import com.demo.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -83,10 +87,15 @@ public class ReviewController {
 
     //movieId viene del campo hidden del formulario para asociar la película correctamente
     @PostMapping("/reviews")
-    public String saveReview(@ModelAttribute ReviewFormDTO review,
+    public String saveReview(@Valid @ModelAttribute ReviewFormDTO review,
+                             BindingResult bindingResult,
                              @RequestParam(required = false) Long movieId,
                              @AuthenticationPrincipal User currentUser,
                              RedirectAttributes ra) {
+
+        if (bindingResult.hasErrors()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datos de reseña no válidos");
+        }
 
         Review persisted;
 
