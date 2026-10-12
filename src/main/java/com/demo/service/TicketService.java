@@ -25,6 +25,8 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final RoomRepository roomRepository;
 
+    private static final int MAX_SNACK_QUANTITY = 100;
+
     private static final double PRICE_PALOMITAS_MEDIANAS = 4.50;
     private static final double PRICE_PALOMITAS_GRANDES  = 6.00;
     private static final double PRICE_REFRESCO           = 3.00;
@@ -150,10 +152,11 @@ public class TicketService {
         if (ticket.getStatus() != BuyStatus.LIBRE) {
             throw new IllegalStateException("La entrada ya no está disponible");
         }
-        if (qtyPalomitasMedianas < 0 || qtyPalomitasGrandes < 0 || qtyRefresco < 0
-                || qtyPackDuo < 0 || qtyComboFamiliar < 0) {
-            throw new IllegalArgumentException("Las cantidades no pueden ser negativas");
-        }
+        validateSnackQuantity(qtyPalomitasMedianas);
+        validateSnackQuantity(qtyPalomitasGrandes);
+        validateSnackQuantity(qtyRefresco);
+        validateSnackQuantity(qtyPackDuo);
+        validateSnackQuantity(qtyComboFamiliar);
 
         double snackTotal = calculateSnackTotal(
                 qtyPalomitasMedianas,
@@ -178,6 +181,12 @@ public class TicketService {
         ticket.setQrCode(generateQrCode(ticket.getId()));
 
         ticketRepository.save(ticket);
+    }
+
+    private static void validateSnackQuantity(int quantity) {
+        if (quantity < 0 || quantity > MAX_SNACK_QUANTITY) {
+            throw new IllegalArgumentException("La cantidad de cada snack debe estar entre 0 y " + MAX_SNACK_QUANTITY);
+        }
     }
 
     private double calculateSnackTotal(
