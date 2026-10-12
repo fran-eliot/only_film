@@ -102,6 +102,38 @@ class SessionEditInvariantsTest {
     }
 
     @Test
+    void editCannotReassignSessionToInactiveMovie() {
+        Session original = prepareSession();
+        Movie inactive = movies.save(Movie.builder().title("Retirada").active(false).build());
+        SessionForm edit = editForm(original);
+        edit.setMovieId(inactive.getId());
+        long beforeTickets = tickets.count();
+
+        assertThrows(IllegalArgumentException.class, () -> management.save(edit));
+
+        assertEquals(original.getMovie().getId(),
+                sessions.findById(original.getId()).orElseThrow().getMovie().getId());
+        assertEquals(beforeTickets, tickets.count());
+    }
+
+    @Test
+    void editsCanKeepPreviouslyAssignedMovieAfterItsDeactivation() {
+        Session original = prepareSession();
+        Movie assigned = original.getMovie();
+        assigned.setActive(false);
+        movies.saveAndFlush(assigned);
+        SessionForm edit = editForm(original);
+        edit.setLanguage("VOSE");
+
+        management.save(edit);
+
+        Session updated = sessions.findById(original.getId()).orElseThrow();
+        assertEquals(assigned.getId(), updated.getMovie().getId());
+        assertEquals("VOSE", updated.getLanguage());
+        assertEquals(10, tickets.findBySession_Id(original.getId()).size());
+    }
+
+    @Test
     void paidTicketRejectsChangesToAllEssentialFields() {
         Session original = prepareSession();
         List<Ticket> inventory = tickets.findBySession_Id(original.getId());
