@@ -83,6 +83,10 @@ public class SessionManagementService {
         List<Ticket> inventory = ticketRepository.findBySessionIdForUpdate(session.getId());
         boolean hasSales = inventory.stream().anyMatch(t -> t.getStatus() != BuyStatus.LIBRE);
         boolean roomChanged = !Objects.equals(idOf(session.getRoom()), idOf(room));
+        boolean movieChanged = !Objects.equals(idOf(session.getMovie()), idOf(movie));
+        if (movieChanged && (movie == null || !Boolean.TRUE.equals(movie.getActive()))) {
+            throw new IllegalArgumentException("No se puede asignar una película inactiva a la sesión");
+        }
 
         if (!inventory.isEmpty() && roomChanged) {
             throw new IllegalStateException("No se puede cambiar la sala con entradas generadas");
