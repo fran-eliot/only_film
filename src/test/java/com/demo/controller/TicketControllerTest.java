@@ -270,6 +270,16 @@ public class TicketControllerTest {
                 .status(BuyStatus.PAGADO)
                 .build());
 
+        ticketRepository.save(Ticket.builder()
+                .session(session).row("D").seat("1").price(10.0)
+                .user(regularUser).status(BuyStatus.CANCELADO).build());
+        ticketRepository.save(Ticket.builder()
+                .session(session).row("D").seat("2").price(10.0)
+                .user(regularUser).status(BuyStatus.LIBRE).build());
+        ticketRepository.save(Ticket.builder()
+                .session(session).row("D").seat("3").price(10.0)
+                .user(regularUser).status(BuyStatus.INICIADO).build());
+
         mockMvc.perform(get("/tickets").with(user(regularUser)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("tickets/ticket-list"))
