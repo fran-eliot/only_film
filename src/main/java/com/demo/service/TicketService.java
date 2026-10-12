@@ -152,6 +152,9 @@ public class TicketService {
         if (ticket.getStatus() != BuyStatus.LIBRE) {
             throw new IllegalStateException("La entrada ya no está disponible");
         }
+        if (ticket.getSession() == null || !Boolean.TRUE.equals(ticket.getSession().getActive())) {
+            throw new IllegalStateException("La sesión ya no está disponible");
+        }
         validateSnackQuantity(qtyPalomitasMedianas);
         validateSnackQuantity(qtyPalomitasGrandes);
         validateSnackQuantity(qtyRefresco);

@@ -93,6 +93,9 @@ public class TicketController {
         if (ticket.getStatus() != BuyStatus.LIBRE) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La entrada ya no está disponible");
         }
+        if (ticket.getSession() == null || !Boolean.TRUE.equals(ticket.getSession().getActive())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La sesión ya no está disponible");
+        }
         model.addAttribute(MODEL_TICKET, ticket);
         return "tickets/ticket-checkout";
     }
