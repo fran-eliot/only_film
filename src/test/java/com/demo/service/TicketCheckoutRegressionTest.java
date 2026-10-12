@@ -105,6 +105,29 @@ class TicketCheckoutRegressionTest {
     }
 
     @Test
+    void inactiveRoomCannotBePurchased() {
+        Ticket freeTicket = ticket(11L, BuyStatus.LIBRE);
+        freeTicket.getSession().setRoom(com.demo.model.Room.builder().id(30L).active(false).build());
+        when(ticketRepository.findByIdForCheckout(11L)).thenReturn(Optional.of(freeTicket));
+        assertThrows(IllegalStateException.class,
+                () -> ticketService.processCheckout(11L, User.builder().id(11L).build(), 0, 0, 0, 0, 0));
+        assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
+        org.junit.jupiter.api.Assertions.assertNull(freeTicket.getUser());
+        org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
+        verify(ticketRepository, never()).save(any());
+    }
+
+    @Test
+    void activeRoomRemainsPurchasable() {
+        Ticket freeTicket = ticket(12L, BuyStatus.LIBRE);
+        freeTicket.getSession().setRoom(com.demo.model.Room.builder().id(31L).active(true).build());
+        when(ticketRepository.findByIdForCheckout(12L)).thenReturn(Optional.of(freeTicket));
+        ticketService.processCheckout(12L, User.builder().id(12L).build(), 0, 0, 0, 0, 0);
+        assertEquals(BuyStatus.PAGADO, freeTicket.getStatus());
+        verify(ticketRepository).save(freeTicket);
+    }
+
+    @Test
     void excessiveSnackQuantityIsRejectedBeforeSaving() {
         when(ticketRepository.findByIdForCheckout(4L))
                 .thenReturn(Optional.of(ticket(4L, BuyStatus.LIBRE)));

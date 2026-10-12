@@ -341,6 +341,30 @@ public class TicketControllerTest {
     }
 
     @Test
+    void checkoutGetRejectsInactiveRoom() throws Exception {
+        Room room = session.getRoom();
+        room.setActive(false);
+        roomRepository.saveAndFlush(room);
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isConflict());
+        assertEquals(BuyStatus.LIBRE, ticketRepository.findById(ticket3.getId()).orElseThrow().getStatus());
+    }
+
+    @Test
+    void checkoutPostRejectsInactiveRoomWithoutSellingTicket() throws Exception {
+        Room room = session.getRoom();
+        room.setActive(false);
+        roomRepository.saveAndFlush(room);
+        mockMvc.perform(post("/tickets/" + ticket3.getId() + "/checkout")
+                        .with(user(user)).with(csrf()))
+                .andExpect(status().isConflict());
+        Ticket persisted = ticketRepository.findById(ticket3.getId()).orElseThrow();
+        assertEquals(BuyStatus.LIBRE, persisted.getStatus());
+        assertNull(persisted.getUser());
+        assertNull(persisted.getQrCode());
+    }
+
+    @Test
     @DisplayName("POST /tickets/{id}/checkout procesa compra sin snacks")
     void checkoutPostWithoutSnacksMarksTicketAsPaid() throws Exception {
         Long ticketId = ticket3.getId();
