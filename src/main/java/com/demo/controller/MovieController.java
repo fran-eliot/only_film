@@ -10,6 +10,8 @@ import com.demo.repository.SessionRepository;
 import com.demo.repository.TicketRepository;
 import com.demo.service.FileService;
 import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -108,15 +110,21 @@ public class MovieController {
     }
 
     @PostMapping("movies")
-    public String createMovie(@ModelAttribute(MODEL_MOVIE) MovieForm form,
+    public String createMovie(@Valid @ModelAttribute(MODEL_MOVIE) MovieForm form,
+                              BindingResult bindingResult,
                               @RequestParam("imageFile") MultipartFile imageFile,
-                              RedirectAttributes redirectAttributes) {
+                              Model model) {
+        if (bindingResult.hasErrors()) {
+            restoreExistingMoviePreview(form);
+            return "movies/movie-form";
+        }
         String imageUrl;
         try {
             imageUrl = fileService.store(imageFile);
         } catch (IllegalArgumentException invalidImage) {
-            redirectAttributes.addFlashAttribute("error", invalidImage.getMessage());
-            return form.getId() == null ? "redirect:/movies/new" : "redirect:/movies/edit/" + form.getId();
+            restoreExistingMoviePreview(form);
+            model.addAttribute("imageError", invalidImage.getMessage());
+            return "movies/movie-form";
         }
 
         // Load the existing entity: never copy arbitrary HTTP-bound properties.
@@ -141,4 +149,9 @@ public class MovieController {
     }
 
 
+    private void restoreExistingMoviePreview(MovieForm form) {
+        if (form.getId() != null) {
+            form.setImageUrl(movieRepository.findById(form.getId()).orElseThrow().getImageUrl());
+        }
+    }
 }
