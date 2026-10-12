@@ -100,6 +100,10 @@ public class TicketController {
                 && !Boolean.TRUE.equals(ticket.getSession().getMovie().getActive())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La película ya no está disponible");
         }
+        if (ticket.getSession().getRoom() != null
+                && !Boolean.TRUE.equals(ticket.getSession().getRoom().getActive())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La sala ya no está disponible");
+        }
         model.addAttribute(MODEL_TICKET, ticket);
         return "tickets/ticket-checkout";
     }

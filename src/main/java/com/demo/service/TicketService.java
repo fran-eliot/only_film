@@ -159,6 +159,10 @@ public class TicketService {
                 && !Boolean.TRUE.equals(ticket.getSession().getMovie().getActive())) {
             throw new IllegalStateException("La película ya no está disponible");
         }
+        if (ticket.getSession().getRoom() != null
+                && !Boolean.TRUE.equals(ticket.getSession().getRoom().getActive())) {
+            throw new IllegalStateException("La sala ya no está disponible");
+        }
         validateSnackQuantity(qtyPalomitasMedianas);
         validateSnackQuantity(qtyPalomitasGrandes);
         validateSnackQuantity(qtyRefresco);
