@@ -44,6 +44,7 @@ public class TicketServiceTest {
                 .id(1L)
                 .name("Sala 1")
                 .capacity(4)
+                .active(true)
                 .build();
 
         session = Session.builder()
