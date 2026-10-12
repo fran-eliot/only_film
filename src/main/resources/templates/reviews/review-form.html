@@ -172,6 +172,30 @@
                 : 'Selecciona una puntuación';
         });
 
+        // Las flechas desplazan el foco; Espacio o Intro confirman la puntuación.
+        star.addEventListener('keydown', event => {
+            const index = Array.from(stars).indexOf(star);
+            let nextIndex;
+            switch (event.key) {
+                case 'ArrowRight':
+                    nextIndex = (index + 1) % stars.length;
+                    break;
+                case 'ArrowLeft':
+                    nextIndex = (index - 1 + stars.length) % stars.length;
+                    break;
+                case 'Home':
+                    nextIndex = 0;
+                    break;
+                case 'End':
+                    nextIndex = stars.length - 1;
+                    break;
+                default:
+                    return;
+            }
+            event.preventDefault();
+            stars[nextIndex].focus();
+        });
+
         star.addEventListener('click', () => chooseRating(val));
     });
 
