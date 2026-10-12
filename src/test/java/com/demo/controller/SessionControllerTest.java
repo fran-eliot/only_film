@@ -179,4 +179,35 @@ public class SessionControllerTest {
         org.junit.jupiter.api.Assertions.assertEquals(8.0, persisted.getPrice());
     }
 
+
+    @Test
+    void invalidCreationShowsPriceErrorsWithoutSavingSession() throws Exception {
+        long before = sessionRepository.count();
+        mockMvc.perform(post("/sessions").with(csrf())
+                        .param("price", "-1")
+                        .param("adMinutes", "5"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("sessions/session-form"))
+                .andExpect(model().attributeHasFieldErrors("proyeccion", "price"))
+                .andExpect(model().attributeExists("movies", "rooms"))
+                .andExpect(content().string(containsString("priceError")));
+        org.junit.jupiter.api.Assertions.assertEquals(before, sessionRepository.count());
+    }
+
+    @Test
+    void invalidEditShowsAdvertisingErrorsAndPreservesOriginal() throws Exception {
+        var original = sessionRepository.save(com.demo.model.Session.builder()
+                .price(8.0).adMinutes(10).build());
+        mockMvc.perform(post("/sessions").with(csrf())
+                        .param("id", original.getId().toString())
+                        .param("price", "12.0")
+                        .param("adMinutes", "-3"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("sessions/session-form"))
+                .andExpect(model().attributeHasFieldErrors("proyeccion", "adMinutes"))
+                .andExpect(model().attributeExists("movies", "rooms"));
+        var persisted = sessionRepository.findById(original.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertEquals(8.0, persisted.getPrice());
+        org.junit.jupiter.api.Assertions.assertEquals(10, persisted.getAdMinutes());
+    }
 }
