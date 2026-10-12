@@ -97,7 +97,7 @@ public class MovieControllerTest {
                 .andExpect(view().name("movies/movie-form"))
                 .andExpect(model().attributeHasFieldErrors("movie", "director"))
                 .andExpect(model().attribute("movie", hasProperty("imageUrl", is("/uploads/previous.png"))))
-                .andExpect(content().string(containsString("Nuevo título")));
+                .andExpect(model().attribute("movie", hasProperty("title", is("Nuevo título"))));
         assertEquals(before, movieRepository.count());
         assertEquals(original.getTitle(), movieRepository.findById(original.getId()).orElseThrow().getTitle());
     }
@@ -306,6 +306,7 @@ public class MovieControllerTest {
         mockMvc.perform(multipart("/movies").file("imageFile", new byte[0])
                         .param("id", movie.getId().toString())
                         .param("title", "Changed title")
+                        .param("director", "Director válido")
                         .param("imageUrl", "/uploads/forged.html"))
                 .andExpect(status().is3xxRedirection());
         Movie persisted = movieRepository.findById(movie.getId()).orElseThrow();
