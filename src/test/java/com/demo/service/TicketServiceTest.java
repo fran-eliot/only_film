@@ -123,6 +123,23 @@ public class TicketServiceTest {
     }
 
     @Test
+    void updateAdminDiscountRejectsNaNWithoutSaving() {
+        Ticket ticket = Ticket.builder().id(1L).session(session)
+                .status(BuyStatus.LIBRE).discount(0.0).build();
+        com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
+        form.setId(1L);
+        form.setDiscount(Double.NaN);
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
+
+        assertThrows(IllegalArgumentException.class, () -> ticketService.updateAdminDiscount(form));
+
+        assertEquals(0.0, ticket.getDiscount());
+        verify(ticketRepository).findByIdForCheckout(1L);
+        verify(ticketRepository, never()).save(any());
+        verifyNoMoreInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     @DisplayName("admin: descuento permitido solo en entrada libre")
     public void updateAdminDiscount_changesOnlyFreeTicketDiscount() {
         Ticket ticket = Ticket.builder().id(1L).row("C").seat("3")
