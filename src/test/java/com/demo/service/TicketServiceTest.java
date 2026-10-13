@@ -614,6 +614,14 @@ public class TicketServiceTest {
     }
 
     @Test
+    void processCheckoutRejectsNullTicketIdWithoutRepositoryAccess() {
+        assertThrows(IllegalArgumentException.class, () ->
+                ticketService.processCheckout(null, User.builder().id(6L).build(), 0, 0, 0, 0, 0));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     @DisplayName("processCheckout: ticket inexistente -> lanza NoSuchElementException")
     public void processCheckout_nonExistingTicket_throwsNoSuchElementException() {
         // Arrange

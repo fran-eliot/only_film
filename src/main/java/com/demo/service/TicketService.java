@@ -192,6 +192,10 @@ public class TicketService {
             throw new IllegalArgumentException("Se requiere un comprador identificado");
         }
 
+        if (ticketId == null) {
+            throw new IllegalArgumentException("Se requiere un identificador de entrada");
+        }
+
         Ticket ticket = ticketRepository.findByIdForCheckout(ticketId)
                 .orElseThrow();
 
