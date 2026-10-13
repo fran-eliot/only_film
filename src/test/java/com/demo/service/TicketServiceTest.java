@@ -322,6 +322,15 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsRejectsUnsavedMovieWithoutPersisting() {
+        session.getMovie().setId(null);
+
+        assertThrows(IllegalArgumentException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     void generarTicketsRejectsUnsavedSessionWithoutPersisting() {
         session.setId(null);
 
