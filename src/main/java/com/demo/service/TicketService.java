@@ -74,7 +74,10 @@ public class TicketService {
         if (discount == null || !Double.isFinite(discount) || discount < 0) {
             throw new IllegalArgumentException("Descuento inválido");
         }
-        double price = ticket.getPrice() == null ? 0.0 : ticket.getPrice();
+        Double price = ticket.getSession() == null ? null : ticket.getSession().getPrice();
+        if (price == null || !Double.isFinite(price) || price < 0) {
+            throw new IllegalStateException("Precio de sesión inválido");
+        }
         if (discount > price) {
             throw new IllegalArgumentException("El descuento supera el precio de la entrada");
         }
