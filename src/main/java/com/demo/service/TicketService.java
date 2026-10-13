@@ -85,6 +85,7 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
 
+    @Transactional
     public List <Ticket> generarTickets(Session session) {
         Double price = session == null ? null : session.getPrice();
         if (price == null || !Double.isFinite(price) || price < 0) {
