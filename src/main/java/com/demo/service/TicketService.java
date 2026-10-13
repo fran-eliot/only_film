@@ -63,7 +63,7 @@ public class TicketService {
      */
     @Transactional
     public Ticket updateAdminDiscount(TicketAdminForm form) {
-        if (form.getId() == null) {
+        if (form == null || form.getId() == null) {
             throw new IllegalArgumentException("La entrada debe existir");
         }
         Ticket ticket = ticketRepository.findByIdForCheckout(form.getId()).orElseThrow();
