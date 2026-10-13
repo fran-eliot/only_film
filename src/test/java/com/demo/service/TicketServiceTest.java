@@ -284,6 +284,18 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsDoesNotDuplicateExistingSessionInventory() {
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+        when(ticketRepository.existsBySession_Id(1L)).thenReturn(true);
+
+        List<Ticket> result = ticketService.generarTickets(session);
+
+        assertTrue(result.isEmpty());
+        verify(ticketRepository).existsBySession_Id(1L);
+        verify(ticketRepository, never()).saveAll(anyList());
+    }
+
+    @Test
     @DisplayName("generarTickets: sesión sin sala -> devuelve lista vacía")
     public void generarTickets_withoutRoom_returnsEmptyList() {
         // Arrange

@@ -16,6 +16,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findBySession_Id(Long id);
 
+    boolean existsBySession_Id(Long id);
+
     // Lock the existing seat inventory before changing a session's essential details.
     // Checkout locks individual tickets, so an edit waits for any in-flight purchase.
     @Lock(LockModeType.PESSIMISTIC_WRITE)

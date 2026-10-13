@@ -102,6 +102,10 @@ public class TicketService {
             return List.of();
         }
 
+        if (session.getId() != null && ticketRepository.existsBySession_Id(session.getId())) {
+            return List.of();
+        }
+
         int seatsPerRow = (int) Math.ceil(Math.sqrt(capacity));
 
         List<Ticket> tickets = new ArrayList<>(capacity);
