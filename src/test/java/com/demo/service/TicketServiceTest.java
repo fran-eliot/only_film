@@ -295,6 +295,15 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsRejectsInactiveSessionWithoutPersisting() {
+        session.setActive(false);
+
+        assertThrows(IllegalStateException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     void generarTicketsBeyondRowZPreservesFullCapacity() {
         room.setCapacity(800);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));

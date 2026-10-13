@@ -92,6 +92,10 @@ public class TicketService {
         }
 
 
+        if (!Boolean.TRUE.equals(session.getActive())) {
+            throw new IllegalStateException("La sesión ya no está disponible");
+        }
+
         // Validar que session tenga una sala asociada
         if (session.getRoom() == null || session.getRoom().getId() == null) {
             return List.of();
