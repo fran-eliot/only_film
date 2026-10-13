@@ -104,6 +104,12 @@ public class TicketController {
                 && !Boolean.TRUE.equals(ticket.getSession().getRoom().getActive())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La sala ya no está disponible");
         }
+        Double price = ticket.getSession().getPrice();
+        double discount = ticket.getDiscount() == null ? 0.0 : ticket.getDiscount();
+        if (price == null || !Double.isFinite(price) || price < 0
+                || !Double.isFinite(discount) || discount < 0 || discount > price) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Precio o descuento de entrada inválido");
+        }
         model.addAttribute(MODEL_TICKET, ticket);
         return "tickets/ticket-checkout";
     }
