@@ -263,6 +263,7 @@ public class TicketServiceTest {
         assertEquals(4, savedTickets.size());
 
         verify(roomRepository, times(1)).findById(1L);
+        verify(ticketRepository).existsBySession_Id(1L);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
 
