@@ -369,6 +369,7 @@ public class TicketServiceTest {
         Session sessionWithoutRoom = Session.builder()
                 .id(1L)
                 .price(9.50)
+                .movie(com.demo.model.Movie.builder().id(1L).active(true).build())
                 .room(null)
                 .build();
 
@@ -394,6 +395,7 @@ public class TicketServiceTest {
         Session sessionWithRoomWithoutId = Session.builder()
                 .id(1L)
                 .price(9.50)
+                .movie(com.demo.model.Movie.builder().id(1L).active(true).build())
                 .room(roomWithoutId)
                 .build();
 
