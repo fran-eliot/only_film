@@ -26,7 +26,9 @@ class TicketCheckoutRegressionTest {
 
     private Ticket ticket(long id, BuyStatus status) {
         return Ticket.builder().id(id)
-                .session(Session.builder().id(10L).price(10.0).build())
+                .session(Session.builder().id(10L).price(10.0)
+                        .movie(com.demo.model.Movie.builder().id(21L).active(true).build())
+                        .room(com.demo.model.Room.builder().id(31L).active(true).build()).build())
                 .status(status).build();
     }
 
@@ -90,6 +92,34 @@ class TicketCheckoutRegressionTest {
                 () -> ticketService.processCheckout(9L, User.builder().id(9L).build(), 0, 0, 0, 0, 0));
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getUser());
+        org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
+        verify(ticketRepository, never()).save(any());
+    }
+
+    @Test
+    void missingMovieCannotBePurchased() {
+        Ticket freeTicket = ticket(16L, BuyStatus.LIBRE);
+        freeTicket.getSession().setMovie(null);
+        when(ticketRepository.findByIdForCheckout(16L)).thenReturn(Optional.of(freeTicket));
+
+        assertThrows(IllegalStateException.class,
+                () -> ticketService.processCheckout(16L, User.builder().id(16L).build(), 0, 0, 0, 0, 0));
+
+        assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
+        org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
+        verify(ticketRepository, never()).save(any());
+    }
+
+    @Test
+    void missingRoomCannotBePurchased() {
+        Ticket freeTicket = ticket(17L, BuyStatus.LIBRE);
+        freeTicket.getSession().setRoom(null);
+        when(ticketRepository.findByIdForCheckout(17L)).thenReturn(Optional.of(freeTicket));
+
+        assertThrows(IllegalStateException.class,
+                () -> ticketService.processCheckout(17L, User.builder().id(17L).build(), 0, 0, 0, 0, 0));
+
+        assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
         verify(ticketRepository, never()).save(any());
     }
