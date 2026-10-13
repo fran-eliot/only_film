@@ -433,7 +433,7 @@ public class TicketServiceTest {
         assertThrows(NoSuchElementException.class, () ->
                 ticketService.processCheckout(
                         99L,
-                        null,
+                        User.builder().id(99L).build(),
                         0,
                         0,
                         0,
