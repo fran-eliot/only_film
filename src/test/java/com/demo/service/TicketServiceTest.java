@@ -401,7 +401,7 @@ public class TicketServiceTest {
         // Act
         ticketService.processCheckout(
                 1L,
-                null,
+                User.builder().id(6L).build(),
                 0,
                 0,
                 0,
@@ -413,7 +413,7 @@ public class TicketServiceTest {
         assertEquals(BuyStatus.PAGADO, ticket.getStatus());
         assertEquals(9.50, ticket.getPrice());
         assertNull(ticket.getSnackPrice());
-        assertNull(ticket.getUser());
+        assertEquals(6L, ticket.getUser().getId());
         assertNotNull(ticket.getBuyDateTime());
         assertNotNull(ticket.getQrCode());
         assertTrue(ticket.getQrCode().startsWith("ONLYFILM-1-"));
@@ -433,7 +433,7 @@ public class TicketServiceTest {
         assertThrows(NoSuchElementException.class, () ->
                 ticketService.processCheckout(
                         99L,
-                        null,
+                        User.builder().id(99L).build(),
                         0,
                         0,
                         0,
@@ -500,7 +500,7 @@ public class TicketServiceTest {
 
         ticketService.processCheckout(
                 10L,
-                null,
+                User.builder().id(11L).build(),
                 2, // 2 * 4.50 = 9.00
                 1, // 1 * 6.00 = 6.00
                 3, // 3 * 3.00 = 9.00

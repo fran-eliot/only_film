@@ -33,6 +33,20 @@ class TicketCheckoutRegressionTest {
     }
 
     @Test
+    void nullBuyerCannotPurchase() {
+        assertThrows(IllegalArgumentException.class,
+                () -> ticketService.processCheckout(18L, null, 0, 0, 0, 0, 0));
+        verifyNoInteractions(ticketRepository);
+    }
+
+    @Test
+    void buyerWithoutIdCannotPurchase() {
+        assertThrows(IllegalArgumentException.class,
+                () -> ticketService.processCheckout(19L, User.builder().build(), 0, 0, 0, 0, 0));
+        verifyNoInteractions(ticketRepository);
+    }
+
+    @Test
     void paidTicketCannotBePurchasedAgain() {
         when(ticketRepository.findByIdForCheckout(1L))
                 .thenReturn(Optional.of(ticket(1L, BuyStatus.PAGADO)));

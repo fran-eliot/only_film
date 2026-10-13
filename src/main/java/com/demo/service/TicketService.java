@@ -145,6 +145,9 @@ public class TicketService {
             int qtyPackDuo,
             int qtyComboFamiliar
     ) {
+        if (user == null || user.getId() == null) {
+            throw new IllegalArgumentException("Se requiere un comprador identificado");
+        }
 
         Ticket ticket = ticketRepository.findByIdForCheckout(ticketId)
                 .orElseThrow();
@@ -190,9 +193,7 @@ public class TicketService {
 
         ticket.setStatus(BuyStatus.PAGADO);
 
-        if (user != null) {
-            ticket.setUser(user);
-        }
+        ticket.setUser(user);
 
         ticket.setQrCode(generateQrCode(ticket.getId()));
 
