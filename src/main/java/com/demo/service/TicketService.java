@@ -118,13 +118,13 @@ public class TicketService {
 
         Room room = roomRepository.findById(session.getRoom().getId()).orElseThrow();
 
-        Integer capacity = room.getCapacity();
-
-        if (capacity == null || capacity <=0){
-            return List.of();
-        }
         if (!Boolean.TRUE.equals(room.getActive())) {
             throw new IllegalStateException("La sala ya no está disponible");
+        }
+
+        Integer capacity = room.getCapacity();
+        if (capacity == null || capacity <= 0) {
+            return List.of();
         }
 
         if (session.getId() != null && ticketRepository.existsBySession_Id(session.getId())) {
