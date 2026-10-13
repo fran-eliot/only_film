@@ -304,6 +304,24 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsRejectsMissingMovieWithoutPersisting() {
+        session.setMovie(null);
+
+        assertThrows(IllegalStateException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
+    void generarTicketsRejectsInactiveMovieWithoutPersisting() {
+        session.getMovie().setActive(false);
+
+        assertThrows(IllegalStateException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     void generarTicketsRejectsInactiveRoomWithoutPersisting() {
         room.setActive(false);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
@@ -351,6 +369,7 @@ public class TicketServiceTest {
         Session sessionWithoutRoom = Session.builder()
                 .id(1L)
                 .price(9.50)
+                .movie(com.demo.model.Movie.builder().id(1L).active(true).build())
                 .room(null)
                 .build();
 
@@ -376,6 +395,7 @@ public class TicketServiceTest {
         Session sessionWithRoomWithoutId = Session.builder()
                 .id(1L)
                 .price(9.50)
+                .movie(com.demo.model.Movie.builder().id(1L).active(true).build())
                 .room(roomWithoutId)
                 .build();
 
