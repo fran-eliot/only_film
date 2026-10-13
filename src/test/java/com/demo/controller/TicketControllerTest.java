@@ -319,8 +319,8 @@ public class TicketControllerTest {
     }
 
     @Test
-    void checkoutGetRejectsNonFiniteSessionPrice() throws Exception {
-        session.setPrice(Double.NaN);
+    void checkoutGetRejectsNegativeSessionPrice() throws Exception {
+        session.setPrice(-1.0);
         sessionRepository.saveAndFlush(session);
 
         mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
