@@ -400,6 +400,28 @@ public class TicketControllerTest {
     }
 
     @Test
+    void checkoutGetRejectsSessionWithoutMovie() throws Exception {
+        session.setMovie(null);
+        sessionRepository.saveAndFlush(session);
+
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isConflict());
+
+        assertEquals(BuyStatus.LIBRE, ticketRepository.findById(ticket3.getId()).orElseThrow().getStatus());
+    }
+
+    @Test
+    void checkoutGetRejectsSessionWithoutRoom() throws Exception {
+        session.setRoom(null);
+        sessionRepository.saveAndFlush(session);
+
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isConflict());
+
+        assertEquals(BuyStatus.LIBRE, ticketRepository.findById(ticket3.getId()).orElseThrow().getStatus());
+    }
+
+    @Test
     void checkoutGetRejectsInactiveMovie() throws Exception {
         Movie movie = session.getMovie();
         movie.setActive(false);

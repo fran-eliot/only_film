@@ -97,12 +97,12 @@ public class TicketController {
         if (ticket.getSession() == null || !Boolean.TRUE.equals(ticket.getSession().getActive())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La sesión ya no está disponible");
         }
-        if (ticket.getSession().getMovie() != null
-                && !Boolean.TRUE.equals(ticket.getSession().getMovie().getActive())) {
+        if (ticket.getSession().getMovie() == null
+                || !Boolean.TRUE.equals(ticket.getSession().getMovie().getActive())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La película ya no está disponible");
         }
-        if (ticket.getSession().getRoom() != null
-                && !Boolean.TRUE.equals(ticket.getSession().getRoom().getActive())) {
+        if (ticket.getSession().getRoom() == null
+                || !Boolean.TRUE.equals(ticket.getSession().getRoom().getActive())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La sala ya no está disponible");
         }
         Double price = ticket.getSession().getPrice();
