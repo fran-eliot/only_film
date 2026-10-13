@@ -304,6 +304,24 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsRejectsMissingMovieWithoutPersisting() {
+        session.setMovie(null);
+
+        assertThrows(IllegalStateException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
+    void generarTicketsRejectsInactiveMovieWithoutPersisting() {
+        session.getMovie().setActive(false);
+
+        assertThrows(IllegalStateException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     void generarTicketsRejectsInactiveRoomWithoutPersisting() {
         room.setActive(false);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
