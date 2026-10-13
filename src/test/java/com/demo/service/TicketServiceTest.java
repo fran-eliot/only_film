@@ -322,6 +322,15 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsRejectsUnsavedSessionWithoutPersisting() {
+        session.setId(null);
+
+        assertThrows(IllegalArgumentException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     void generarTicketsRejectsInactiveRoomWithoutPersisting() {
         room.setActive(false);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));

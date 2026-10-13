@@ -100,6 +100,10 @@ public class TicketService {
             throw new IllegalStateException("La película ya no está disponible");
         }
 
+        if (session.getId() == null) {
+            throw new IllegalArgumentException("La sesión debe estar guardada antes de generar entradas");
+        }
+
         // Validar que session tenga una sala asociada
         if (session.getRoom() == null || session.getRoom().getId() == null) {
             return List.of();
