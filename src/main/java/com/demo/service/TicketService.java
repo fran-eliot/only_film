@@ -86,6 +86,11 @@ public class TicketService {
     }
 
     public List <Ticket> generarTickets(Session session) {
+        Double price = session == null ? null : session.getPrice();
+        if (price == null || !Double.isFinite(price) || price < 0) {
+            throw new IllegalArgumentException("Precio de sesión inválido");
+        }
+
 
         // Validar que session tenga una sala asociada
         if (session.getRoom() == null || session.getRoom().getId() == null) {

@@ -268,6 +268,33 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsRejectsNegativeSessionPriceWithoutPersisting() {
+        session.setPrice(-0.01);
+
+        assertThrows(IllegalArgumentException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
+    void generarTicketsRejectsNonFiniteSessionPriceWithoutPersisting() {
+        session.setPrice(Double.NaN);
+
+        assertThrows(IllegalArgumentException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
+    void generarTicketsRejectsNullSessionPriceWithoutPersisting() {
+        session.setPrice(null);
+
+        assertThrows(IllegalArgumentException.class, () -> ticketService.generarTickets(session));
+
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     void generarTicketsBeyondRowZPreservesFullCapacity() {
         room.setCapacity(800);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
