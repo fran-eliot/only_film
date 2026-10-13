@@ -352,6 +352,30 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsRejectsInactiveRoomWithZeroCapacity() {
+        room.setActive(false);
+        room.setCapacity(0);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+
+        assertThrows(IllegalStateException.class, () -> ticketService.generarTickets(session));
+
+        verify(roomRepository).findById(1L);
+        verifyNoInteractions(ticketRepository);
+    }
+
+    @Test
+    void generarTicketsRejectsInactiveRoomWithNullCapacity() {
+        room.setActive(false);
+        room.setCapacity(null);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+
+        assertThrows(IllegalStateException.class, () -> ticketService.generarTickets(session));
+
+        verify(roomRepository).findById(1L);
+        verifyNoInteractions(ticketRepository);
+    }
+
+    @Test
     void generarTicketsHasTransactionalBoundary() throws NoSuchMethodException {
         org.springframework.transaction.annotation.Transactional annotation =
                 TicketService.class.getMethod("generarTickets", Session.class)
@@ -444,6 +468,7 @@ public class TicketServiceTest {
         Room roomWithoutCapacity = Room.builder()
                 .id(1L)
                 .name("Sala sin capacidad")
+                .active(true)
                 .capacity(null)
                 .build();
 
@@ -468,6 +493,7 @@ public class TicketServiceTest {
         Room roomWithZeroCapacity = Room.builder()
                 .id(1L)
                 .name("Sala vacía")
+                .active(true)
                 .capacity(0)
                 .build();
 
