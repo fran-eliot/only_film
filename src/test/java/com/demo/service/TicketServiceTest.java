@@ -110,7 +110,7 @@ public class TicketServiceTest {
     @DisplayName("admin: descuento permitido solo en entrada libre")
     public void updateAdminDiscount_changesOnlyFreeTicketDiscount() {
         Ticket ticket = Ticket.builder().id(1L).row("C").seat("3")
-                .price(9.50).discount(0.0).status(BuyStatus.LIBRE).build();
+                .price(9.50).session(session).discount(0.0).status(BuyStatus.LIBRE).build();
         com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
         form.setId(1L);
         form.setDiscount(2.0);
@@ -123,6 +123,38 @@ public class TicketServiceTest {
         assertEquals("C", updated.getRow());
         assertEquals(9.50, updated.getPrice());
         assertEquals(BuyStatus.LIBRE, updated.getStatus());
+        verify(ticketRepository).save(ticket);
+    }
+
+    @Test
+    void adminDiscountRejectsAmountAboveCurrentSessionPrice() {
+        Session discountedSession = Session.builder().price(5.0).build();
+        Ticket ticket = Ticket.builder().id(2L).session(discountedSession)
+                .price(10.0).status(BuyStatus.LIBRE).build();
+        com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
+        form.setId(2L);
+        form.setDiscount(7.0);
+        when(ticketRepository.findByIdForCheckout(2L)).thenReturn(Optional.of(ticket));
+
+        assertThrows(IllegalArgumentException.class, () -> ticketService.updateAdminDiscount(form));
+        assertNull(ticket.getDiscount());
+        verify(ticketRepository, never()).save(any());
+    }
+
+    @Test
+    void adminDiscountAllowsAmountBelowCurrentSessionPrice() {
+        Session repricedSession = Session.builder().price(12.0).build();
+        Ticket ticket = Ticket.builder().id(3L).session(repricedSession)
+                .price(7.0).status(BuyStatus.LIBRE).build();
+        com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
+        form.setId(3L);
+        form.setDiscount(10.0);
+        when(ticketRepository.findByIdForCheckout(3L)).thenReturn(Optional.of(ticket));
+        when(ticketRepository.save(ticket)).thenReturn(ticket);
+
+        Ticket updated = ticketService.updateAdminDiscount(form);
+
+        assertEquals(10.0, updated.getDiscount());
         verify(ticketRepository).save(ticket);
     }
 
