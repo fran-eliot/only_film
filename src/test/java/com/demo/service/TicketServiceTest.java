@@ -352,6 +352,16 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsHasTransactionalBoundary() throws NoSuchMethodException {
+        org.springframework.transaction.annotation.Transactional annotation =
+                TicketService.class.getMethod("generarTickets", Session.class)
+                        .getAnnotation(org.springframework.transaction.annotation.Transactional.class);
+
+        assertNotNull(annotation);
+        assertFalse(annotation.readOnly());
+    }
+
+    @Test
     void generarTicketsBeyondRowZPreservesFullCapacity() {
         room.setCapacity(800);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
