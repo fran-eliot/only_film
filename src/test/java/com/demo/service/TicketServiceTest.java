@@ -468,6 +468,7 @@ public class TicketServiceTest {
         Room roomWithoutCapacity = Room.builder()
                 .id(1L)
                 .name("Sala sin capacidad")
+                .active(true)
                 .capacity(null)
                 .build();
 
@@ -492,6 +493,7 @@ public class TicketServiceTest {
         Room roomWithZeroCapacity = Room.builder()
                 .id(1L)
                 .name("Sala vacía")
+                .active(true)
                 .capacity(0)
                 .build();
 
