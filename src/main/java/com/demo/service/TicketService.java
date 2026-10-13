@@ -110,6 +110,9 @@ public class TicketService {
         if (capacity == null || capacity <=0){
             return List.of();
         }
+        if (!Boolean.TRUE.equals(room.getActive())) {
+            throw new IllegalStateException("La sala ya no está disponible");
+        }
 
         if (session.getId() != null && ticketRepository.existsBySession_Id(session.getId())) {
             return List.of();
