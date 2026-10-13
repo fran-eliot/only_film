@@ -51,6 +51,7 @@ public class TicketServiceTest {
                 .id(1L)
                 .price(9.50)
                 .room(room)
+                .movie(com.demo.model.Movie.builder().id(1L).active(true).build())
                 .build();
     }
 
