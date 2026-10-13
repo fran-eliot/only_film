@@ -267,6 +267,23 @@ public class TicketServiceTest {
     }
 
     @Test
+    void generarTicketsBeyondRowZPreservesFullCapacity() {
+        room.setCapacity(800);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+        when(ticketRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<Ticket> result = ticketService.generarTickets(session);
+
+        assertEquals(800, result.size());
+        assertEquals("A", result.get(0).getRow());
+        assertEquals("Z", result.get(25 * 29).getRow());
+        assertEquals("AA", result.get(26 * 29).getRow());
+        assertEquals("AB", result.get(27 * 29).getRow());
+        assertEquals("16", result.get(799).getSeat());
+        verify(ticketRepository).saveAll(anyList());
+    }
+
+    @Test
     @DisplayName("generarTickets: sesión sin sala -> devuelve lista vacía")
     public void generarTickets_withoutRoom_returnsEmptyList() {
         // Arrange

@@ -105,10 +105,10 @@ public class TicketService {
         int seatsPerRow = (int) Math.ceil(Math.sqrt(capacity));
 
         List<Ticket> tickets = new ArrayList<>(capacity);
-        char rowLetter = 'A';
+        int rowIndex = 0;
         int created = 0;
 
-        while (created < capacity && rowLetter <= 'Z') {
+        while (created < capacity) {
 
             for (int seatNum = 1;
                  seatNum <= seatsPerRow && created < capacity;
@@ -116,7 +116,7 @@ public class TicketService {
 
                 Ticket ticket = Ticket.builder()
                         .session(session)
-                        .row(String.valueOf(rowLetter))
+                        .row(rowLabel(rowIndex))
                         .seat(String.valueOf(seatNum))
                         .price(session.getPrice())
                         .discount(0.0)
@@ -126,7 +126,7 @@ public class TicketService {
                 tickets.add(ticket);
             }
 
-            rowLetter++;
+            rowIndex++;
         }
 
         // Guardar datos
@@ -136,6 +136,17 @@ public class TicketService {
 
 
         return tickets;
+    }
+
+    private static String rowLabel(int index) {
+        StringBuilder label = new StringBuilder();
+        int n = index + 1;
+        while (n > 0) {
+            n--;
+            label.append((char) ('A' + n % 26));
+            n /= 26;
+        }
+        return label.reverse().toString();
     }
 
     @Transactional
