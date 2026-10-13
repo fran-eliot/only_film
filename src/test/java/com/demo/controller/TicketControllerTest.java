@@ -305,6 +305,41 @@ public class TicketControllerTest {
     }
 
     @Test
+    void checkoutGetRejectsDiscountAboveSessionPrice() throws Exception {
+        ticket3.setDiscount(11.0);
+        ticketRepository.saveAndFlush(ticket3);
+
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isConflict());
+
+        Ticket persisted = ticketRepository.findById(ticket3.getId()).orElseThrow();
+        assertEquals(BuyStatus.LIBRE, persisted.getStatus());
+        assertEquals(10.0, persisted.getPrice());
+        assertNull(persisted.getQrCode());
+    }
+
+    @Test
+    void checkoutGetRejectsNonFiniteSessionPrice() throws Exception {
+        session.setPrice(Double.NaN);
+        sessionRepository.saveAndFlush(session);
+
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isConflict());
+        assertEquals(BuyStatus.LIBRE, ticketRepository.findById(ticket3.getId()).orElseThrow().getStatus());
+    }
+
+    @Test
+    void checkoutGetAcceptsValidDiscount() throws Exception {
+        ticket3.setDiscount(2.5);
+        ticketRepository.saveAndFlush(ticket3);
+
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tickets/ticket-checkout"))
+                .andExpect(model().attribute("ticket", hasProperty("discount", is(2.5))));
+    }
+
+    @Test
     void checkoutGetRejectsInactiveSession() throws Exception {
         session.setActive(false);
         sessionRepository.saveAndFlush(session);
