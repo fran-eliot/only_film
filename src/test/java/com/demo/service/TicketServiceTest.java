@@ -263,6 +263,7 @@ public class TicketServiceTest {
         assertEquals(4, savedTickets.size());
 
         verify(roomRepository, times(1)).findById(1L);
+        verify(ticketRepository).existsBySession_Id(1L);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
 
@@ -281,6 +282,18 @@ public class TicketServiceTest {
         assertEquals("AB", result.get(27 * 29).getRow());
         assertEquals("17", result.get(799).getSeat());
         verify(ticketRepository).saveAll(anyList());
+    }
+
+    @Test
+    void generarTicketsDoesNotDuplicateExistingSessionInventory() {
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+        when(ticketRepository.existsBySession_Id(1L)).thenReturn(true);
+
+        List<Ticket> result = ticketService.generarTickets(session);
+
+        assertTrue(result.isEmpty());
+        verify(ticketRepository).existsBySession_Id(1L);
+        verify(ticketRepository, never()).saveAll(anyList());
     }
 
     @Test
