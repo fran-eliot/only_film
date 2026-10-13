@@ -279,7 +279,7 @@ public class TicketServiceTest {
         assertEquals("Z", result.get(25 * 29).getRow());
         assertEquals("AA", result.get(26 * 29).getRow());
         assertEquals("AB", result.get(27 * 29).getRow());
-        assertEquals("16", result.get(799).getSeat());
+        assertEquals("17", result.get(799).getSeat());
         verify(ticketRepository).saveAll(anyList());
     }
 
