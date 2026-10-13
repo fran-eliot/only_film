@@ -105,7 +105,7 @@
                                         <i class="fa-solid fa-ticket me-2"></i>Entrada
                                     </span>
                                     <span class="text-secondary small"
-                                          th:text="${#numbers.formatDecimal(ticket.session.price, 1, 2) + ' €'}">—</span>
+                                          th:text="${#numbers.formatDecimal(ticket.price, 1, 2) + ' €'}">—</span>
                                 </div>
                                 <div class="breakdown-line" th:if="${ticket.snackPrice != null and ticket.snackPrice > 0}">
                                     <span class="text-muted small">

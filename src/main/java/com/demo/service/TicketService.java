@@ -179,7 +179,13 @@ public class TicketService {
 
         ticket.setSnackPrice(snackTotal > 0 ? snackTotal : null);
 
-        ticket.setPrice(ticket.getSession().getPrice());
+        Double sessionPrice = ticket.getSession().getPrice();
+        double discount = ticket.getDiscount() == null ? 0.0 : ticket.getDiscount();
+        if (sessionPrice == null || !Double.isFinite(sessionPrice) || sessionPrice < 0
+                || !Double.isFinite(discount) || discount < 0 || discount > sessionPrice) {
+            throw new IllegalStateException("Precio o descuento de entrada inválido");
+        }
+        ticket.setPrice(sessionPrice - discount);
 
         ticket.setBuyDateTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")));
 

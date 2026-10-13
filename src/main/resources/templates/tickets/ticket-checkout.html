@@ -70,7 +70,7 @@
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <span class="text-muted"><i class="fa-solid fa-ticket me-2"></i>Entrada</span>
                             <span class="text-gold fw-bold"
-                                  th:text="${#numbers.formatDecimal(ticket.session.price, 1, 2) + ' €'}">0.00 €</span>
+                                  th:text="${#numbers.formatDecimal(ticket.session.price - (ticket.discount != null ? ticket.discount : 0), 1, 2) + ' €'}">0.00 €</span>
                         </div>
                     </div>
                 </div>
@@ -208,7 +208,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted small">Entrada</span>
                                 <span class="text-muted small"
-                                      th:text="${#numbers.formatDecimal(ticket.session.price, 1, 2) + ' €'}">0.00 €</span>
+                                      th:text="${#numbers.formatDecimal(ticket.session.price - (ticket.discount != null ? ticket.discount : 0), 1, 2) + ' €'}">0.00 €</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-3" id="snack-line"
                                  style="display:none !important" th:style="${''}">
@@ -218,7 +218,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold text-gold">Total</span>
                                 <span class="fw-bold text-gold fs-5" id="total-display"
-                                      th:text="${#numbers.formatDecimal(ticket.session.price, 1, 2) + ' €'}">0.00 €</span>
+                                      th:text="${#numbers.formatDecimal(ticket.session.price - (ticket.discount != null ? ticket.discount : 0), 1, 2) + ' €'}">0.00 €</span>
                             </div>
                         </div>
                     </div>
@@ -317,7 +317,7 @@
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-muted small">Entrada</span>
                                 <span class="text-muted small"
-                                      th:text="${#numbers.formatDecimal(ticket.session.price, 1, 2) + ' €'}">—</span>
+                                      th:text="${#numbers.formatDecimal(ticket.session.price - (ticket.discount != null ? ticket.discount : 0), 1, 2) + ' €'}">—</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
                                 <span class="text-muted small">Snacks</span>
@@ -326,7 +326,7 @@
                             <div class="d-flex justify-content-between">
                                 <span class="text-gold fw-bold">Total a pagar</span>
                                 <span class="text-gold fw-bold" id="pay-total-display"
-                                      th:text="${#numbers.formatDecimal(ticket.session.price, 1, 2) + ' €'}">—</span>
+                                      th:text="${#numbers.formatDecimal(ticket.session.price - (ticket.discount != null ? ticket.discount : 0), 1, 2) + ' €'}">—</span>
                             </div>
                         </div>
 
@@ -335,7 +335,7 @@
                             <span class="pay-text">
                                 <i class="fa-solid fa-lock me-2"></i>
                                 Pagar ahora · <span id="pay-btn-amount"
-                                                    th:text="${#numbers.formatDecimal(ticket.session.price, 1, 2) + ' €'}">—</span>
+                                                    th:text="${#numbers.formatDecimal(ticket.session.price - (ticket.discount != null ? ticket.discount : 0), 1, 2) + ' €'}">—</span>
                             </span>
                             <span class="pay-spinner" aria-hidden="true">
                                 <span class="spinner-ring"></span>
@@ -617,7 +617,7 @@
 <script th:inline="javascript">
 (function () {
     /* ── 1. Precio base desde Thymeleaf ── */
-    const BASE_PRICE = /*[[${ticket.session.price}]]*/ 0;
+    const BASE_PRICE = /*[[${ticket.session.price - (ticket.discount != null ? ticket.discount : 0)}]]*/ 0;
 
     /* ── 2. Total en tiempo real ── */
     function recalculate() {
