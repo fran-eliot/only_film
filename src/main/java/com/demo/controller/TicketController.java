@@ -64,7 +64,8 @@ public class TicketController {
     public String ticketDetail(@PathVariable Long id, Model model, @AuthenticationPrincipal User user) {
         Ticket ticket = ticketService.findById(id).orElseThrow();
         if (user == null || (user.getRole() != Role.ROLE_ADMIN
-                && (ticket.getUser() == null || !ticket.getUser().getId().equals(user.getId())))) {
+                && (ticket.getStatus() != BuyStatus.PAGADO || ticket.getUser() == null
+                || !ticket.getUser().getId().equals(user.getId())))) {
             throw new AccessDeniedException("No puedes consultar esta entrada");
         }
         model.addAttribute(MODEL_TICKET, ticket);
