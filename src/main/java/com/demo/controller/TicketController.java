@@ -50,7 +50,7 @@ public class TicketController {
             model.addAttribute("title", "Entradas vendidas");
             model.addAttribute("isAdmin", true);
         } else {
-            tickets = ticketService.getByUserId(user.getId());
+            tickets = ticketService.findPagadoByUserId(user.getId());
             model.addAttribute("title", "Mis entradas");
             model.addAttribute("isAdmin", false);
         }
