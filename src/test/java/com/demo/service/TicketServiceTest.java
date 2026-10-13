@@ -107,6 +107,12 @@ public class TicketServiceTest {
     }
 
     @Test
+    void updateAdminDiscountRejectsNullFormWithoutRepositoryAccess() {
+        assertThrows(IllegalArgumentException.class, () -> ticketService.updateAdminDiscount(null));
+        verifyNoInteractions(ticketRepository, roomRepository);
+    }
+
+    @Test
     @DisplayName("admin: descuento permitido solo en entrada libre")
     public void updateAdminDiscount_changesOnlyFreeTicketDiscount() {
         Ticket ticket = Ticket.builder().id(1L).row("C").seat("3")
