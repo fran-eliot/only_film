@@ -152,6 +152,44 @@ public class TicketControllerTest {
     }
 
     @Test
+    void customerCannotSeeOwnCancelledTicketDetail() throws Exception {
+        User customer = userRepository.save(User.builder()
+                .username("cancelled_customer").email("cancelled@cinema.com")
+                .firstName("Cancelled").password(passwordEncoder.encode("user123"))
+                .role(Role.ROLE_USER).active(true).build());
+        ticket3.setUser(customer);
+        ticket3.setStatus(BuyStatus.CANCELADO);
+        ticketRepository.saveAndFlush(ticket3);
+
+        mockMvc.perform(get("/tickets/" + ticket3.getId()).with(user(customer)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void customerCanSeeOwnPaidTicketDetail() throws Exception {
+        User customer = userRepository.save(User.builder()
+                .username("paid_customer").email("paid@cinema.com")
+                .firstName("Paid").password(passwordEncoder.encode("user123"))
+                .role(Role.ROLE_USER).active(true).build());
+        ticket1.setUser(customer);
+        ticketRepository.saveAndFlush(ticket1);
+
+        mockMvc.perform(get("/tickets/" + ticket1.getId()).with(user(customer)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tickets/ticket-detail"));
+    }
+
+    @Test
+    void adminCanInspectCancelledTicketDetail() throws Exception {
+        ticket3.setStatus(BuyStatus.CANCELADO);
+        ticketRepository.saveAndFlush(ticket3);
+
+        mockMvc.perform(get("/tickets/" + ticket3.getId()).with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("tickets/ticket-detail"));
+    }
+
+    @Test
     void editFreeTicketShowsDiscountOnlyForm() throws Exception {
         mockMvc.perform(get("/tickets/edit/" + ticket3.getId()).with(user(user)))
                 .andExpect(status().isOk())
