@@ -97,12 +97,7 @@ public class ReviewController {
         if (review.getId() != null) {
             // Never trust ownership, movie or timestamp supplied by form fields.
             persisted = reviewRepository.findById(review.getId()).orElseThrow();
-            boolean isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
-            boolean isOwner = persisted.getUser() != null
-                    && persisted.getUser().getId().equals(currentUser.getId());
-            if (!isAdmin && !isOwner) {
-                throw new AccessDeniedException("No puedes modificar esta reseña");
-            }
+            verifyEditPermission(persisted, currentUser);
 
             if (bindingResult.hasErrors()) {
                 model.addAttribute("movie", persisted.getMovie());
@@ -140,6 +135,15 @@ public class ReviewController {
         if (persisted.getMovie() != null)
             return REDIRECT_MOVIE_DETAIL + persisted.getMovie().getId() + "#reviews";
         return "redirect:/reviews";
+    }
+
+    private static void verifyEditPermission(Review persisted, User currentUser) {
+        boolean isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
+        boolean isOwner = persisted.getUser() != null
+                && persisted.getUser().getId().equals(currentUser.getId());
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException("No puedes modificar esta reseña");
+        }
     }
 
     @PostMapping("/reviews/delete/{id}")
