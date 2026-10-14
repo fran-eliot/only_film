@@ -162,6 +162,18 @@ public class SessionControllerTest {
     }
 
     @Test
+    void missingSessionDetailReturnsNotFound() throws Exception {
+        mockMvc.perform(get("/sessions/999999999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void missingSessionEditReturnsNotFound() throws Exception {
+        mockMvc.perform(get("/sessions/edit/999999999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void editSession() throws Exception {
         var session = sessionRepository.save(com.demo.model.Session.builder().build());
         mockMvc.perform(get("/sessions/edit/" + session.getId()))

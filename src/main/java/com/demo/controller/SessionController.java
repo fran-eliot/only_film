@@ -13,6 +13,8 @@ package com.demo.controller;
     import org.springframework.validation.BindingResult;
     import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.server.ResponseStatusException;
     import org.springframework.web.bind.annotation.GetMapping;
     import org.springframework.web.bind.annotation.ModelAttribute;
     import org.springframework.web.bind.annotation.PathVariable;
@@ -51,7 +53,8 @@ public String listSessions(Model model) {
     // Detalle de sesión
     @GetMapping("/sessions/{id}")
     public String sessionDetail(Model model, @PathVariable Long id) {
-        Session session = sessionRepository.findById(id).orElseThrow();
+        Session session = sessionRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Proyección no encontrada"));
         Integer capacity = session.getRoom() == null ? null : session.getRoom().getCapacity();
         int seatsPerRow = capacity == null || capacity <= 0 ? 0 : (int) Math.ceil(Math.sqrt(capacity));
         model.addAttribute(MODEL_SESSION, session);
@@ -70,7 +73,8 @@ public String listSessions(Model model) {
     // Formulario editar sesión
     @GetMapping("/sessions/edit/{id}")
     public String editSession(Model model, @PathVariable Long id) {
-        model.addAttribute(MODEL_SESSION, SessionForm.from(sessionRepository.findById(id).orElseThrow()));
+        model.addAttribute(MODEL_SESSION, SessionForm.from(sessionRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Proyección no encontrada"))));
         model.addAttribute("movies", movieRepository.findAll());
         model.addAttribute("rooms", roomRepository.findAll());
         return "sessions/session-form";
