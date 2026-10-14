@@ -50,9 +50,10 @@ public String listSessions(Model model) {
     // Detalle de sesión
     @GetMapping("/sessions/{id}")
     public String sessionDetail(Model model, @PathVariable Long id) {
-        int capacity = sessionRepository.findById(id).orElseThrow().getRoom().getCapacity();
-        int seatsPerRow = (int) Math.ceil(Math.sqrt(capacity));
-        model.addAttribute(MODEL_SESSION, sessionRepository.findById(id).orElseThrow());
+        Session session = sessionRepository.findById(id).orElseThrow();
+        Integer capacity = session.getRoom() == null ? null : session.getRoom().getCapacity();
+        int seatsPerRow = capacity == null || capacity <= 0 ? 0 : (int) Math.ceil(Math.sqrt(capacity));
+        model.addAttribute(MODEL_SESSION, session);
         model.addAttribute("tickets", ticketRepository.findBySession_Id(id)); // Cargar los tickets de esta sesión
         model.addAttribute("seatsPerRow", seatsPerRow);
         return "sessions/session-detail";
