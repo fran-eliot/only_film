@@ -13,6 +13,8 @@ import com.demo.repository.SessionRepository;
 import com.demo.repository.TicketRepository;
 import com.demo.repository.UserRepository;
 import jakarta.servlet.ServletException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import org.springframework.transaction.annotation.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,6 +86,7 @@ public class TicketControllerTest {
                 .movie(movie)
                 .room(room)
                 .price(10.0)
+                .startTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")).plusDays(1))
                 .build());
 
         // 2. Población base de tickets para las pruebas

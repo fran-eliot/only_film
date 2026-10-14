@@ -220,6 +220,9 @@ public class TicketService {
                 || !Boolean.TRUE.equals(ticket.getSession().getRoom().getActive())) {
             throw new IllegalStateException("La sala ya no está disponible");
         }
+        if (hasSessionStarted(ticket.getSession())) {
+            throw new IllegalStateException("La sesión ya ha comenzado o no tiene fecha válida");
+        }
         validateSnackQuantity(qtyPalomitasMedianas);
         validateSnackQuantity(qtyPalomitasGrandes);
         validateSnackQuantity(qtyRefresco);
@@ -252,6 +255,11 @@ public class TicketService {
         ticket.setQrCode(generateQrCode(ticket.getId()));
 
         ticketRepository.save(ticket);
+    }
+
+    public static boolean hasSessionStarted(Session session) {
+        return session == null || session.getStartTime() == null
+                || !session.getStartTime().isAfter(LocalDateTime.now(ZoneId.of("Europe/Madrid")));
     }
 
     private static void validateSnackQuantity(int quantity) {
