@@ -139,7 +139,7 @@ public class SessionControllerTest {
         mockMvc.perform(get("/sessions/" + session.getId()))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("salesOpen", true))
-                .andExpect(content().string(containsString("data-bs-target=\\"#confirmarCompraModal\\"")))
+                .andExpect(content().string(containsString("data-bs-target=\"#confirmarCompraModal\"")))
                 .andExpect(content().string(containsString("seat-btn taken")));
     }
 
@@ -156,7 +156,7 @@ public class SessionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("salesOpen", false))
                 .andExpect(content().string(containsString("La venta de entradas no está disponible")))
-                .andExpect(content().string(not(containsString("data-bs-target=\\"#confirmarCompraModal\\""))));
+                .andExpect(content().string(not(containsString("data-bs-target=\"#confirmarCompraModal\""))));
     }
 
     @Test
