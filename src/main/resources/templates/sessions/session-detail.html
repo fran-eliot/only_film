@@ -138,6 +138,10 @@
         </div>
     </div>
 
+    <div class="alert alert-warning" th:if="${!salesOpen and !#lists.isEmpty(tickets)}">
+        La venta de entradas no está disponible para esta proyección.
+    </div>
+
     <!-- MAPA DE ASIENTOS -->
     <div class="card mb-5" th:if="${!#lists.isEmpty(tickets)}">
         <div class="card-body">
@@ -173,7 +177,7 @@
                                 th:classappend="${t.seat == a1 or t.seat == a2 ? ' aisle' : ''}">
 
                                 <!-- Butaca libre -> abre modal — CAMBIO: data-url apunta a /checkout -->
-                                <a th:if="${t.status.name() != 'PAGADO'}"
+                                <a th:if="${salesOpen and t.status.name() == 'LIBRE'}"
                                    href="#"
                                    class="seat-btn free"
                                    data-bs-toggle="modal"
@@ -187,7 +191,7 @@
                                 </a>
 
                                 <!-- Butaca ocupada -->
-                                <span th:if="${t.status.name() == 'PAGADO'}" class="seat-btn taken">
+                                <span th:if="${!salesOpen or t.status.name() != 'LIBRE'}" class="seat-btn taken">
                                     <i class="fa-solid fa-couch"></i>
                                 </span>
                             </td>
@@ -200,7 +204,7 @@
             <div class="mt-4 d-flex justify-content-center gap-4 flex-wrap">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-couch legend-free"></i>
-                    <small class="text-muted">Disponible — pulsa para comprar</small>
+                    <small class="text-muted"><span th:text="${salesOpen ? 'Disponible — pulsa para comprar' : 'Venta no disponible'}">Disponible — pulsa para comprar</span></small>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <i class="fa-solid fa-couch legend-taken"></i>
