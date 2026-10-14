@@ -27,6 +27,9 @@ package com.demo.controller;
     @AllArgsConstructor
     public class SessionController {
     private static final String MODEL_SESSION = "proyeccion";
+    private static final String MODEL_MOVIES = "movies";
+    private static final String MODEL_ROOMS = "rooms";
+    private static final String VIEW_SESSION_FORM = "sessions/session-form";
 
 
         private final SessionRepository sessionRepository;
@@ -47,9 +50,9 @@ public String listSessions(Model model) {
     @GetMapping("/sessions/new")
     public String newSession(Model model) {
         model.addAttribute(MODEL_SESSION, new SessionForm());
-        model.addAttribute("movies", movieRepository.findAll()); // Todas las películas
-        model.addAttribute("rooms", roomRepository.findAll()); // Todas las salas
-        return "sessions/session-form";
+        model.addAttribute(MODEL_MOVIES, movieRepository.findAll()); // Todas las películas
+        model.addAttribute(MODEL_ROOMS, roomRepository.findAll()); // Todas las salas
+        return VIEW_SESSION_FORM;
     }
 
     // Detalle de sesión
@@ -77,9 +80,9 @@ public String listSessions(Model model) {
     public String editSession(Model model, @PathVariable Long id) {
         model.addAttribute(MODEL_SESSION, SessionForm.from(sessionRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Proyección no encontrada"))));
-        model.addAttribute("movies", movieRepository.findAll());
-        model.addAttribute("rooms", roomRepository.findAll());
-        return "sessions/session-form";
+        model.addAttribute(MODEL_MOVIES, movieRepository.findAll());
+        model.addAttribute(MODEL_ROOMS, roomRepository.findAll());
+        return VIEW_SESSION_FORM;
     }
 
     // POST: Guardar (crear o actualizar)
@@ -91,9 +94,9 @@ public String listSessions(Model model) {
             bindingResult.rejectValue("startTime", "future", "La fecha de la proyección debe ser futura");
         }
         if (bindingResult.hasErrors()) {
-            model.addAttribute("movies", movieRepository.findAll());
-            model.addAttribute("rooms", roomRepository.findAll());
-            return "sessions/session-form";
+            model.addAttribute(MODEL_MOVIES, movieRepository.findAll());
+            model.addAttribute(MODEL_ROOMS, roomRepository.findAll());
+            return VIEW_SESSION_FORM;
         }
         sessionManagementService.save(form);
         return "redirect:/sessions";
