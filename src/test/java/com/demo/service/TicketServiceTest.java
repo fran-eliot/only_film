@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -50,9 +51,32 @@ public class TicketServiceTest {
         session = Session.builder()
                 .id(1L)
                 .price(9.50)
+                .startTime(LocalDateTime.now().plusDays(1))
                 .room(room)
                 .movie(com.demo.model.Movie.builder().id(1L).active(true).build())
                 .build();
+    }
+
+    @Test
+    void processCheckoutRejectsStartedSessionWithoutSaving() {
+        session.setStartTime(LocalDateTime.now().minusMinutes(1));
+        Ticket ticket = Ticket.builder().id(1L).session(session).status(BuyStatus.LIBRE).build();
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
+        assertThrows(IllegalStateException.class,
+                () -> ticketService.processCheckout(1L, User.builder().id(5L).build(), 0, 0, 0, 0, 0));
+        assertEquals(BuyStatus.LIBRE, ticket.getStatus());
+        verify(ticketRepository, never()).save(any());
+    }
+
+    @Test
+    void processCheckoutRejectsMissingSessionStartWithoutSaving() {
+        session.setStartTime(null);
+        Ticket ticket = Ticket.builder().id(1L).session(session).status(BuyStatus.LIBRE).build();
+        when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
+        assertThrows(IllegalStateException.class,
+                () -> ticketService.processCheckout(1L, User.builder().id(5L).build(), 0, 0, 0, 0, 0));
+        assertEquals(BuyStatus.LIBRE, ticket.getStatus());
+        verify(ticketRepository, never()).save(any());
     }
 
     @Test

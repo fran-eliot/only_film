@@ -105,6 +105,9 @@ public class TicketController {
                 || !Boolean.TRUE.equals(ticket.getSession().getRoom().getActive())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "La sala ya no está disponible");
         }
+        if (TicketService.hasSessionStarted(ticket.getSession())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La sesión ya ha comenzado o no tiene fecha válida");
+        }
         Double price = ticket.getSession().getPrice();
         double discount = ticket.getDiscount() == null ? 0.0 : ticket.getDiscount();
         if (price == null || !Double.isFinite(price) || price < 0
