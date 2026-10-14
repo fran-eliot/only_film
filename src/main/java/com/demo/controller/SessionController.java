@@ -20,6 +20,8 @@ package com.demo.controller;
     import org.springframework.web.bind.annotation.PathVariable;
     import org.springframework.web.bind.annotation.PostMapping;
     import java.util.List;
+    import java.time.LocalDateTime;
+    import java.time.ZoneId;
 
 @Controller
     @AllArgsConstructor
@@ -84,6 +86,10 @@ public String listSessions(Model model) {
     @PostMapping("/sessions")
     public String saveSession(@Valid @ModelAttribute(MODEL_SESSION) SessionForm form,
                               BindingResult bindingResult, Model model) {
+        if (form.getId() == null && (form.getStartTime() == null
+                || !form.getStartTime().isAfter(LocalDateTime.now(ZoneId.of("Europe/Madrid"))))) {
+            bindingResult.rejectValue("startTime", "future", "La fecha de la proyección debe ser futura");
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("movies", movieRepository.findAll());
             model.addAttribute("rooms", roomRepository.findAll());

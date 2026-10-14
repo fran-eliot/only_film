@@ -235,6 +235,7 @@ public class SessionControllerTest {
                         .with(csrf())
                         .param("price", "10.0")
                         .param("language", "VOSE")
+                        .param("startTime", LocalDateTime.now(ZoneId.of("Europe/Madrid")).plusDays(2).withNano(0).toString())
                         .param("adMinutes", "5")
                         .param("movieId", String.valueOf(movie.getId()))
                         .param("roomId", String.valueOf(room.getId())))
@@ -245,6 +246,43 @@ public class SessionControllerTest {
         var savedSessions = sessionRepository.findAll();
         org.junit.jupiter.api.Assertions.assertEquals(1, savedSessions.size());
         org.junit.jupiter.api.Assertions.assertEquals(12, ticketRepository.findBySession_Id(savedSessions.get(0).getId()).size());
+    }
+
+    @Test
+    void creationWithoutStartTimeDoesNotPersistInventory() throws Exception {
+        Movie movie = movieRepository.save(Movie.builder().title("Undated film").active(true).build());
+        Room room = roomRepository.save(Room.builder().name("Undated room").capacity(10).active(true).build());
+        long beforeSessions = sessionRepository.count();
+        long beforeTickets = ticketRepository.count();
+
+        mockMvc.perform(post("/sessions").with(csrf())
+                        .param("price", "10.0")
+                        .param("movieId", movie.getId().toString())
+                        .param("roomId", room.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasFieldErrors("proyeccion", "startTime"));
+
+        org.junit.jupiter.api.Assertions.assertEquals(beforeSessions, sessionRepository.count());
+        org.junit.jupiter.api.Assertions.assertEquals(beforeTickets, ticketRepository.count());
+    }
+
+    @Test
+    void creationWithPastStartTimeDoesNotPersistInventory() throws Exception {
+        Movie movie = movieRepository.save(Movie.builder().title("Expired film").active(true).build());
+        Room room = roomRepository.save(Room.builder().name("Expired room").capacity(10).active(true).build());
+        long beforeSessions = sessionRepository.count();
+        long beforeTickets = ticketRepository.count();
+
+        mockMvc.perform(post("/sessions").with(csrf())
+                        .param("price", "10.0")
+                        .param("movieId", movie.getId().toString())
+                        .param("roomId", room.getId().toString())
+                        .param("startTime", LocalDateTime.now(ZoneId.of("Europe/Madrid")).minusDays(1).withNano(0).toString()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasFieldErrors("proyeccion", "startTime"));
+
+        org.junit.jupiter.api.Assertions.assertEquals(beforeSessions, sessionRepository.count());
+        org.junit.jupiter.api.Assertions.assertEquals(beforeTickets, ticketRepository.count());
     }
 
     @Test

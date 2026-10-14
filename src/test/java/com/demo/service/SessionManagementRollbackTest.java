@@ -1,6 +1,8 @@
 package com.demo.service;
 
 import com.demo.dto.SessionForm;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import com.demo.model.Movie;
 import com.demo.model.Room;
 import com.demo.model.Session;
@@ -43,6 +45,7 @@ class SessionManagementRollbackTest {
         form.setMovieId(movie.getId());
         form.setRoomId(room.getId());
         form.setPrice(9.5);
+        form.setStartTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")).plusDays(1));
 
         doThrow(new IllegalStateException("Simulated seat generation failure"))
                 .when(ticketService).generarTickets(any(Session.class));

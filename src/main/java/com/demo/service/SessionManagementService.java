@@ -7,6 +7,8 @@ import com.demo.model.Session;
 import com.demo.model.Ticket;
 import com.demo.model.enums.BuyStatus;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 import com.demo.repository.MovieRepository;
 import com.demo.repository.RoomRepository;
@@ -34,6 +36,10 @@ public class SessionManagementService {
         validatePrice(form.getPrice());
         validateAdMinutes(form.getAdMinutes());
         boolean creating = form.getId() == null;
+        if (creating && (form.getStartTime() == null
+                || !form.getStartTime().isAfter(LocalDateTime.now(ZoneId.of("Europe/Madrid"))))) {
+            throw new IllegalArgumentException("La fecha de la proyección debe ser futura");
+        }
         Session session = creating ? new Session() : sessionRepository.findById(form.getId()).orElseThrow();
 
         Movie movie = form.getMovieId() == null
