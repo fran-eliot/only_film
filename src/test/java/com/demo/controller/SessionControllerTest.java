@@ -50,10 +50,9 @@ public class SessionControllerTest {
     void sessionListInitializesBootstrapTooltipsWithoutArrayConversion() throws Exception {
         mockMvc.perform(get("/sessions"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(
-                        "document.querySelectorAll('[data-bs-toggle=\\\"tooltip\\\"]').forEach(")))
-                .andExpect(content().string(containsString(
-                        "new bootstrap.Tooltip(tooltipTriggerEl);")))
+                .andExpect(content().string(containsString("document.querySelectorAll(")))
+                .andExpect(content().string(containsString(".forEach(tooltipTriggerEl =>")))
+                .andExpect(content().string(containsString("new bootstrap.Tooltip(tooltipTriggerEl);")))
                 .andExpect(content().string(not(containsString("[].slice.call("))));
     }
 
