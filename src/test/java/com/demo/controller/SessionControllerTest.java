@@ -8,6 +8,8 @@ import com.demo.model.Movie;
 import com.demo.model.Room;
 import com.demo.model.Ticket;
 import com.demo.model.enums.BuyStatus;
+import com.demo.model.Ticket;
+import com.demo.model.enums.BuyStatus;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import jakarta.transaction.Transactional;
@@ -174,6 +176,33 @@ public class SessionControllerTest {
     void deactivateSession() throws Exception {
         var session = sessionRepository.save(com.demo.model.Session.builder().build());
         mockMvc.perform(post("/sessions/deactivate/" + session.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/sessions"));
+    }
+
+    @Test
+    void deactivationPreservesSoldTicketsAndIsIdempotent() throws Exception {
+        var movie = movieRepository.save(Movie.builder().title("Deactivation film").active(true).build());
+        var room = roomRepository.save(Room.builder().name("Sala cerrada").capacity(10).active(true).build());
+        var session = sessionRepository.save(com.demo.model.Session.builder()
+                .movie(movie).room(room).price(10.0).active(true).build());
+        var sold = ticketRepository.save(Ticket.builder()
+                .session(session).row("A").seat("1").status(BuyStatus.PAGADO).build());
+
+        mockMvc.perform(post("/sessions/deactivate/" + session.getId()).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/sessions"));
+        mockMvc.perform(post("/sessions/deactivate/" + session.getId()).with(csrf()))
+                .andExpect(status().is3xxRedirection());
+
+        org.junit.jupiter.api.Assertions.assertFalse(sessionRepository.findById(session.getId()).orElseThrow().getActive());
+        org.junit.jupiter.api.Assertions.assertEquals(BuyStatus.PAGADO,
+                ticketRepository.findById(sold.getId()).orElseThrow().getStatus());
+    }
+
+    @Test
+    void deactivationOfMissingSessionIsIdempotent() throws Exception {
+        mockMvc.perform(post("/sessions/deactivate/99999999").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/sessions"));
     }

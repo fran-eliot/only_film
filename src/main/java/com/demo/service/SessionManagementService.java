@@ -54,6 +54,24 @@ public class SessionManagementService {
         return saved;
     }
 
+    /**
+     * Coordinates deactivation with in-flight checkouts by locking the session's
+     * ticket inventory before changing its availability.
+     */
+    @Transactional
+    public void deactivate(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Se requiere un identificador de sesión");
+        }
+        Session session = sessionRepository.findById(id).orElse(null);
+        if (session == null || !Boolean.TRUE.equals(session.getActive())) {
+            return;
+        }
+        ticketRepository.findBySessionIdForUpdate(id);
+        session.setActive(false);
+        sessionRepository.save(session);
+    }
+
     private static void validatePrice(Double price) {
         if (price == null || !Double.isFinite(price) || price < 0) {
             throw new IllegalArgumentException("El precio debe ser un número no negativo");
