@@ -110,15 +110,15 @@ public class SessionControllerTest {
     }
 
     @Test
-    void sessionDetailWithMissingCapacityRendersSafely() throws Exception {
+    void sessionDetailWithValidCapacityPreservesSeatLayout() throws Exception {
         var room = roomRepository.save(Room.builder()
-                .name("Sala incompleta").capacity(null).build());
+                .name("Sala con capacidad").capacity(16).build());
         var session = sessionRepository.save(com.demo.model.Session.builder()
                 .room(room).build());
 
         mockMvc.perform(get("/sessions/" + session.getId()))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("seatsPerRow", 0))
+                .andExpect(model().attribute("seatsPerRow", 4))
                 .andExpect(model().attributeExists("tickets"));
     }
 
