@@ -92,10 +92,7 @@ public String listSessions(Model model) {
         // GET: Desactivar (en lugar de eliminar, para evitar errores de constraint con tickets asociados)
     @PostMapping("/sessions/deactivate/{id}")
     public String deactivateSession(@PathVariable Long id) {
-        sessionRepository.findById(id).ifPresent(session -> {
-            session.setActive(false);
-            sessionRepository.save(session);
-        });
+        sessionManagementService.deactivate(id);
         return "redirect:/sessions";
     }
 }
