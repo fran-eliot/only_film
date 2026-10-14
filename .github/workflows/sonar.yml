@@ -12,6 +12,24 @@ jobs:
   sonar:
     name: Build + Tests + Coverage + SonarCloud
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: onlyfilm
+          POSTGRES_USER: onlyfilm
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U onlyfilm -d onlyfilm"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/onlyfilm
+      DB_USERNAME: onlyfilm
+      DB_PASSWORD: ci-only-password
 
     steps:
       - name: Checkout
