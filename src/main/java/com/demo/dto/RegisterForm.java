@@ -27,5 +27,4 @@ public class RegisterForm {
 
     @NotBlank(message = "Debes repetir la contraseña")
     private String passwordConfirm;
-//     private Boolean acceptRGPD;
 }

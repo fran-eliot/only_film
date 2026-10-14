@@ -56,14 +56,10 @@ public class UserService implements UserDetailsService {
         user.setPassword(encodedPassword);
         return userRepository.save(user);
     }
-    //Utilizamos el Service para llamar desde aqui el repository que antes lo haciamos desde el controller
     public List<User> findAll(){
         return userRepository.findAll();
     }
 
-    //En el metodo anterior indicamos que ese metodo nos devuelve algo de TIPO lista User
-    //En este metodo como es 1 usuario en particular, el metodo devuelve algo de TIPO user.
-    //Es lo mismo que haciamos antes en el controller, pedirle al Repository que nos de el user por id y si no que nos de una excepcion
     public User findById(Long id){
         return userRepository.findById(id).orElseThrow(() -> new java.util.NoSuchElementException("Usuario no encontrado"));
     }
