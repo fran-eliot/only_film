@@ -339,6 +339,7 @@ public class TicketServiceTest {
     @Test
     @DisplayName("generarTickets: sesión con sala válida -> genera tickets según capacidad")
     public void generarTickets_withValidSessionAndRoom_generatesTicketsByRoomCapacity() {
+        when(ticketRepository.lockSessionForInventoryGeneration(1L)).thenReturn(Optional.of(session));
         // Arrange
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
         when(ticketRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -364,6 +365,7 @@ public class TicketServiceTest {
         assertEquals(4, savedTickets.size());
 
         verify(roomRepository, times(1)).findById(1L);
+        verify(ticketRepository).lockSessionForInventoryGeneration(1L);
         verify(ticketRepository).existsBySession_Id(1L);
         verifyNoMoreInteractions(ticketRepository, roomRepository);
     }
@@ -488,6 +490,7 @@ public class TicketServiceTest {
 
     @Test
     void generarTicketsBeyondRowZPreservesFullCapacity() {
+        when(ticketRepository.lockSessionForInventoryGeneration(1L)).thenReturn(Optional.of(session));
         room.setCapacity(800);
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
         when(ticketRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -505,6 +508,7 @@ public class TicketServiceTest {
 
     @Test
     void generarTicketsDoesNotDuplicateExistingSessionInventory() {
+        when(ticketRepository.lockSessionForInventoryGeneration(1L)).thenReturn(Optional.of(session));
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
         when(ticketRepository.existsBySession_Id(1L)).thenReturn(true);
 

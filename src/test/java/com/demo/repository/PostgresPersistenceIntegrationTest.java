@@ -129,6 +129,39 @@ class PostgresPersistenceIntegrationTest {
     }
 
     @Test
+    void concurrentInventoryGenerationCreatesExactlyOneSeatBatch() throws Exception {
+        String suffix = unique();
+        Movie movie = movies.save(Movie.builder().title("Inventory movie " + suffix).active(true).build());
+        Room room = rooms.save(Room.builder().name("Inventory room " + suffix).capacity(20).active(true).build());
+        Session session = sessions.save(Session.builder().movie(movie).room(room).price(12.5).build());
+
+        CountDownLatch ready = new CountDownLatch(2);
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        try {
+            java.util.concurrent.Callable<Integer> task = () -> {
+                ready.countDown();
+                if (!start.await(10, TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("Concurrent inventory start timed out");
+                }
+                Session persisted = sessions.findById(session.getId()).orElseThrow();
+                return checkout.generarTickets(persisted).size();
+            };
+            Future<Integer> first = pool.submit(task);
+            Future<Integer> second = pool.submit(task);
+
+            assertTrue(ready.await(10, TimeUnit.SECONDS));
+            start.countDown();
+            int generated = first.get(20, TimeUnit.SECONDS) + second.get(20, TimeUnit.SECONDS);
+            assertEquals(20, generated, "Only one request may create the inventory");
+            assertEquals(20, tickets.findBySession_Id(session.getId()).size());
+        } finally {
+            start.countDown();
+            pool.shutdownNow();
+        }
+    }
+
+    @Test
     void pessimisticCheckoutLockAllowsExactlyOneConcurrentPurchase() throws Exception {
         String suffix = unique();
         User buyer1 = createBuyer("a" + suffix);
