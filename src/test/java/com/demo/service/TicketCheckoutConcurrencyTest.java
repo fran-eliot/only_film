@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,7 +48,8 @@ class TicketCheckoutConcurrencyTest {
         Room room = roomRepository.save(Room.builder()
                 .name("Room " + suffix).capacity(10).active(true).build());
         Session session = sessionRepository.save(Session.builder()
-                .movie(movie).room(room).price(10.0).build());
+                .movie(movie).room(room).price(10.0)
+                .startTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")).plusDays(1)).build());
         User first = userRepository.save(User.builder()
                 .username("buyer1_" + suffix).email("buyer1_" + suffix + "@example.com")
                 .firstName("Buyer 1").password("not-used-in-test")

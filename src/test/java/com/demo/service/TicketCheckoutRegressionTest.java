@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,6 +29,7 @@ class TicketCheckoutRegressionTest {
     private Ticket ticket(long id, BuyStatus status) {
         return Ticket.builder().id(id)
                 .session(Session.builder().id(10L).price(10.0)
+                        .startTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")).plusDays(1))
                         .movie(com.demo.model.Movie.builder().id(21L).active(true).build())
                         .room(com.demo.model.Room.builder().id(31L).active(true).build()).build())
                 .status(status).build();

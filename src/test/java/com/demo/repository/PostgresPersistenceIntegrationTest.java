@@ -15,6 +15,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,7 +58,8 @@ class PostgresPersistenceIntegrationTest {
     private Ticket createAvailableTicket(String suffix) {
         Movie movie = movies.save(Movie.builder().title("Postgres movie " + suffix).active(true).build());
         Room room = rooms.save(Room.builder().name("PG room " + suffix).capacity(20).active(true).build());
-        Session session = sessions.save(Session.builder().movie(movie).room(room).price(12.5).build());
+        Session session = sessions.save(Session.builder().movie(movie).room(room).price(12.5)
+                .startTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")).plusDays(1)).build());
         return tickets.save(Ticket.builder().session(session)
                 .row("A").seat("1").status(BuyStatus.LIBRE).build());
     }
