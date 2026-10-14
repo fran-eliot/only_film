@@ -28,6 +28,7 @@ import java.util.Optional;
 public class MovieController {
     private static final String REDIRECT_MOVIES = "redirect:/movies";
     private static final String MODEL_MOVIE = "movie";
+    private static final String VIEW_MOVIE_FORM = "movies/movie-form";
 
     //Inyectar el repositorio de movie
     private final MovieRepository movieRepository;
@@ -98,7 +99,7 @@ public class MovieController {
     @GetMapping("movies/new")
     public String newMovie(Model model){
         model.addAttribute(MODEL_MOVIE, new MovieForm());
-        return "movies/movie-form";
+        return VIEW_MOVIE_FORM;
     }
 
     //Editamos una pelicula existente
@@ -106,7 +107,7 @@ public class MovieController {
     public String editMovie(@PathVariable Long id, Model model){
         //Se pude hacer tambien con el Optional
         model.addAttribute(MODEL_MOVIE, MovieForm.from(movieRepository.findById(id).orElseThrow()));
-        return "movies/movie-form";
+        return VIEW_MOVIE_FORM;
     }
 
     @PostMapping("movies")
@@ -116,7 +117,7 @@ public class MovieController {
                               Model model) {
         if (bindingResult.hasErrors()) {
             restoreExistingMoviePreview(form);
-            return "movies/movie-form";
+            return VIEW_MOVIE_FORM;
         }
         String imageUrl;
         try {
@@ -124,7 +125,7 @@ public class MovieController {
         } catch (IllegalArgumentException invalidImage) {
             restoreExistingMoviePreview(form);
             model.addAttribute("imageError", invalidImage.getMessage());
-            return "movies/movie-form";
+            return VIEW_MOVIE_FORM;
         }
 
         // Load the existing entity: never copy arbitrary HTTP-bound properties.
