@@ -98,6 +98,31 @@ public class SessionControllerTest {
     }
 
     @Test
+    void sessionDetailWithoutRoomRendersSafely() throws Exception {
+        var session = sessionRepository.save(com.demo.model.Session.builder().build());
+
+        mockMvc.perform(get("/sessions/" + session.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("sessions/session-detail"))
+                .andExpect(model().attribute("seatsPerRow", 0))
+                .andExpect(content().string(containsString("Sin sala")))
+                .andExpect(content().string(containsString("href=\"/sessions\"")));
+    }
+
+    @Test
+    void sessionDetailWithValidCapacityPreservesSeatLayout() throws Exception {
+        var room = roomRepository.save(Room.builder()
+                .name("Sala con capacidad").capacity(16).build());
+        var session = sessionRepository.save(com.demo.model.Session.builder()
+                .room(room).build());
+
+        mockMvc.perform(get("/sessions/" + session.getId()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("seatsPerRow", 4))
+                .andExpect(model().attributeExists("tickets"));
+    }
+
+    @Test
     void editSession() throws Exception {
         var session = sessionRepository.save(com.demo.model.Session.builder().build());
         mockMvc.perform(get("/sessions/edit/" + session.getId()))
