@@ -206,6 +206,37 @@ public class TicketService {
         Ticket ticket = ticketRepository.findByIdForCheckout(ticketId)
                 .orElseThrow();
 
+        validateCheckoutAvailability(ticket);
+        validateSnackQuantity(qtyPalomitasMedianas);
+        validateSnackQuantity(qtyPalomitasGrandes);
+        validateSnackQuantity(qtyRefresco);
+        validateSnackQuantity(qtyPackDuo);
+        validateSnackQuantity(qtyComboFamiliar);
+
+        double snackTotal = calculateSnackTotal(
+                qtyPalomitasMedianas,
+                qtyPalomitasGrandes,
+                qtyRefresco,
+                qtyPackDuo,
+                qtyComboFamiliar
+        );
+
+        double ticketPrice = validatedCheckoutPrice(ticket);
+        ticket.setSnackPrice(snackTotal > 0 ? snackTotal : null);
+        ticket.setPrice(ticketPrice);
+
+        ticket.setBuyDateTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")));
+
+        ticket.setStatus(BuyStatus.PAGADO);
+
+        ticket.setUser(user);
+
+        ticket.setQrCode(generateQrCode(ticket.getId()));
+
+        ticketRepository.save(ticket);
+    }
+
+    private static void validateCheckoutAvailability(Ticket ticket) {
         if (ticket.getStatus() != BuyStatus.LIBRE) {
             throw new IllegalStateException("La entrada ya no está disponible");
         }
@@ -223,38 +254,16 @@ public class TicketService {
         if (hasSessionStarted(ticket.getSession())) {
             throw new IllegalStateException("La sesión ya ha comenzado o no tiene fecha válida");
         }
-        validateSnackQuantity(qtyPalomitasMedianas);
-        validateSnackQuantity(qtyPalomitasGrandes);
-        validateSnackQuantity(qtyRefresco);
-        validateSnackQuantity(qtyPackDuo);
-        validateSnackQuantity(qtyComboFamiliar);
+    }
 
-        double snackTotal = calculateSnackTotal(
-                qtyPalomitasMedianas,
-                qtyPalomitasGrandes,
-                qtyRefresco,
-                qtyPackDuo,
-                qtyComboFamiliar
-        );
-
+    private static double validatedCheckoutPrice(Ticket ticket) {
         Double sessionPrice = ticket.getSession().getPrice();
         double discount = ticket.getDiscount() == null ? 0.0 : ticket.getDiscount();
         if (sessionPrice == null || !Double.isFinite(sessionPrice) || sessionPrice < 0
                 || !Double.isFinite(discount) || discount < 0 || discount > sessionPrice) {
             throw new IllegalStateException("Precio o descuento de entrada inválido");
         }
-        ticket.setSnackPrice(snackTotal > 0 ? snackTotal : null);
-        ticket.setPrice(sessionPrice - discount);
-
-        ticket.setBuyDateTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")));
-
-        ticket.setStatus(BuyStatus.PAGADO);
-
-        ticket.setUser(user);
-
-        ticket.setQrCode(generateQrCode(ticket.getId()));
-
-        ticketRepository.save(ticket);
+        return sessionPrice - discount;
     }
 
     public static boolean hasSessionStarted(Session session) {
