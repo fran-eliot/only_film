@@ -107,7 +107,10 @@ public class TicketService {
             return List.of();
         }
 
-        if (session.getId() != null && ticketRepository.existsBySession_Id(session.getId())) {
+        // Serialize the check-and-insert for this session across concurrent requests.
+        ticketRepository.lockSessionForInventoryGeneration(session.getId()).orElseThrow();
+
+        if (ticketRepository.existsBySession_Id(session.getId())) {
             return List.of();
         }
 
