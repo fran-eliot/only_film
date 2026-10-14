@@ -1,7 +1,6 @@
 package com.demo.repository;
 
 import com.demo.model.Movie;
-import com.demo.model.Room;
 import com.demo.model.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,9 +21,6 @@ public class SessionRepositoryTest {
     Movie movie1;
     @BeforeEach
     void setUp(){
-
-        //room
-        Room room1 = Room.builder().name("Sala 1").capacity(100).build();
 
         //movie
         movie1 = Movie.builder().title("peli1").build();

@@ -38,7 +38,7 @@ public class MovieRepositoryTest {
         assertNotNull(movies);
         System.out.println(movies);
 
-        assertTrue(movies.size() == 0);
+        assertEquals(0, movies.size());
         assertTrue(movies.isEmpty());
 
     }
