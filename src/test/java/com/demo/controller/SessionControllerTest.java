@@ -6,6 +6,10 @@ import com.demo.repository.RoomRepository;
 import com.demo.repository.TicketRepository;
 import com.demo.model.Movie;
 import com.demo.model.Room;
+import com.demo.model.Ticket;
+import com.demo.model.enums.BuyStatus;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,6 +124,39 @@ public class SessionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("seatsPerRow", 4))
                 .andExpect(model().attributeExists("tickets"));
+    }
+
+    @Test
+    void futureSessionOffersFreeSeatButNotCancelledSeat() throws Exception {
+        Movie movie = movieRepository.save(Movie.builder().title("Future film").active(true).build());
+        Room room = roomRepository.save(Room.builder().name("Sala futura").capacity(10).active(true).build());
+        var session = sessionRepository.save(com.demo.model.Session.builder()
+                .movie(movie).room(room).price(10.0)
+                .startTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")).plusDays(1)).build());
+        ticketRepository.save(Ticket.builder().session(session).row("A").seat("1").status(BuyStatus.LIBRE).build());
+        ticketRepository.save(Ticket.builder().session(session).row("A").seat("2").status(BuyStatus.CANCELADO).build());
+
+        mockMvc.perform(get("/sessions/" + session.getId()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("salesOpen", true))
+                .andExpect(content().string(containsString("data-bs-target=\\"#confirmarCompraModal\\"")))
+                .andExpect(content().string(containsString("seat-btn taken")));
+    }
+
+    @Test
+    void startedSessionDoesNotOfferCheckoutAction() throws Exception {
+        Movie movie = movieRepository.save(Movie.builder().title("Past film").active(true).build());
+        Room room = roomRepository.save(Room.builder().name("Sala pasada").capacity(10).active(true).build());
+        var session = sessionRepository.save(com.demo.model.Session.builder()
+                .movie(movie).room(room).price(10.0)
+                .startTime(LocalDateTime.now(ZoneId.of("Europe/Madrid")).minusMinutes(5)).build());
+        ticketRepository.save(Ticket.builder().session(session).row("A").seat("1").status(BuyStatus.LIBRE).build());
+
+        mockMvc.perform(get("/sessions/" + session.getId()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("salesOpen", false))
+                .andExpect(content().string(containsString("La venta de entradas no está disponible")))
+                .andExpect(content().string(not(containsString("data-bs-target=\\"#confirmarCompraModal\\""))));
     }
 
     @Test

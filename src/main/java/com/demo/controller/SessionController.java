@@ -7,6 +7,7 @@ package com.demo.controller;
     import com.demo.repository.RoomRepository;
     import com.demo.repository.TicketRepository;
     import com.demo.service.SessionManagementService;
+    import com.demo.service.TicketService;
     import lombok.AllArgsConstructor;
     import jakarta.validation.Valid;
     import org.springframework.validation.BindingResult;
@@ -55,6 +56,13 @@ public String listSessions(Model model) {
         int seatsPerRow = capacity == null || capacity <= 0 ? 0 : (int) Math.ceil(Math.sqrt(capacity));
         model.addAttribute(MODEL_SESSION, session);
         model.addAttribute("tickets", ticketRepository.findBySession_Id(id)); // Cargar los tickets de esta sesión
+        boolean salesOpen = !TicketService.hasSessionStarted(session)
+                && Boolean.TRUE.equals(session.getActive())
+                && session.getMovie() != null && Boolean.TRUE.equals(session.getMovie().getActive())
+                && session.getRoom() != null && Boolean.TRUE.equals(session.getRoom().getActive())
+                && session.getPrice() != null && Double.isFinite(session.getPrice())
+                && session.getPrice() >= 0;
+        model.addAttribute("salesOpen", salesOpen);
         model.addAttribute("seatsPerRow", seatsPerRow);
         return "sessions/session-detail";
     }
