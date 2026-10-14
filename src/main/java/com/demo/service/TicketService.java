@@ -87,27 +87,7 @@ public class TicketService {
 
     @Transactional
     public List <Ticket> generarTickets(Session session) {
-        Double price = session == null ? null : session.getPrice();
-        if (price == null || !Double.isFinite(price) || price < 0) {
-            throw new IllegalArgumentException("Precio de sesión inválido");
-        }
-
-
-        if (!Boolean.TRUE.equals(session.getActive())) {
-            throw new IllegalStateException("La sesión ya no está disponible");
-        }
-
-        if (session.getMovie() == null || !Boolean.TRUE.equals(session.getMovie().getActive())) {
-            throw new IllegalStateException("La película ya no está disponible");
-        }
-
-        if (session.getMovie().getId() == null) {
-            throw new IllegalArgumentException("La película debe estar guardada antes de generar entradas");
-        }
-
-        if (session.getId() == null) {
-            throw new IllegalArgumentException("La sesión debe estar guardada antes de generar entradas");
-        }
+        validateGenerationSession(session);
 
         // Validar que session tenga una sala asociada
         if (session.getRoom() == null || session.getRoom().getId() == null) {
@@ -165,6 +145,30 @@ public class TicketService {
 
 
         return tickets;
+    }
+
+    private static void validateGenerationSession(Session session) {
+        Double price = session == null ? null : session.getPrice();
+        if (price == null || !Double.isFinite(price) || price < 0) {
+            throw new IllegalArgumentException("Precio de sesión inválido");
+        }
+
+
+        if (!Boolean.TRUE.equals(session.getActive())) {
+            throw new IllegalStateException("La sesión ya no está disponible");
+        }
+
+        if (session.getMovie() == null || !Boolean.TRUE.equals(session.getMovie().getActive())) {
+            throw new IllegalStateException("La película ya no está disponible");
+        }
+
+        if (session.getMovie().getId() == null) {
+            throw new IllegalArgumentException("La película debe estar guardada antes de generar entradas");
+        }
+
+        if (session.getId() == null) {
+            throw new IllegalArgumentException("La sesión debe estar guardada antes de generar entradas");
+        }
     }
 
     private static String rowLabel(int index) {
