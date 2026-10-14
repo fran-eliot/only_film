@@ -92,48 +92,60 @@ public class ReviewController {
                              RedirectAttributes ra,
                              Model model) {
 
-        Review persisted;
-
         if (review.getId() != null) {
-            // Never trust ownership, movie or timestamp supplied by form fields.
-            persisted = reviewRepository.findById(review.getId()).orElseThrow();
-            verifyEditPermission(persisted, currentUser);
+            return saveExistingReview(review, bindingResult, currentUser, model);
+        }
+        return saveNewReview(review, bindingResult, movieId, currentUser, ra, model);
+    }
 
-            if (bindingResult.hasErrors()) {
-                model.addAttribute("movie", persisted.getMovie());
-                return "reviews/review-form";
-            }
+    private String saveExistingReview(ReviewFormDTO form, BindingResult bindingResult,
+                                      User currentUser, Model model) {
+        // Comprobar permisos antes de procesar errores de validación del formulario.
+        Review persisted = reviewRepository.findById(form.getId()).orElseThrow();
+        verifyEditPermission(persisted, currentUser);
 
-            // Only editable fields are copied: the original author, movie and date are immutable.
-            persisted.setTitle(review.getTitle());
-            persisted.setDescription(review.getDescription());
-            persisted.setRating(review.getRating());
-        } else {
-            // Creation requires an actual paid ticket for the target movie.
-            if (movieId == null ||
-                    !ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(
-                            currentUser.getId(), movieId, BuyStatus.PAGADO)) {
-                ra.addFlashAttribute("error", "Debes haber comprado una entrada de esta película para reseñarla.");
-                return movieId != null ? REDIRECT_MOVIE_DETAIL + movieId : "redirect:/movies";
-            }
-
-            if (bindingResult.hasErrors()) {
-                model.addAttribute("movie", movieRepository.findById(movieId).orElseThrow());
-                return "reviews/review-form";
-            }
-
-            persisted = new Review();
-            persisted.setTitle(review.getTitle());
-            persisted.setDescription(review.getDescription());
-            persisted.setRating(review.getRating());
-            persisted.setMovie(movieRepository.findById(movieId).orElseThrow());
-            persisted.setUser(currentUser);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("movie", persisted.getMovie());
+            return "reviews/review-form";
         }
 
-        reviewRepository.save(persisted);
+        // La película, el autor y la fecha de creación nunca se modifican desde el formulario.
+        persisted.setTitle(form.getTitle());
+        persisted.setDescription(form.getDescription());
+        persisted.setRating(form.getRating());
+        return persistAndRedirect(persisted);
+    }
 
-        if (persisted.getMovie() != null)
-            return REDIRECT_MOVIE_DETAIL + persisted.getMovie().getId() + "#reviews";
+    private String saveNewReview(ReviewFormDTO form, BindingResult bindingResult,
+                                 Long movieId, User currentUser,
+                                 RedirectAttributes ra, Model model) {
+        // La creación requiere una entrada pagada para esta película.
+        if (movieId == null ||
+                !ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(
+                        currentUser.getId(), movieId, BuyStatus.PAGADO)) {
+            ra.addFlashAttribute("error", "Debes haber comprado una entrada de esta película para reseñarla.");
+            return movieId != null ? REDIRECT_MOVIE_DETAIL + movieId : "redirect:/movies";
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("movie", movieRepository.findById(movieId).orElseThrow());
+            return "reviews/review-form";
+        }
+
+        Review persisted = new Review();
+        persisted.setTitle(form.getTitle());
+        persisted.setDescription(form.getDescription());
+        persisted.setRating(form.getRating());
+        persisted.setMovie(movieRepository.findById(movieId).orElseThrow());
+        persisted.setUser(currentUser);
+        return persistAndRedirect(persisted);
+    }
+
+    private String persistAndRedirect(Review review) {
+        reviewRepository.save(review);
+        if (review.getMovie() != null) {
+            return REDIRECT_MOVIE_DETAIL + review.getMovie().getId() + "#reviews";
+        }
         return "redirect:/reviews";
     }
 
