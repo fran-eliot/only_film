@@ -40,6 +40,7 @@ public class Room {
     private ScreenType screenType = ScreenType.STANDARD;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT true") //por defecto será true cuando se inserta en base de datos
+    @Builder.Default
     private Boolean active = true;
     // private Boolean active = true; Esto inicializa el atributo cuando creas el objeto:
     // Room room = new Room();
