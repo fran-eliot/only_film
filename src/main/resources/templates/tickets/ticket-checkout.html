@@ -628,8 +628,8 @@
     function recalculate() {
         let snackTotal = 0;
         document.querySelectorAll('.snack-counter').forEach(function (input) {
-            const qty   = parseInt(input.value, 10) || 0;
-            const price = parseFloat(input.dataset.price) || 0;
+            const qty   = Number.parseInt(input.value, 10) || 0;
+            const price = Number.parseFloat(input.dataset.price) || 0;
             snackTotal += qty * price;
         });
         const total = BASE_PRICE + snackTotal;
@@ -670,7 +670,7 @@
     function luhn(num) {
         let sum = 0, alt = false;
         for (let i = num.length - 1; i >= 0; i--) {
-            let n = parseInt(num[i], 10);
+            let n = Number.parseInt(num[i], 10);
             if (alt) { n *= 2; if (n > 9) n -= 9; }
             sum += n;
             alt = !alt;
@@ -757,8 +757,8 @@
         // Validar
         if (formatted.length === 0) { clearState(this); return; }
         const parts = formatted.split('/');
-        const mm = parseInt(parts[0], 10);
-        const yy = parseInt(parts[1] || '', 10);
+        const mm = Number.parseInt(parts[0], 10);
+        const yy = Number.parseInt(parts[1] || '', 10);
         const now = new Date();
         const curY = now.getFullYear() % 100;
         const curM = now.getMonth() + 1;
@@ -844,8 +844,8 @@
         // Caducidad
         const expVal = expiryInput.value;
         const parts  = expVal.split('/');
-        const mm     = parseInt(parts[0], 10);
-        const yy     = parseInt(parts[1] || '', 10);
+        const mm     = Number.parseInt(parts[0], 10);
+        const yy     = Number.parseInt(parts[1] || '', 10);
         const now    = new Date();
         const curY   = now.getFullYear() % 100;
         const curM   = now.getMonth() + 1;

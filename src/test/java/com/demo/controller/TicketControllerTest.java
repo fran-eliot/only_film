@@ -365,6 +365,16 @@ public class TicketControllerTest {
     }
 
     @Test
+    void checkoutUsesNumberParsingMethods() throws Exception {
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Number.parseInt(")))
+                .andExpect(content().string(containsString("Number.parseFloat(")))
+                .andExpect(content().string(not(containsString(" = parseInt("))))
+                .andExpect(content().string(not(containsString(" = parseFloat("))));
+    }
+
+    @Test
     void checkoutGetRejectsDiscountAboveSessionPrice() throws Exception {
         ticket3.setDiscount(11.0);
         ticketRepository.saveAndFlush(ticket3);
