@@ -75,6 +75,27 @@ class RoomRepositoryTest {
         assertFalse(activeRooms.stream().anyMatch(room -> room.getId().equals(disabled.getId())));
     }
 
+    @Test
+    void findByIdAndActiveTrueExcludesInactiveRooms() {
+        Room activeRoom = roomRepository.save(Room.builder()
+                .name("Sala habilitada").capacity(60).active(true).build());
+        Room inactiveRoom = roomRepository.save(Room.builder()
+                .name("Sala deshabilitada").capacity(60).active(false).build());
+
+        assertEquals(activeRoom.getId(), roomRepository
+                .findByIdAndActiveTrue(activeRoom.getId()).orElseThrow().getId());
+        assertEquals(1, roomRepository.findAllByIdAndActiveTrue(activeRoom.getId()).size());
+        assertEquals(activeRoom.getId(),
+                roomRepository.findAllByIdAndActiveTrue(activeRoom.getId()).getFirst().getId());
+
+        assertTrue(roomRepository.findByIdAndActiveTrue(inactiveRoom.getId()).isEmpty());
+        assertTrue(roomRepository.findAllByIdAndActiveTrue(inactiveRoom.getId()).isEmpty());
+        assertTrue(roomRepository.findById(inactiveRoom.getId()).isPresent());
+
+        assertTrue(roomRepository.findByIdAndActiveTrue(Long.MAX_VALUE).isEmpty());
+        assertTrue(roomRepository.findAllByIdAndActiveTrue(Long.MAX_VALUE).isEmpty());
+    }
+
     @AfterEach
     void tearDown() {
         roomRepository.deleteAll();
