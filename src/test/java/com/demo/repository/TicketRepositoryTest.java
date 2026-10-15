@@ -202,6 +202,37 @@ public class TicketRepositoryTest {
     }
 
     @Test
+    @DisplayName("La compra pagada pertenece únicamente al comprador y a la película correctos")
+    void existsByUserIdAndMovieIdAndStatusFiltersUserAndMovie() {
+        Ticket paidTicket = Ticket.builder()
+                .row("E")
+                .seat("1")
+                .session(session)
+                .user(user)
+                .status(BuyStatus.PAGADO)
+                .build();
+        ticketRepository.save(paidTicket);
+
+        User otherUser = userRepository.save(User.builder()
+                .email("otro@demo.com")
+                .firstName("Ana")
+                .lastName("Test")
+                .username("otra")
+                .password("$2a$10$Bsw2uXDBS18RshkSkZDxOOTyWPG/KSQsjwwqXEfzusiMYT7qs528y")
+                .role(Role.ROLE_USER)
+                .build());
+        Movie otherMovie = movieRepository.save(Movie.builder().title("Otra película").build());
+
+        Long movieId = session.getMovie().getId();
+        assertTrue(ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(
+                user.getId(), movieId, BuyStatus.PAGADO));
+        assertFalse(ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(
+                otherUser.getId(), movieId, BuyStatus.PAGADO));
+        assertFalse(ticketRepository.existsByUser_IdAndSession_Movie_IdAndStatus(
+                user.getId(), otherMovie.getId(), BuyStatus.PAGADO));
+    }
+
+    @Test
     @DisplayName("No debería encontrar compra si el estado no coincide")
     void existsByUserIdAndMovieIdAndDifferentStatusReturnsFalseTest() {
         Ticket freeTicket = Ticket.builder()
