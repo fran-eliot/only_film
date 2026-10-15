@@ -8,6 +8,8 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
@@ -36,7 +38,6 @@ public class MovieRepositoryTest {
         //Traemos todos las peliculas de BD
         List<Movie> movies = movieRepository.findAll();
         assertNotNull(movies);
-        System.out.println(movies);
 
         assertEquals(0, movies.size());
         assertTrue(movies.isEmpty());
@@ -54,17 +55,13 @@ public class MovieRepositoryTest {
 
         //Traemos todas las peliculas de BD
         List<Movie> moviesDB = movieRepository.findAll();
-        for(Movie movie : moviesDB){
-            System.out.println(movie);
-        }
-
-        //Comprobar que si hay peliculas
+        // Comprobar el contenido sin presuponer el orden de findAll().
         assertNotNull(moviesDB);
-        assertFalse(moviesDB.isEmpty());
         assertEquals(2, moviesDB.size());
-
-        assertEquals("Movie 1", moviesDB.get(0).getTitle());
-        assertEquals("Movie 2", moviesDB.get(1).getTitle());
+        Set<String> titles = moviesDB.stream()
+                .map(Movie::getTitle)
+                .collect(Collectors.toSet());
+        assertEquals(Set.of("Movie 1", "Movie 2"), titles);
     }
 
     @Test
