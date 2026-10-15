@@ -11,6 +11,8 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 //filtro el acceso a los datos
 @DataJpaTest
@@ -57,6 +59,21 @@ class RoomRepositoryTest {
         assertEquals(2, rooms.size());
     }
 
+
+    @Test
+    void builderDefaultsRoomToActiveButRespectsExplicitDeactivation() {
+        Room defaultActive = roomRepository.save(Room.builder()
+                .name("Sala nueva").capacity(60).build());
+        Room disabled = roomRepository.save(Room.builder()
+                .name("Sala cerrada").capacity(60).active(false).build());
+
+        assertTrue(defaultActive.getActive());
+        assertFalse(disabled.getActive());
+
+        List<Room> activeRooms = roomRepository.findAllByActiveTrue();
+        assertTrue(activeRooms.stream().anyMatch(room -> room.getId().equals(defaultActive.getId())));
+        assertFalse(activeRooms.stream().anyMatch(room -> room.getId().equals(disabled.getId())));
+    }
 
     @AfterEach
     void tearDown() {
