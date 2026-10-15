@@ -619,6 +619,11 @@
     /* ── 1. Precio base desde Thymeleaf ── */
     const BASE_PRICE = /*[[${ticket.session.price - (ticket.discount != null ? ticket.discount : 0)}]]*/ 0;
 
+    /* Formateador reutilizado en cada actualización del total. */
+    function formatPrice(amount) {
+        return amount.toFixed(2).replace('.', ',') + ' €';
+    }
+
     /* ── 2. Total en tiempo real ── */
     function recalculate() {
         let snackTotal = 0;
@@ -628,12 +633,12 @@
             snackTotal += qty * price;
         });
         const total = BASE_PRICE + snackTotal;
-        const fmt = function (n) { return n.toFixed(2).replace('.', ',') + ' €'; };
-        document.getElementById('snack-subtotal').textContent    = fmt(snackTotal);
-        document.getElementById('pay-snack-subtotal').textContent = fmt(snackTotal);
-        document.getElementById('total-display').textContent      = fmt(total);
-        document.getElementById('pay-total-display').textContent  = fmt(total);
-        document.getElementById('pay-btn-amount').textContent     = fmt(total);
+
+        document.getElementById('snack-subtotal').textContent    = formatPrice(snackTotal);
+        document.getElementById('pay-snack-subtotal').textContent = formatPrice(snackTotal);
+        document.getElementById('total-display').textContent      = formatPrice(total);
+        document.getElementById('pay-total-display').textContent  = formatPrice(total);
+        document.getElementById('pay-btn-amount').textContent     = formatPrice(total);
         document.getElementById('snack-line').style.display = snackTotal > 0 ? 'flex' : 'none';
     }
     document.querySelectorAll('.snack-counter').forEach(function (input) {
