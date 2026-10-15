@@ -90,6 +90,7 @@ public class TicketRepositoryTest {
         List<Ticket> otros = ticketRepository.findBySession_Id(otherSession.getId());
         assertEquals(1, otros.size());
         assertEquals(otherTicket.getId(), otros.getFirst().getId());
+        assertTrue(ticketRepository.findBySession_Id(Long.MAX_VALUE).isEmpty());
     }
 
     @Test
