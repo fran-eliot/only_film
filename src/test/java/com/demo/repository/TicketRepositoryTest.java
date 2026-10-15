@@ -106,16 +106,29 @@ public class TicketRepositoryTest {
     }
 
     @Test
-    @DisplayName("Debería encontrar tickets por el ID de la Película a través de la Sesión")
+    @DisplayName("Debería encontrar solo tickets de la película solicitada")
     void findByMovieIdTest() {
         Long movieId = session.getMovie().getId();
-        Ticket ticket = Ticket.builder().row("C").seat("1").session(session).user(user).build();
-        ticketRepository.save(ticket);
+        Movie otherMovie = movieRepository.save(Movie.builder().title("Dune").build());
+        Session otherSession = sessionRepository.save(Session.builder().movie(otherMovie).build());
+
+        Ticket firstTicket = Ticket.builder().row("C").seat("1").session(session).user(user).build();
+        Ticket secondTicket = Ticket.builder().row("C").seat("2").session(session).user(user).build();
+        Ticket otherTicket = Ticket.builder().row("D").seat("1").session(otherSession).user(user).build();
+        ticketRepository.saveAll(List.of(firstTicket, secondTicket, otherTicket));
 
         List<Ticket> ticketsPelicula = ticketRepository.findBySession_Movie_Id(movieId);
+        assertEquals(2, ticketsPelicula.size());
+        assertEquals(java.util.Set.of(firstTicket.getId(), secondTicket.getId()),
+                ticketsPelicula.stream().map(Ticket::getId).collect(java.util.stream.Collectors.toSet()));
+        assertTrue(ticketsPelicula.stream().allMatch(t -> movieId.equals(t.getSession().getMovie().getId())));
 
-        assertFalse(ticketsPelicula.isEmpty());
-        assertEquals("Interstellar", ticketsPelicula.getFirst().getSession().getMovie().getTitle());
+        List<Ticket> ticketsOtraPelicula = ticketRepository.findBySession_Movie_Id(otherMovie.getId());
+        assertEquals(1, ticketsOtraPelicula.size());
+        assertEquals(otherTicket.getId(), ticketsOtraPelicula.getFirst().getId());
+
+        Movie withoutTickets = movieRepository.save(Movie.builder().title("Sin entradas").build());
+        assertTrue(ticketRepository.findBySession_Movie_Id(withoutTickets.getId()).isEmpty());
     }
 
     @Test
