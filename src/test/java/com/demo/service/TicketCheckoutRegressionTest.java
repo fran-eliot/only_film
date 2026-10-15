@@ -44,8 +44,9 @@ class TicketCheckoutRegressionTest {
 
     @Test
     void buyerWithoutIdCannotPurchase() {
+        User buyer = User.builder().build();
         assertThrows(IllegalArgumentException.class,
-                () -> ticketService.processCheckout(19L, User.builder().build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(19L, buyer, 0, 0, 0, 0, 0));
         verifyNoInteractions(ticketRepository);
     }
 
@@ -83,8 +84,9 @@ class TicketCheckoutRegressionTest {
         Ticket freeTicket = ticket(7L, BuyStatus.LIBRE);
         freeTicket.getSession().setActive(false);
         when(ticketRepository.findByIdForCheckout(7L)).thenReturn(Optional.of(freeTicket));
+        User buyer = User.builder().id(7L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(7L, User.builder().id(7L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(7L, buyer, 0, 0, 0, 0, 0));
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getUser());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
@@ -95,8 +97,9 @@ class TicketCheckoutRegressionTest {
     void missingSessionCannotBePurchased() {
         Ticket freeTicket = Ticket.builder().id(8L).status(BuyStatus.LIBRE).build();
         when(ticketRepository.findByIdForCheckout(8L)).thenReturn(Optional.of(freeTicket));
+        User buyer = User.builder().id(8L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(8L, User.builder().id(8L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(8L, buyer, 0, 0, 0, 0, 0));
         verify(ticketRepository, never()).save(any());
     }
 
@@ -105,8 +108,9 @@ class TicketCheckoutRegressionTest {
         Ticket freeTicket = ticket(9L, BuyStatus.LIBRE);
         freeTicket.getSession().setMovie(com.demo.model.Movie.builder().id(20L).active(false).build());
         when(ticketRepository.findByIdForCheckout(9L)).thenReturn(Optional.of(freeTicket));
+        User buyer = User.builder().id(9L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(9L, User.builder().id(9L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(9L, buyer, 0, 0, 0, 0, 0));
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getUser());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
@@ -119,8 +123,9 @@ class TicketCheckoutRegressionTest {
         freeTicket.getSession().setMovie(null);
         when(ticketRepository.findByIdForCheckout(16L)).thenReturn(Optional.of(freeTicket));
 
+        User buyer = User.builder().id(16L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(16L, User.builder().id(16L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(16L, buyer, 0, 0, 0, 0, 0));
 
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
@@ -133,8 +138,9 @@ class TicketCheckoutRegressionTest {
         freeTicket.getSession().setRoom(null);
         when(ticketRepository.findByIdForCheckout(17L)).thenReturn(Optional.of(freeTicket));
 
+        User buyer = User.builder().id(17L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(17L, User.builder().id(17L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(17L, buyer, 0, 0, 0, 0, 0));
 
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
@@ -156,8 +162,9 @@ class TicketCheckoutRegressionTest {
         Ticket freeTicket = ticket(11L, BuyStatus.LIBRE);
         freeTicket.getSession().setRoom(com.demo.model.Room.builder().id(30L).active(false).build());
         when(ticketRepository.findByIdForCheckout(11L)).thenReturn(Optional.of(freeTicket));
+        User buyer = User.builder().id(11L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(11L, User.builder().id(11L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(11L, buyer, 0, 0, 0, 0, 0));
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getUser());
         org.junit.jupiter.api.Assertions.assertNull(freeTicket.getQrCode());
@@ -196,8 +203,9 @@ class TicketCheckoutRegressionTest {
         freeTicket.setPrice(10.0);
         when(ticketRepository.findByIdForCheckout(14L)).thenReturn(Optional.of(freeTicket));
 
+        User buyer = User.builder().id(14L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(14L, User.builder().id(14L).build(), 1, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(14L, buyer, 1, 0, 0, 0, 0));
 
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         assertEquals(3.25, freeTicket.getSnackPrice());
@@ -215,8 +223,9 @@ class TicketCheckoutRegressionTest {
         freeTicket.setPrice(10.0);
         when(ticketRepository.findByIdForCheckout(15L)).thenReturn(Optional.of(freeTicket));
 
+        User buyer = User.builder().id(15L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(15L, User.builder().id(15L).build(), 1, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(15L, buyer, 1, 0, 0, 0, 0));
 
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         assertEquals(2.0, freeTicket.getSnackPrice());
@@ -230,8 +239,9 @@ class TicketCheckoutRegressionTest {
     void excessiveSnackQuantityIsRejectedBeforeSaving() {
         when(ticketRepository.findByIdForCheckout(4L))
                 .thenReturn(Optional.of(ticket(4L, BuyStatus.LIBRE)));
+        User buyer = User.builder().id(5L).build();
         assertThrows(IllegalArgumentException.class,
-                () -> ticketService.processCheckout(4L, User.builder().id(5L).build(), 0, 101, 0, 0, 0));
+                () -> ticketService.processCheckout(4L, buyer, 0, 101, 0, 0, 0));
         verify(ticketRepository, never()).save(any());
     }
 
@@ -240,8 +250,9 @@ class TicketCheckoutRegressionTest {
         Ticket freeTicket = ticket(5L, BuyStatus.LIBRE);
         when(ticketRepository.findByIdForCheckout(5L))
                 .thenReturn(Optional.of(freeTicket));
+        User buyer = User.builder().id(6L).build();
         assertThrows(IllegalArgumentException.class,
-                () -> ticketService.processCheckout(5L, User.builder().id(6L).build(), 0, 0, Integer.MAX_VALUE, 0, 0));
+                () -> ticketService.processCheckout(5L, buyer, 0, 0, Integer.MAX_VALUE, 0, 0));
         assertEquals(BuyStatus.LIBRE, freeTicket.getStatus());
         verify(ticketRepository, never()).save(any());
     }
