@@ -27,6 +27,8 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
     private static final String LANGUAGE_DUBBED = "doblada";
+    private static final String LANGUAGE_ORIGINAL = "VO";
+    private static final String LANGUAGE_ORIGINAL_SUBTITLED = "VOSE";
 
     private static final String GENRE_ROMANCE = "Romance";
     private static final String GENRE_COMEDY = "Comedia";
@@ -217,12 +219,12 @@ public class DataInitializer implements CommandLineRunner {
 
         Session pasada2 = sessionRepo.save(Session.builder()
                 .movie(m4).room(room2).price(14.00)
-                .language("VO").adMinutes(20)
+                .language(LANGUAGE_ORIGINAL).adMinutes(20)
                 .startTime(hoy.minusDays(5).atTime(21, 0)).build());
 
         Session pasada3 = sessionRepo.save(Session.builder()
                 .movie(m2).room(room4).price(11.00)
-                .language("VOSE").adMinutes(15)
+                .language(LANGUAGE_ORIGINAL_SUBTITLED).adMinutes(15)
                 .startTime(hoy.minusDays(3).atTime(18, 30)).build());
 
         Session sesAgotada = sessionRepo.save(Session.builder()
@@ -263,12 +265,12 @@ public class DataInitializer implements CommandLineRunner {
             sesionesFuturas.add(r1a);
 
             Session r1b = sessionRepo.save(Session.builder()
-                    .movie(m2).room(room1).price(13.00).language("VO").adMinutes(20)
+                    .movie(m2).room(room1).price(13.00).language(LANGUAGE_ORIGINAL).adMinutes(20)
                     .startTime(fecha.atTime(19, 0)).build());
             sesionesFuturas.add(r1b);
 
             Session r1c = sessionRepo.save(Session.builder()
-                    .movie(m4).room(room1).price(13.00).language("VOSE").adMinutes(15)
+                    .movie(m4).room(room1).price(13.00).language(LANGUAGE_ORIGINAL_SUBTITLED).adMinutes(15)
                     .startTime(fecha.atTime(21, 30)).build());
             sesionesFuturas.add(r1c);
 
@@ -284,12 +286,12 @@ public class DataInitializer implements CommandLineRunner {
             sesionesFuturas.add(r2a);
 
             Session r2b = sessionRepo.save(Session.builder()
-                    .movie(m5).room(room2).price(14.00).language("VO").adMinutes(15)
+                    .movie(m5).room(room2).price(14.00).language(LANGUAGE_ORIGINAL).adMinutes(15)
                     .startTime(fecha.atTime(18, 30)).build());
             sesionesFuturas.add(r2b);
 
             Session r2c = sessionRepo.save(Session.builder()
-                    .movie(m0).room(room2).price(14.00).language("VOSE").adMinutes(15)
+                    .movie(m0).room(room2).price(14.00).language(LANGUAGE_ORIGINAL_SUBTITLED).adMinutes(15)
                     .startTime(fecha.atTime(21, 0)).build());
             sesionesFuturas.add(r2c);
 
@@ -300,19 +302,19 @@ public class DataInitializer implements CommandLineRunner {
                         .startTime(fecha.atTime(11, 0)).build()));
             } else {
                 sesionesFuturas.add(sessionRepo.save(Session.builder()
-                        .movie(m6).room(room4).price(11.00).language("VO").adMinutes(13)
+                        .movie(m6).room(room4).price(11.00).language(LANGUAGE_ORIGINAL).adMinutes(13)
                         .startTime(fecha.atTime(11, 0)).build()));
             }
             sesionesFuturas.add(sessionRepo.save(Session.builder()
-                    .movie(m11).room(room4).price(11.00).language("VO").adMinutes(15)
+                    .movie(m11).room(room4).price(11.00).language(LANGUAGE_ORIGINAL).adMinutes(15)
                     .startTime(fecha.atTime(16, 30)).build()));
 
             sesionesFuturas.add(sessionRepo.save(Session.builder()
-                    .movie(m8).room(room4).price(11.00).language("VO").adMinutes(12)
+                    .movie(m8).room(room4).price(11.00).language(LANGUAGE_ORIGINAL).adMinutes(12)
                     .startTime(fecha.atTime(19, 0)).build()));
 
             sesionesFuturas.add(sessionRepo.save(Session.builder()
-                    .movie(m3).room(room4).price(11.00).language("VOSE").adMinutes(12)
+                    .movie(m3).room(room4).price(11.00).language(LANGUAGE_ORIGINAL_SUBTITLED).adMinutes(12)
                     .startTime(fecha.atTime(21, 15)).build()));
 
             // ── Sala 5 · STANDARD · 10€ ───────────────────────────────────────
@@ -329,12 +331,12 @@ public class DataInitializer implements CommandLineRunner {
                     .startTime(fecha.atTime(18, 30)).build()));
 
             sesionesFuturas.add(sessionRepo.save(Session.builder()
-                    .movie(m9).room(room5).price(10.00).language("VO").adMinutes(18)
+                    .movie(m9).room(room5).price(10.00).language(LANGUAGE_ORIGINAL).adMinutes(18)
                     .startTime(fecha.atTime(21, 0)).build()));
 
             // ── Sala 6 · STANDARD · 9€ ────────────────────────────────────────
             sesionesFuturas.add(sessionRepo.save(Session.builder()
-                    .movie(m3).room(room6).price(9.00).language("VO").adMinutes(12)
+                    .movie(m3).room(room6).price(9.00).language(LANGUAGE_ORIGINAL).adMinutes(12)
                     .startTime(fecha.atTime(10, 0)).build()));
 
             sesionesFuturas.add(sessionRepo.save(Session.builder()
