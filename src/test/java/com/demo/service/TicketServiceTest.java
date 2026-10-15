@@ -62,8 +62,9 @@ public class TicketServiceTest {
         session.setStartTime(LocalDateTime.now().minusMinutes(1));
         Ticket ticket = Ticket.builder().id(1L).session(session).status(BuyStatus.LIBRE).build();
         when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
+        User buyer = User.builder().id(5L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(1L, User.builder().id(5L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(1L, buyer, 0, 0, 0, 0, 0));
         assertEquals(BuyStatus.LIBRE, ticket.getStatus());
         verify(ticketRepository, never()).save(any());
     }
@@ -73,8 +74,9 @@ public class TicketServiceTest {
         session.setStartTime(null);
         Ticket ticket = Ticket.builder().id(1L).session(session).status(BuyStatus.LIBRE).build();
         when(ticketRepository.findByIdForCheckout(1L)).thenReturn(Optional.of(ticket));
+        User buyer = User.builder().id(5L).build();
         assertThrows(IllegalStateException.class,
-                () -> ticketService.processCheckout(1L, User.builder().id(5L).build(), 0, 0, 0, 0, 0));
+                () -> ticketService.processCheckout(1L, buyer, 0, 0, 0, 0, 0));
         assertEquals(BuyStatus.LIBRE, ticket.getStatus());
         verify(ticketRepository, never()).save(any());
     }
@@ -738,8 +740,9 @@ public class TicketServiceTest {
 
     @Test
     void processCheckoutRejectsNullTicketIdWithoutRepositoryAccess() {
+        User buyer = User.builder().id(6L).build();
         assertThrows(IllegalArgumentException.class, () ->
-                ticketService.processCheckout(null, User.builder().id(6L).build(), 0, 0, 0, 0, 0));
+                ticketService.processCheckout(null, buyer, 0, 0, 0, 0, 0));
 
         verifyNoInteractions(ticketRepository, roomRepository);
     }
@@ -751,10 +754,11 @@ public class TicketServiceTest {
         when(ticketRepository.findByIdForCheckout(99L)).thenReturn(Optional.empty());
 
         // Act & Assert
+        User buyer = User.builder().id(99L).build();
         assertThrows(NoSuchElementException.class, () ->
                 ticketService.processCheckout(
                         99L,
-                        User.builder().id(99L).build(),
+                        buyer,
                         0,
                         0,
                         0,
