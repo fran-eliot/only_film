@@ -36,16 +36,13 @@ public class SessionManagementService {
         validatePrice(form.getPrice());
         validateAdMinutes(form.getAdMinutes());
         boolean creating = form.getId() == null;
-        if (creating && (form.getStartTime() == null
-                || !form.getStartTime().isAfter(LocalDateTime.now(ZoneId.of("Europe/Madrid"))))) {
-            throw new IllegalArgumentException("La fecha de la proyección debe ser futura");
+        if (creating) {
+            validateCreationStartTime(form.getStartTime());
         }
         Session session = creating ? new Session() : sessionRepository.findById(form.getId()).orElseThrow();
 
-        Movie movie = form.getMovieId() == null
-                ? session.getMovie() : movieRepository.findById(form.getMovieId()).orElseThrow();
-        Room room = form.getRoomId() == null
-                ? session.getRoom() : roomRepository.findById(form.getRoomId()).orElseThrow();
+        Movie movie = resolveMovie(form, session);
+        Room room = resolveRoom(form, session);
 
         if (creating) {
             validateCreation(movie, room);
@@ -76,6 +73,22 @@ public class SessionManagementService {
         ticketRepository.findBySessionIdForUpdate(id);
         session.setActive(false);
         sessionRepository.save(session);
+    }
+
+    private static void validateCreationStartTime(LocalDateTime startTime) {
+        if (startTime == null || !startTime.isAfter(LocalDateTime.now(ZoneId.of("Europe/Madrid")))) {
+            throw new IllegalArgumentException("La fecha de la proyección debe ser futura");
+        }
+    }
+
+    private Movie resolveMovie(SessionForm form, Session session) {
+        return form.getMovieId() == null
+                ? session.getMovie() : movieRepository.findById(form.getMovieId()).orElseThrow();
+    }
+
+    private Room resolveRoom(SessionForm form, Session session) {
+        return form.getRoomId() == null
+                ? session.getRoom() : roomRepository.findById(form.getRoomId()).orElseThrow();
     }
 
     private static void validatePrice(Double price) {
