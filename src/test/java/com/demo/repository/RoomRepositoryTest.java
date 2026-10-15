@@ -46,8 +46,25 @@ class RoomRepositoryTest {
     //findByScreenType
     @Test
     void findByScreenType() {
-        List<Room> rooms = roomRepository.findByScreenType(ScreenType.D4X);
-        assertEquals(3, rooms.size());
+        List<Room> d4xRooms = roomRepository.findByScreenType(ScreenType.D4X);
+        assertEquals(3, d4xRooms.size());
+        assertEquals(java.util.Set.of("Salita uno", "Salita tresss", "Salita ultima"),
+                d4xRooms.stream().map(Room::getName).collect(java.util.stream.Collectors.toSet()));
+        assertTrue(d4xRooms.stream().allMatch(room -> room.getScreenType() == ScreenType.D4X));
+
+        List<Room> imaxRooms = roomRepository.findByScreenType(ScreenType.IMAX);
+        assertEquals(2, imaxRooms.size());
+        assertEquals(java.util.Set.of("Salita due", "Salita cuatre"),
+                imaxRooms.stream().map(Room::getName).collect(java.util.stream.Collectors.toSet()));
+
+        Room standardRoom = roomRepository.save(Room.builder()
+                .name("Sala estándar").capacity(60).build());
+        List<Room> standardRooms = roomRepository.findByScreenType(ScreenType.STANDARD);
+        assertEquals(1, standardRooms.size());
+        assertEquals(standardRoom.getId(), standardRooms.getFirst().getId());
+        assertEquals(ScreenType.STANDARD, standardRooms.getFirst().getScreenType());
+
+        assertTrue(roomRepository.findByScreenType(ScreenType.D3).isEmpty());
     }
 
 
