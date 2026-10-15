@@ -149,34 +149,41 @@ public class TicketRepositoryTest {
     }
 
     @Test
-    @DisplayName("Debería encontrar tickets de un usuario por estado ordenados por fecha descendente")
+    @DisplayName("Debería encontrar solo compras pagadas del usuario en orden descendente")
     void findByUserIdAndStatusOrderByBuyDateTimeDescTest() {
-        Ticket paidTicket = Ticket.builder()
-                .row("B")
-                .seat("1")
-                .session(session)
-                .user(user)
-                .status(BuyStatus.PAGADO)
-                .buyDateTime(java.time.LocalDateTime.now())
-                .build();
+        java.time.LocalDateTime earlier = java.time.LocalDateTime.of(2026, 1, 10, 11, 0);
+        java.time.LocalDateTime later = java.time.LocalDateTime.of(2026, 1, 12, 18, 30);
 
-        Ticket cancelledTicket = Ticket.builder()
-                .row("B")
-                .seat("2")
-                .session(session)
-                .user(user)
-                .status(BuyStatus.CANCELADO)
-                .buyDateTime(java.time.LocalDateTime.now())
-                .build();
+        Ticket oldPaid = Ticket.builder()
+                .row("B").seat("1").session(session).user(user)
+                .status(BuyStatus.PAGADO).buyDateTime(earlier).build();
+        Ticket newPaid = Ticket.builder()
+                .row("B").seat("2").session(session).user(user)
+                .status(BuyStatus.PAGADO).buyDateTime(later).build();
+        Ticket cancelled = Ticket.builder()
+                .row("B").seat("3").session(session).user(user)
+                .status(BuyStatus.CANCELADO).buyDateTime(later.plusDays(1)).build();
 
-        ticketRepository.saveAll(List.of(paidTicket, cancelledTicket));
+        User otherUser = userRepository.save(User.builder()
+                .email("otro-historial@demo.com").firstName("Laura").lastName("Prueba")
+                .username("otra_historial")
+                .password("$2a$10$Bsw2uXDBS18RshkSkZDxOOTyWPG/KSQsjwwqXEfzusiMYT7qs528y")
+                .role(Role.ROLE_USER).build());
+        Ticket otherUserPaid = Ticket.builder()
+                .row("B").seat("4").session(session).user(otherUser)
+                .status(BuyStatus.PAGADO).buyDateTime(later.plusDays(2)).build();
+
+        // Guardar primero la compra antigua para no depender del orden de inserción.
+        ticketRepository.saveAll(List.of(oldPaid, newPaid, cancelled, otherUserPaid));
 
         List<Ticket> result = ticketRepository
                 .findByUser_IdAndStatusOrderByBuyDateTimeDesc(user.getId(), BuyStatus.PAGADO);
 
-        assertEquals(1, result.size());
-        assertEquals(BuyStatus.PAGADO, result.getFirst().getStatus());
-        assertEquals(user.getId(), result.getFirst().getUser().getId());
+        assertEquals(2, result.size());
+        assertEquals(newPaid.getId(), result.get(0).getId());
+        assertEquals(oldPaid.getId(), result.get(1).getId());
+        assertTrue(result.stream().allMatch(t -> t.getStatus() == BuyStatus.PAGADO));
+        assertTrue(result.stream().allMatch(t -> user.getId().equals(t.getUser().getId())));
     }
 
     @Test
