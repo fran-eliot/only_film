@@ -903,9 +903,8 @@
 
         const btn = document.getElementById('pay-btn');
         btn.classList.add('loading');
-        const form = this;
-        setTimeout(function () {
-            form.submit();
+        setTimeout(() => {
+            this.submit();
         }, 1500);
     });
 })();

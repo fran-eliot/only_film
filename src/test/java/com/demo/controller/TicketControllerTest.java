@@ -356,6 +356,15 @@ public class TicketControllerTest {
     }
 
     @Test
+    void checkoutUsesLexicalFormReferenceForDelayedSubmission() throws Exception {
+        mockMvc.perform(get("/tickets/" + ticket3.getId() + "/checkout").with(user(user)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("setTimeout(() => {")))
+                .andExpect(content().string(containsString("this.submit();")))
+                .andExpect(content().string(not(containsString("const form = this;"))));
+    }
+
+    @Test
     void checkoutGetRejectsDiscountAboveSessionPrice() throws Exception {
         ticket3.setDiscount(11.0);
         ticketRepository.saveAndFlush(ticket3);
