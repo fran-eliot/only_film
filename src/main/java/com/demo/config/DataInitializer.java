@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import java.util.List;
 @Profile("!test & (!postgres | demo)")
 public class DataInitializer implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+    private static final ZoneId CINEMA_ZONE = ZoneId.of("Europe/Madrid");
     private static final String LANGUAGE_DUBBED = "doblada";
     private static final String LANGUAGE_ORIGINAL = "VO";
     private static final String LANGUAGE_ORIGINAL_SUBTITLED = "VOSE";
@@ -210,7 +212,7 @@ public class DataInitializer implements CommandLineRunner {
         //  pasada3     → hace 3 días → The Mandalorian  (3D,   11€) → user1 compró 3
         //  sesAgotada  → hace 1 día  → Toy Story 5      (IMAX, 14€) → todos PAGADO
         // ==========================================
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.now(CINEMA_ZONE);
 
         Session pasada1 = sessionRepo.save(Session.builder()
                 .movie(m5).room(room1).price(13.00)
@@ -634,13 +636,13 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts0 = ticketRepo.findBySession_Id(todayOdisea4dx.getId());
         if (ts0.size() > 65) {
             ts0.get(1).setStatus(BuyStatus.PAGADO);  ts0.get(1).setUser(carlosR);
-            ts0.get(1).setBuyDateTime(LocalDateTime.now().minusHours(4));
+            ts0.get(1).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(4));
             ts0.get(12).setStatus(BuyStatus.PAGADO); ts0.get(12).setUser(lauraS);
-            ts0.get(12).setBuyDateTime(LocalDateTime.now().minusHours(6));
+            ts0.get(12).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(6));
             ts0.get(34).setStatus(BuyStatus.PAGADO); ts0.get(34).setUser(pabloG);
-            ts0.get(34).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ts0.get(34).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(1));
             ts0.get(65).setStatus(BuyStatus.PAGADO); ts0.get(65).setUser(sofiaL);
-            ts0.get(65).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(2));
+            ts0.get(65).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(1).minusHours(2));
             ticketRepo.saveAll(List.of(ts0.get(1), ts0.get(12), ts0.get(34), ts0.get(65)));
         }
 
@@ -648,11 +650,11 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts1 = ticketRepo.findBySession_Id(todayMandalorian4dx.getId());
         if (ts1.size() > 55) {
             ts1.get(3).setStatus(BuyStatus.PAGADO);  ts1.get(3).setUser(elenaM);
-            ts1.get(3).setBuyDateTime(LocalDateTime.now().minusHours(3));
+            ts1.get(3).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(3));
             ts1.get(22).setStatus(BuyStatus.PAGADO); ts1.get(22).setUser(javierT);
-            ts1.get(22).setBuyDateTime(LocalDateTime.now().minusHours(5));
+            ts1.get(22).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(5));
             ts1.get(55).setStatus(BuyStatus.PAGADO); ts1.get(55).setUser(user2);
-            ts1.get(55).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ts1.get(55).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(1));
             ticketRepo.saveAll(List.of(ts1.get(3), ts1.get(22), ts1.get(55)));
         }
 
@@ -660,9 +662,9 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts2 = ticketRepo.findBySession_Id(todayProyecto4dx.getId());
         if (ts2.size() > 47) {
             ts2.get(9).setStatus(BuyStatus.PAGADO);  ts2.get(9).setUser(sofiaL);
-            ts2.get(9).setBuyDateTime(LocalDateTime.now().minusHours(2));
+            ts2.get(9).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(2));
             ts2.get(47).setStatus(BuyStatus.PAGADO); ts2.get(47).setUser(carlosR);
-            ts2.get(47).setBuyDateTime(LocalDateTime.now().minusHours(7));
+            ts2.get(47).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(7));
             ticketRepo.saveAll(List.of(ts2.get(9), ts2.get(47)));
         }
 
@@ -670,15 +672,15 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts3 = ticketRepo.findBySession_Id(todayMario_imax.getId());
         if (ts3.size() > 120) {
             ts3.get(2).setStatus(BuyStatus.PAGADO);   ts3.get(2).setUser(pabloG);
-            ts3.get(2).setBuyDateTime(LocalDateTime.now().minusHours(2));
+            ts3.get(2).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(2));
             ts3.get(25).setStatus(BuyStatus.PAGADO);  ts3.get(25).setUser(lauraS);
-            ts3.get(25).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ts3.get(25).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(1));
             ts3.get(63).setStatus(BuyStatus.PAGADO);  ts3.get(63).setUser(elenaM);
-            ts3.get(63).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(3));
+            ts3.get(63).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(1).minusHours(3));
             ts3.get(98).setStatus(BuyStatus.PAGADO);  ts3.get(98).setUser(javierT);
-            ts3.get(98).setBuyDateTime(LocalDateTime.now().minusDays(2));
+            ts3.get(98).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(2));
             ts3.get(120).setStatus(BuyStatus.PAGADO); ts3.get(120).setUser(user2);
-            ts3.get(120).setBuyDateTime(LocalDateTime.now().minusDays(2).minusHours(4));
+            ts3.get(120).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(2).minusHours(4));
             ticketRepo.saveAll(List.of(ts3.get(2), ts3.get(25), ts3.get(63), ts3.get(98), ts3.get(120)));
         }
 
@@ -686,11 +688,11 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts4 = ticketRepo.findBySession_Id(todayOdisea_imax.getId());
         if (ts4.size() > 88) {
             ts4.get(14).setStatus(BuyStatus.PAGADO); ts4.get(14).setUser(user2);
-            ts4.get(14).setBuyDateTime(LocalDateTime.now().minusHours(1));
+            ts4.get(14).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(1));
             ts4.get(37).setStatus(BuyStatus.PAGADO); ts4.get(37).setUser(carlosR);
-            ts4.get(37).setBuyDateTime(LocalDateTime.now().minusHours(8));
+            ts4.get(37).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(8));
             ts4.get(88).setStatus(BuyStatus.PAGADO); ts4.get(88).setUser(sofiaL);
-            ts4.get(88).setBuyDateTime(LocalDateTime.now().minusDays(1).minusHours(1));
+            ts4.get(88).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(1).minusHours(1));
             ticketRepo.saveAll(List.of(ts4.get(14), ts4.get(37), ts4.get(88)));
         }
 
@@ -698,13 +700,13 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts5 = ticketRepo.findBySession_Id(todayTopgun_imax.getId());
         if (ts5.size() > 115) {
             ts5.get(4).setStatus(BuyStatus.PAGADO);   ts5.get(4).setUser(javierT);
-            ts5.get(4).setBuyDateTime(LocalDateTime.now().minusHours(3));
+            ts5.get(4).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(3));
             ts5.get(52).setStatus(BuyStatus.PAGADO);  ts5.get(52).setUser(pabloG);
-            ts5.get(52).setBuyDateTime(LocalDateTime.now().minusHours(5));
+            ts5.get(52).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(5));
             ts5.get(100).setStatus(BuyStatus.PAGADO); ts5.get(100).setUser(lauraS);
-            ts5.get(100).setBuyDateTime(LocalDateTime.now().minusDays(1));
+            ts5.get(100).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(1));
             ts5.get(115).setStatus(BuyStatus.PAGADO); ts5.get(115).setUser(elenaM);
-            ts5.get(115).setBuyDateTime(LocalDateTime.now().minusDays(2));
+            ts5.get(115).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusDays(2));
             ticketRepo.saveAll(List.of(ts5.get(4), ts5.get(52), ts5.get(100), ts5.get(115)));
         }
 
@@ -712,9 +714,9 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts6 = ticketRepo.findBySession_Id(todayTopgun_std.getId());
         if (ts6.size() > 30) {
             ts6.get(5).setStatus(BuyStatus.PAGADO);  ts6.get(5).setUser(user);
-            ts6.get(5).setBuyDateTime(LocalDateTime.now().minusHours(2));
+            ts6.get(5).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(2));
             ts6.get(30).setStatus(BuyStatus.PAGADO); ts6.get(30).setUser(user2);
-            ts6.get(30).setBuyDateTime(LocalDateTime.now().minusHours(4));
+            ts6.get(30).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(4));
             ticketRepo.saveAll(List.of(ts6.get(5), ts6.get(30)));
         }
 
@@ -722,7 +724,7 @@ public class DataInitializer implements CommandLineRunner {
         List<Ticket> ts7 = ticketRepo.findBySession_Id(todayPlaya_std.getId());
         if (ts7.size() > 20) {
             ts7.get(8).setStatus(BuyStatus.PAGADO); ts7.get(8).setUser(carlosR);
-            ts7.get(8).setBuyDateTime(LocalDateTime.now().minusHours(1));
+            ts7.get(8).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(1));
             ticketRepo.save(ts7.get(8));
         }
 
