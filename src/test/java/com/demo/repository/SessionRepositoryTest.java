@@ -69,6 +69,44 @@ public class SessionRepositoryTest {
     }
 
     @Test
+    void findActiveSessionsByMovieOrdersByStartTimeAscending() {
+        LocalDateTime early = LocalDateTime.of(2026, 11, 5, 16, 0);
+        LocalDateTime late = early.plusHours(4);
+
+        session1.setStartTime(late);
+        session2.setStartTime(early);
+        sessionRepository.saveAll(List.of(session1, session2));
+
+        Session inactive = sessionRepository.save(Session.builder()
+                .movie(movie1).room(room1).active(false)
+                .startTime(early.minusHours(2)).build());
+
+        Movie otherMovie = movieRepository.save(Movie.builder().title("peli2").build());
+        Session otherMovieSession = sessionRepository.save(Session.builder()
+                .movie(otherMovie).room(room1).active(true)
+                .startTime(early.minusHours(1)).build());
+
+        List<Session> movieSessions = sessionRepository
+                .findByMovie_IdAndActiveTrueOrderByStartTimeAsc(movie1.getId());
+
+        assertEquals(2, movieSessions.size());
+        assertEquals(session2.getId(), movieSessions.get(0).getId());
+        assertEquals(session1.getId(), movieSessions.get(1).getId());
+        assertTrue(movieSessions.stream().allMatch(s -> Boolean.TRUE.equals(s.getActive())));
+        assertTrue(movieSessions.stream().allMatch(s -> movie1.getId().equals(s.getMovie().getId())));
+        assertFalse(movieSessions.stream().anyMatch(s -> inactive.getId().equals(s.getId())));
+
+        List<Session> otherMovieSessions = sessionRepository
+                .findByMovie_IdAndActiveTrueOrderByStartTimeAsc(otherMovie.getId());
+        assertEquals(1, otherMovieSessions.size());
+        assertEquals(otherMovieSession.getId(), otherMovieSessions.getFirst().getId());
+
+        Movie withoutSessions = movieRepository.save(Movie.builder().title("sin sesiones").build());
+        assertTrue(sessionRepository.findByMovie_IdAndActiveTrueOrderByStartTimeAsc(
+                withoutSessions.getId()).isEmpty());
+    }
+
+    @Test
     void findByMovieIdAndRoomId(){
         List<Session> sesionesSala1 = sessionRepository.findByMovieIdAndRoomId(movie1.getId(), room1.getId());
         assertEquals(1, sesionesSala1.size());
