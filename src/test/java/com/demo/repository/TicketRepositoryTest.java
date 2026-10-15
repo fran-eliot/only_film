@@ -94,15 +94,36 @@ public class TicketRepositoryTest {
     }
 
     @Test
-    @DisplayName("Debería encontrar tickets por el ID del Usuario")
+    @DisplayName("Debería recuperar todos los estados del usuario ordenados por fecha descendente")
     void findByUserIdTest() {
-        Ticket ticket = Ticket.builder().row("B").seat("5").session(session).user(user).build();
-        ticketRepository.save(ticket);
+        java.time.LocalDateTime earliest = java.time.LocalDateTime.of(2026, 1, 10, 9, 0);
+        java.time.LocalDateTime middle = earliest.plusDays(1);
+        java.time.LocalDateTime latest = earliest.plusDays(2);
+
+        Ticket paid = Ticket.builder().row("B").seat("5").session(session).user(user)
+                .status(BuyStatus.PAGADO).buyDateTime(earliest).build();
+        Ticket cancelled = Ticket.builder().row("B").seat("6").session(session).user(user)
+                .status(BuyStatus.CANCELADO).buyDateTime(middle).build();
+        Ticket initiated = Ticket.builder().row("B").seat("7").session(session).user(user)
+                .status(BuyStatus.INICIADO).buyDateTime(latest).build();
+
+        User otherUser = userRepository.save(User.builder()
+                .email("otro-listado@demo.com").firstName("Ana").lastName("Prueba")
+                .username("otra_listado")
+                .password("$2a$10$Bsw2uXDBS18RshkSkZDxOOTyWPG/KSQsjwwqXEfzusiMYT7qs528y")
+                .role(Role.ROLE_USER).build());
+        Ticket otherTicket = Ticket.builder().row("B").seat("8").session(session).user(otherUser)
+                .status(BuyStatus.PAGADO).buyDateTime(latest.plusDays(1)).build();
+
+        ticketRepository.saveAll(List.of(paid, cancelled, initiated, otherTicket));
 
         List<Ticket> ticketsUsuario = ticketRepository.findByUser_IdOrderByBuyDateTimeDesc(user.getId());
 
-        assertFalse(ticketsUsuario.isEmpty());
-        assertEquals(user.getId(), ticketsUsuario.get(0).getUser().getId());
+        assertEquals(3, ticketsUsuario.size());
+        assertEquals(initiated.getId(), ticketsUsuario.get(0).getId());
+        assertEquals(cancelled.getId(), ticketsUsuario.get(1).getId());
+        assertEquals(paid.getId(), ticketsUsuario.get(2).getId());
+        assertTrue(ticketsUsuario.stream().allMatch(t -> user.getId().equals(t.getUser().getId())));
     }
 
     @Test
