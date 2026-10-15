@@ -107,6 +107,33 @@ public class SessionRepositoryTest {
     }
 
     @Test
+    void findActiveSessionsDescendingWithNullStartTimesLast() {
+        LocalDateTime earlier = LocalDateTime.of(2026, 11, 5, 16, 0);
+        LocalDateTime later = earlier.plusHours(4);
+
+        session1.setStartTime(earlier);
+        session2.setStartTime(later);
+        sessionRepository.saveAll(List.of(session1, session2));
+
+        Session withoutStartTime = sessionRepository.save(Session.builder()
+                .movie(movie1).room(room1).active(true).startTime(null).build());
+        Session inactive = sessionRepository.save(Session.builder()
+                .movie(movie1).room(room2).active(false)
+                .startTime(later.plusHours(2)).build());
+
+        List<Session> activeSessions = sessionRepository
+                .findAllByActiveTrueOrderByStartTimeDescNullsLast();
+
+        assertEquals(3, activeSessions.size());
+        assertEquals(session2.getId(), activeSessions.get(0).getId());
+        assertEquals(session1.getId(), activeSessions.get(1).getId());
+        assertEquals(withoutStartTime.getId(), activeSessions.get(2).getId());
+        assertNull(activeSessions.get(2).getStartTime());
+        assertTrue(activeSessions.stream().allMatch(s -> Boolean.TRUE.equals(s.getActive())));
+        assertFalse(activeSessions.stream().anyMatch(s -> inactive.getId().equals(s.getId())));
+    }
+
+    @Test
     void findByMovieIdAndRoomId(){
         List<Session> sesionesSala1 = sessionRepository.findByMovieIdAndRoomId(movie1.getId(), room1.getId());
         assertEquals(1, sesionesSala1.size());
