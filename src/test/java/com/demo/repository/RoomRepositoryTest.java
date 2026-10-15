@@ -54,9 +54,20 @@ class RoomRepositoryTest {
     //buscar por capacidad de la sala
     //findByCapacidadGreaterThan
     @Test
-    void findByCapacidadGreaterThan(){
-        List<Room> rooms= roomRepository.findByCapacityGreaterThan(100);
+    void findByCapacidadGreaterThan() {
+        List<Room> rooms = roomRepository.findByCapacityGreaterThan(100);
+
         assertEquals(2, rooms.size());
+        assertEquals(java.util.Set.of("Salita due", "Salita cuatre"),
+                rooms.stream().map(Room::getName).collect(java.util.stream.Collectors.toSet()));
+        assertTrue(rooms.stream().allMatch(room -> room.getCapacity() > 100));
+
+        // La capacidad exactamente igual al umbral no debe incluirse.
+        List<Room> aboveNinetyNine = roomRepository.findByCapacityGreaterThan(99);
+        assertEquals(3, aboveNinetyNine.size());
+        assertTrue(aboveNinetyNine.stream().anyMatch(room -> room.getCapacity() == 100));
+
+        assertTrue(roomRepository.findByCapacityGreaterThan(150).isEmpty());
     }
 
 
