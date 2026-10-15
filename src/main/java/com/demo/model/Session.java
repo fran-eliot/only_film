@@ -4,6 +4,7 @@ package com.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class Session {
 
     // fecha y hora de inicio de la sesión, se asigna automáticamente al crear una nueva sesión.
     @Builder.Default
-    private LocalDateTime startTime = LocalDateTime.now();
+    private LocalDateTime startTime = LocalDateTime.now(ZoneId.of("Europe/Madrid"));
 
      //asociación con la película que se proyectará en esta sesión.
 

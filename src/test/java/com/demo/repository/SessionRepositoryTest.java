@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +44,21 @@ public class SessionRepositoryTest {
         session2 = Session.builder().price(15.00).language("doblada").adMinutes(10).movie(movie1).room(room2).build();
         sessionRepository.save(session1);
         sessionRepository.save(session2);
+    }
+
+    @Test
+    void defaultStartTimeUsesMadridZoneForBuilderAndConstructor() {
+        ZoneId madrid = ZoneId.of("Europe/Madrid");
+        LocalDateTime before = LocalDateTime.now(madrid);
+
+        Session built = Session.builder().build();
+        Session constructed = new Session();
+
+        LocalDateTime after = LocalDateTime.now(madrid);
+        assertFalse(built.getStartTime().isBefore(before));
+        assertFalse(built.getStartTime().isAfter(after));
+        assertFalse(constructed.getStartTime().isBefore(before));
+        assertFalse(constructed.getStartTime().isAfter(after));
     }
 
     @Test
