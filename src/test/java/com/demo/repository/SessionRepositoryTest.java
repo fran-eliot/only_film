@@ -1,6 +1,7 @@
 package com.demo.repository;
 
 import com.demo.model.Movie;
+import com.demo.model.Room;
 import com.demo.model.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,13 @@ public class SessionRepositoryTest {
     MovieRepository movieRepository;
     @Autowired
     SessionRepository sessionRepository;
+    @Autowired
+    RoomRepository roomRepository;
     Movie movie1;
+    Room room1;
+    Room room2;
+    Session session1;
+    Session session2;
     @BeforeEach
     void setUp(){
 
@@ -26,9 +33,13 @@ public class SessionRepositoryTest {
         movie1 = Movie.builder().title("peli1").build();
         movieRepository.save(movie1);
 
+        // Dos salas distintas para comprobar el filtrado combinado.
+        room1 = roomRepository.save(Room.builder().name("Sala A").capacity(50).active(true).build());
+        room2 = roomRepository.save(Room.builder().name("Sala B").capacity(70).active(true).build());
+
         //session
-        Session session1 = Session.builder().price(12.50).language("VO").adMinutes(5).movie(movie1).build();
-        Session session2 = Session.builder().price(15.00).language("doblada").adMinutes(10).movie(movie1).build();
+        session1 = Session.builder().price(12.50).language("VO").adMinutes(5).movie(movie1).room(room1).build();
+        session2 = Session.builder().price(15.00).language("doblada").adMinutes(10).movie(movie1).room(room2).build();
         sessionRepository.save(session1);
         sessionRepository.save(session2);
     }
@@ -42,8 +53,16 @@ public class SessionRepositoryTest {
 
     @Test
     void findByMovieIdAndRoomId(){
-    List<Session> sesionesPeli1Sala1 = sessionRepository.findByMovieIdAndRoomId(1L, 1L);
-    assertEquals(0, sesionesPeli1Sala1.size());
+        List<Session> sesionesSala1 = sessionRepository.findByMovieIdAndRoomId(movie1.getId(), room1.getId());
+        assertEquals(1, sesionesSala1.size());
+        assertEquals(session1.getId(), sesionesSala1.get(0).getId());
+
+        List<Session> sesionesSala2 = sessionRepository.findByMovieIdAndRoomId(movie1.getId(), room2.getId());
+        assertEquals(1, sesionesSala2.size());
+        assertEquals(session2.getId(), sesionesSala2.get(0).getId());
+
+        Movie otraPelicula = movieRepository.save(Movie.builder().title("peli2").build());
+        assertTrue(sessionRepository.findByMovieIdAndRoomId(otraPelicula.getId(), room1.getId()).isEmpty());
     }
 
     @Test
