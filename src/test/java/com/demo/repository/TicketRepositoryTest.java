@@ -73,15 +73,23 @@ public class TicketRepositoryTest {
     @Test
     @DisplayName("Debería encontrar tickets por el ID de la Sesión")
     void findBySessionIdTest() {
-        // Guardamos un par de tickets para la misma sesión
+        // Dos entradas de la sesión consultada y otra de distinta sesión.
         Ticket t1 = Ticket.builder().row("A").seat("1").session(session).user(user).build();
         Ticket t2 = Ticket.builder().row("A").seat("2").session(session).user(user).build();
-        ticketRepository.saveAll(List.of(t1, t2));
+        Session otherSession = sessionRepository.save(Session.builder().movie(session.getMovie()).build());
+        Ticket otherTicket = Ticket.builder().row("A").seat("3").session(otherSession).user(user).build();
+        ticketRepository.saveAll(List.of(t1, t2, otherTicket));
 
         List<Ticket> encontrados = ticketRepository.findBySession_Id(session.getId());
 
         assertEquals(2, encontrados.size());
+        assertEquals(java.util.Set.of(t1.getId(), t2.getId()),
+                encontrados.stream().map(Ticket::getId).collect(java.util.stream.Collectors.toSet()));
         assertTrue(encontrados.stream().allMatch(t -> t.getSession().getId().equals(session.getId())));
+
+        List<Ticket> otros = ticketRepository.findBySession_Id(otherSession.getId());
+        assertEquals(1, otros.size());
+        assertEquals(otherTicket.getId(), otros.getFirst().getId());
     }
 
     @Test
