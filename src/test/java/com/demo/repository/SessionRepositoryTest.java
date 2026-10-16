@@ -134,6 +134,33 @@ public class SessionRepositoryTest {
     }
 
     @Test
+    void findAllSessionsDescendingWithInactiveAndNullStartTimesLast() {
+        LocalDateTime early = LocalDateTime.of(2026, 11, 5, 16, 0);
+        LocalDateTime late = early.plusHours(4);
+
+        session1.setStartTime(early);
+        session2.setStartTime(late);
+        sessionRepository.saveAll(List.of(session1, session2));
+
+        Session inactive = sessionRepository.save(Session.builder()
+                .movie(movie1).room(room1).active(false)
+                .startTime(late.plusHours(2)).build());
+        Session withoutStartTime = sessionRepository.save(Session.builder()
+                .movie(movie1).room(room2).active(true)
+                .startTime(null).build());
+
+        List<Session> sessions = sessionRepository.findAllOrderByStartTimeDescNullsLast();
+
+        assertEquals(4, sessions.size());
+        assertEquals(inactive.getId(), sessions.get(0).getId());
+        assertEquals(session2.getId(), sessions.get(1).getId());
+        assertEquals(session1.getId(), sessions.get(2).getId());
+        assertEquals(withoutStartTime.getId(), sessions.get(3).getId());
+        assertFalse(sessions.get(0).getActive());
+        assertNull(sessions.get(3).getStartTime());
+    }
+
+    @Test
     void existsByRoomIdIncludesInactiveSessionsAndExcludesUnusedRooms() {
         assertTrue(sessionRepository.existsByRoom_Id(room1.getId()));
         assertTrue(sessionRepository.existsByRoom_Id(room2.getId()));
