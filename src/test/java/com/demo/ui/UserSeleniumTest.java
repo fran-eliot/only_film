@@ -197,7 +197,7 @@ class UserSeleniumTest extends BaseSeleniumTest {
         try {
             wait.until(ExpectedConditions.elementToBeClickable(element));
             element.click();
-        } catch (ElementClickInterceptedException e) {
+        } catch (ElementClickInterceptedException _) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
         }
     }
