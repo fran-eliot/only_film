@@ -104,8 +104,11 @@
                 <div th:if="${isNewDay}"
                      class="session-day-header"
                      th:classappend="${isToday} ? ' today'"
-                     th:attr="data-group=${currentDay}"
-                     onclick="toggleDayGroup(this)">
+                     th:attr="data-group=${currentDay},aria-expanded=${isToday}"
+                     role="button"
+                     tabindex="0"
+                     onclick="toggleDayGroup(this)"
+                     onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleDayGroup(this); }">
                     <div class="d-flex align-items-center gap-3">
                         <i class="fa-solid fa-calendar-day text-gold"></i>
                         <span class="day-name"
@@ -169,6 +172,7 @@
                     row.style.display = isOpen ? 'none' : 'flex';
                 });
                 icon.classList.toggle('open', !isOpen);
+                header.setAttribute('aria-expanded', String(!isOpen));
             }
         </script>
     </div>
