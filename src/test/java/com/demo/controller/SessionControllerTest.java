@@ -8,8 +8,6 @@ import com.demo.model.Movie;
 import com.demo.model.Room;
 import com.demo.model.Ticket;
 import com.demo.model.enums.BuyStatus;
-import com.demo.model.Ticket;
-import com.demo.model.enums.BuyStatus;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import jakarta.transaction.Transactional;
