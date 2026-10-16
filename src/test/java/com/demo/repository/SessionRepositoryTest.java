@@ -134,6 +134,24 @@ public class SessionRepositoryTest {
     }
 
     @Test
+    void existsByRoomIdIncludesInactiveSessionsAndExcludesUnusedRooms() {
+        assertTrue(sessionRepository.existsByRoom_Id(room1.getId()));
+        assertTrue(sessionRepository.existsByRoom_Id(room2.getId()));
+
+        Room unusedRoom = roomRepository.save(Room.builder()
+                .name("Sala sin sesiones").capacity(60).build());
+        assertFalse(sessionRepository.existsByRoom_Id(unusedRoom.getId()));
+
+        Room inactiveSessionRoom = roomRepository.save(Room.builder()
+                .name("Sala con sesión inactiva").capacity(60).build());
+        sessionRepository.save(Session.builder().movie(movie1)
+                .room(inactiveSessionRoom).active(false).build());
+
+        assertTrue(sessionRepository.existsByRoom_Id(inactiveSessionRoom.getId()));
+        assertFalse(sessionRepository.existsByRoom_Id(Long.MAX_VALUE));
+    }
+
+    @Test
     void findByMovieIdAndRoomId(){
         List<Session> sesionesSala1 = sessionRepository.findByMovieIdAndRoomId(movie1.getId(), room1.getId());
         assertEquals(1, sesionesSala1.size());
