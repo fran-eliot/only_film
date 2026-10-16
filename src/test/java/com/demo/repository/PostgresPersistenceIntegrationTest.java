@@ -202,7 +202,7 @@ class PostgresPersistenceIntegrationTest {
         try {
             checkout.processCheckout(id, buyer, 0, 0, 0, 0, 0);
             return true;
-        } catch (IllegalStateException alreadySold) {
+        } catch (IllegalStateException _) {
             return false;
         }
     }
