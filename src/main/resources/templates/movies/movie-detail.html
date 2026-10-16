@@ -161,7 +161,7 @@
 
         <script th:if="${!#lists.isEmpty(sessions)}">
             function toggleDayGroup(header) {
-                var group = header.getAttribute('data-group');
+                var group = header.dataset.group;
                 var icon  = header.querySelector('.day-toggle-icon');
                 var rows  = document.querySelectorAll('.session-row[data-group="' + group + '"]');
                 var isOpen = icon.classList.contains('open');
