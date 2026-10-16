@@ -111,8 +111,8 @@ class RoomControllerTest {
                 .andExpect(redirectedUrl("/salas"));
 
         // Buscamos en BD para confirmar que active cambió a false
-        Room room = roomRepository.findById(id).orElseThrow();
-        assertFalse(room.getActive());
+        Room deactivatedRoom = roomRepository.findById(id).orElseThrow();
+        assertFalse(deactivatedRoom.getActive());
     }
 
     // Solo comprobar que la vista es rooms/room-form
