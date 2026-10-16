@@ -83,7 +83,6 @@ public class UserController {
         return VIEW_USER_FORM;
     }
 
-    // GetMapping admin/users/edit/{id}
     @GetMapping("admin/users/edit/{id}")
     public String editUser(Model model, @PathVariable Long id) {
         model.addAttribute(ATTR_USER, AdminUserFormDTO.from(userService.findById(id)));
