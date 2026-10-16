@@ -97,7 +97,7 @@ public abstract class BaseSeleniumTest {
         wait.until(ExpectedConditions.elementToBeClickable(element));
         try {
             element.click();
-        } catch (ElementClickInterceptedException e) {
+        } catch (ElementClickInterceptedException _) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
         }
     }
