@@ -246,9 +246,14 @@ public class DataInitializer implements CommandLineRunner {
         List<Session> sesionesFuturas = new ArrayList<>();
 
         // Referencias a las sesiones de HOY para asignar tickets a usuarios
-        Session todayOdisea4dx = null, todayMandalorian4dx = null, todayProyecto4dx = null;
-        Session todayMarioImax = null, todayOdiseaImax = null, todayTopgunImax = null;
-        Session todayTopgunStd = null, todayPlayaStd = null;
+        Session todayOdisea4dx = null;
+        Session todayMandalorian4dx = null;
+        Session todayProyecto4dx = null;
+        Session todayMarioImax = null;
+        Session todayOdiseaImax = null;
+        Session todayTopgunImax = null;
+        Session todayTopgunStd = null;
+        Session todayPlayaStd = null;
 
         for (int dia = 0; dia <= 7; dia++) {
             LocalDate fecha = hoy.plusDays(dia);
