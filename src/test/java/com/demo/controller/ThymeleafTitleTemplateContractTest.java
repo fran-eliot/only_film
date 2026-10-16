@@ -99,9 +99,9 @@ class ThymeleafTitleTemplateContractTest {
         }
     }
     @Test
-    void userListFeedbackUsesAccessibleRoles() throws IOException {
+    void userListFeedbackUsesAccessibleSemantics() throws IOException {
         String html = template("users/user-list.html");
-        assertTrue(html.contains("th:if=\"${message}\" class=\"alert alert-success mt-3\" role=\"status\""));
+        assertTrue(html.contains("<output th:if=\"${message}\" class=\"alert alert-success mt-3 d-block\""));
         assertTrue(html.contains("th:if=\"${error}\"   class=\"alert alert-danger  mt-3\" role=\"alert\""));
     }
     @Test
