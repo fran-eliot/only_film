@@ -152,6 +152,42 @@ public class SessionRepositoryTest {
     }
 
     @Test
+    void findAllMovieSessionsChronologicallyIncludingInactive() {
+        LocalDateTime early = LocalDateTime.of(2026, 11, 5, 16, 0);
+        LocalDateTime middle = early.plusHours(2);
+        LocalDateTime late = early.plusHours(4);
+
+        session1.setStartTime(late);
+        session2.setStartTime(early);
+        sessionRepository.saveAll(List.of(session1, session2));
+
+        Session inactive = sessionRepository.save(Session.builder()
+                .movie(movie1).room(room1).active(false)
+                .startTime(middle).build());
+
+        Movie otherMovie = movieRepository.save(Movie.builder().title("otra película").build());
+        Session otherMovieSession = sessionRepository.save(Session.builder()
+                .movie(otherMovie).room(room2).active(true)
+                .startTime(early.plusHours(1)).build());
+
+        List<Session> sessions = sessionRepository.findByMovie_IdOrderByStartTimeAsc(movie1.getId());
+
+        assertEquals(3, sessions.size());
+        assertEquals(session2.getId(), sessions.get(0).getId());
+        assertEquals(inactive.getId(), sessions.get(1).getId());
+        assertEquals(session1.getId(), sessions.get(2).getId());
+        assertTrue(sessions.stream().allMatch(item -> movie1.getId().equals(item.getMovie().getId())));
+        assertFalse(sessions.get(1).getActive());
+
+        List<Session> otherSessions = sessionRepository.findByMovie_IdOrderByStartTimeAsc(otherMovie.getId());
+        assertEquals(1, otherSessions.size());
+        assertEquals(otherMovieSession.getId(), otherSessions.getFirst().getId());
+
+        Movie withoutSessions = movieRepository.save(Movie.builder().title("sin proyecciones").build());
+        assertTrue(sessionRepository.findByMovie_IdOrderByStartTimeAsc(withoutSessions.getId()).isEmpty());
+    }
+
+    @Test
     void findByMovieIdAndRoomId(){
         List<Session> sesionesSala1 = sessionRepository.findByMovieIdAndRoomId(movie1.getId(), room1.getId());
         assertEquals(1, sesionesSala1.size());
