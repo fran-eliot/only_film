@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MovieSeleniumTest extends BaseSeleniumTest{
     private Movie movieAction;
-    private Movie movieRomance;
 
     @BeforeEach
     void setUpMovies() {
@@ -21,7 +20,7 @@ public class MovieSeleniumTest extends BaseSeleniumTest{
                 Movie.builder().active(true).title("The Bourne Identity").genre("Action")
                         .durationMinutes(119).releaseYear(2002).director("Doug Liman").build()
         );
-        movieRomance = movieRepository.save(
+        movieRepository.save(
                 Movie.builder().active(true).title("The Age of Adaline").genre("Romance")
                         .durationMinutes(112).releaseYear(2015).director("Lee Toland Krieger").build()
         );
