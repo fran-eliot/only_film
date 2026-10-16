@@ -13,12 +13,12 @@
                 </div>
 
                 <div th:if="${param.error}" class="alert alert-danger" role="alert">Credenciales incorrectas.</div>
-                <div th:if="${param.logout}" class="alert alert-success" role="status">Sesión cerrada correctamente, hasta pronto.</div>
-                <div th:if="${message}" class="alert alert-success" role="status" th:text="${message}"></div>
+                <output th:if="${param.logout}" class="alert alert-success d-block">Sesión cerrada correctamente, hasta pronto.</output>
+                <output th:if="${message}" class="alert alert-success d-block" th:text="${message}"></output>
 
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="username" name="username"
-                           required autofocus minlength="3" maxlength="100">
+                           required minlength="3" maxlength="100">
                     <label for="username">Username</label>
                 </div>
 

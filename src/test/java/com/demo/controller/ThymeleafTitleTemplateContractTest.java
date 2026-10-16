@@ -82,11 +82,11 @@ class ThymeleafTitleTemplateContractTest {
     }
 
     @Test
-    void authenticationMessagesHaveAccessibleRoles() throws IOException {
+    void authenticationMessagesHaveAccessibleSemantics() throws IOException {
         String login = template("auth/login.html");
         assertTrue(login.contains("th:if=\"${param.error}\" class=\"alert alert-danger\" role=\"alert\""));
-        assertTrue(login.contains("th:if=\"${param.logout}\" class=\"alert alert-success\" role=\"status\""));
-        assertTrue(login.contains("th:if=\"${message}\" class=\"alert alert-success\" role=\"status\""));
+        assertTrue(login.contains("<output th:if=\"${param.logout}\" class=\"alert alert-success d-block\""));
+        assertTrue(login.contains("<output th:if=\"${message}\" class=\"alert alert-success d-block\""));
 
         String register = template("auth/register.html");
         assertTrue(register.contains("th:if=\"${error}\" class=\"alert alert-danger\" role=\"alert\""));
