@@ -32,7 +32,6 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
     private Movie movieToReview;
     private Room room;
     private Session session;
-    private Ticket paidTicket;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -83,7 +82,7 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
                 .build());
 
         // Crear entrada pagada para que el usuario pueda escribir reseña
-        paidTicket = ticketRepository.save(Ticket.builder()
+        ticketRepository.save(Ticket.builder()
                 .session(session)
                 .user(reviewUser)
                 .row("C")
