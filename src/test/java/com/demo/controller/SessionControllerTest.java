@@ -52,7 +52,7 @@ public class SessionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("document.querySelectorAll(")))
                 .andExpect(content().string(containsString(".forEach(tooltipTriggerEl =>")))
-                .andExpect(content().string(containsString("new bootstrap.Tooltip(tooltipTriggerEl);")))
+                .andExpect(content().string(containsString("bootstrap.Tooltip.getOrCreateInstance(tooltipTriggerEl);")))
                 .andExpect(content().string(not(containsString("[].slice.call("))));
     }
 
