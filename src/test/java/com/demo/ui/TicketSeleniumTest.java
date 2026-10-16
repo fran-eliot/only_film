@@ -30,7 +30,6 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
     private PasswordEncoder passwordEncoder;
 
     private User user;
-    private User admin;
     private Movie movie;
     private Room room;
     private Session session;
@@ -51,7 +50,7 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
                 .active(true)
                 .build());
 
-        admin = userRepository.save(User.builder()
+        userRepository.save(User.builder()
                 .username("admin_ticket")
                 .email("admin_ticket@onlyfilm.com")
                 .firstName("Admin")
@@ -117,7 +116,6 @@ public class TicketSeleniumTest extends BaseSeleniumTest {
         driver.get(baseUrl + "tickets");
         wait.until(driver -> driver.getPageSource().contains(movie.getTitle()));
 
-//        assertEquals("Mis Tickets", driver.findElement(By.tagName("h1")).getText());
 
         assertTrue(driver.getPageSource().contains(movie.getTitle()));
         assertTrue(driver.getPageSource().contains("Fila: " + paidTicket.getRow()));
