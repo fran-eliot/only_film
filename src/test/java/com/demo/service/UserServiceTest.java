@@ -49,7 +49,7 @@ public class UserServiceTest {
     private RegisterForm defaultForm;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         defaultForm = new RegisterForm();
         defaultForm.setUsername("john");
         defaultForm.setEmail("john@example.com");
@@ -59,7 +59,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("register: datos válidos -> guarda usuario con contraseña encriptada")
-    public void register_withValidData_savesUserWithEncodedPassword() {
+    void register_withValidData_savesUserWithEncodedPassword() {
         // Arrange
         RegisterForm form = defaultForm;
 
@@ -93,7 +93,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("register: username ya existente -> lanza IllegalArgumentException")
-    public void register_withExistingUsername_throwsException() {
+    void register_withExistingUsername_throwsException() {
         // Arrange
         RegisterForm form = new RegisterForm();
         form.setUsername("exists");
@@ -116,7 +116,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("register: email ya existente -> lanza IllegalArgumentException")
-    public void register_withExistingEmail_throwsException() {
+    void register_withExistingEmail_throwsException() {
         // Arrange
         RegisterForm form = defaultForm;
         when(userRepository.existsByUsername(form.getUsername())).thenReturn(false);
@@ -135,7 +135,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("register: contraseñas no coinciden -> lanza IllegalArgumentException")
-    public void register_withPasswordMismatch_throwsException() {
+    void register_withPasswordMismatch_throwsException() {
         // Arrange
         RegisterForm form = new RegisterForm();
         form.setUsername("mark");
@@ -159,7 +159,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("loadUserByUsername: usuario existente -> devuelve UserDetails correcto")
-    public void loadUserByUsername_existingUser_returnsUserDetails() {
+    void loadUserByUsername_existingUser_returnsUserDetails() {
         // Arrange
         User user = User.builder()
                 .username("alice")
@@ -191,7 +191,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("loadUserByUsername: usuario no existente -> lanza UsernameNotFoundException")
-    public void loadUserByUsername_nonExisting_throwsUsernameNotFoundException() {
+    void loadUserByUsername_nonExisting_throwsUsernameNotFoundException() {
         // Arrange
         when(userRepository.findByUsername("nope")).thenReturn(Optional.empty());
 
