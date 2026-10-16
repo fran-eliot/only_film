@@ -91,7 +91,7 @@ class TicketCheckoutConcurrencyTest {
         try {
             ticketService.processCheckout(id, buyer, 0, 0, 0, 0, 0);
             return true;
-        } catch (IllegalStateException ex) {
+        } catch (IllegalStateException _) {
             return false;
         }
     }
