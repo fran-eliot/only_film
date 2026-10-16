@@ -23,6 +23,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ReviewController {
     private static final String REDIRECT_MOVIE_DETAIL = "redirect:/movies/";
     private static final String MODEL_REVIEW = "review";
+    private static final String MODEL_MOVIE = "movie";
+    private static final String REVIEW_FORM_VIEW = "reviews/review-form";
 
 
     // inyectar el repositorio de reviews
@@ -61,8 +63,8 @@ public class ReviewController {
         }
 
         model.addAttribute(MODEL_REVIEW, new ReviewFormDTO());
-        model.addAttribute("movie", movieRepository.findById(movieId).orElseThrow());
-        return "reviews/review-form";
+        model.addAttribute(MODEL_MOVIE, movieRepository.findById(movieId).orElseThrow());
+        return REVIEW_FORM_VIEW;
     }
 
     @GetMapping("/reviews/edit/{id}")
@@ -79,8 +81,8 @@ public class ReviewController {
             return "redirect:/reviews/" + id;
 
         model.addAttribute(MODEL_REVIEW, ReviewFormDTO.from(review));
-        model.addAttribute("movie", review.getMovie());
-        return "reviews/review-form";
+        model.addAttribute(MODEL_MOVIE, review.getMovie());
+        return REVIEW_FORM_VIEW;
     }
 
     //movieId viene del campo hidden del formulario para asociar la película correctamente
@@ -105,8 +107,8 @@ public class ReviewController {
         verifyEditPermission(persisted, currentUser);
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("movie", persisted.getMovie());
-            return "reviews/review-form";
+            model.addAttribute(MODEL_MOVIE, persisted.getMovie());
+            return REVIEW_FORM_VIEW;
         }
 
         // La película, el autor y la fecha de creación nunca se modifican desde el formulario.
@@ -128,8 +130,8 @@ public class ReviewController {
         }
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("movie", movieRepository.findById(movieId).orElseThrow());
-            return "reviews/review-form";
+            model.addAttribute(MODEL_MOVIE, movieRepository.findById(movieId).orElseThrow());
+            return REVIEW_FORM_VIEW;
         }
 
         Review persisted = new Review();
