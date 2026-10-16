@@ -247,8 +247,8 @@ public class DataInitializer implements CommandLineRunner {
 
         // Referencias a las sesiones de HOY para asignar tickets a usuarios
         Session todayOdisea4dx = null, todayMandalorian4dx = null, todayProyecto4dx = null;
-        Session todayMario_imax = null, todayOdisea_imax = null, todayTopgun_imax = null;
-        Session todayTopgun_std = null, todayPlaya_std = null;
+        Session todayMarioImax = null, todayOdiseaImax = null, todayTopgunImax = null;
+        Session todayTopgunStd = null, todayPlayaStd = null;
 
         for (int dia = 0; dia <= 7; dia++) {
             LocalDate fecha = hoy.plusDays(dia);
@@ -360,11 +360,11 @@ public class DataInitializer implements CommandLineRunner {
                 todayOdisea4dx      = r1a;
                 todayMandalorian4dx = r1b;
                 todayProyecto4dx    = r1c;
-                todayMario_imax     = r2a;
-                todayOdisea_imax    = r2b;
-                todayTopgun_imax    = r2c;
-                todayTopgun_std     = r6c;
-                todayPlaya_std      = r6d;
+                todayMarioImax     = r2a;
+                todayOdiseaImax    = r2b;
+                todayTopgunImax    = r2c;
+                todayTopgunStd     = r6c;
+                todayPlayaStd      = r6d;
             }
         }
 
@@ -381,7 +381,7 @@ public class DataInitializer implements CommandLineRunner {
         seedPastPurchases(pasada1, pasada2, pasada3, sesAgotada, user);
         seedTodayPurchases(
                 new Session[]{todayOdisea4dx, todayMandalorian4dx, todayProyecto4dx,
-                        todayMario_imax, todayOdisea_imax, todayTopgun_imax, todayTopgun_std, todayPlaya_std},
+                        todayMarioImax, todayOdiseaImax, todayTopgunImax, todayTopgunStd, todayPlayaStd},
                 new User[]{user, user2, carlosR, lauraS, pabloG, elenaM, javierT, sofiaL});
 
         // REVIEWS
@@ -617,11 +617,11 @@ public class DataInitializer implements CommandLineRunner {
         Session todayOdisea4dx = sessions[0];
         Session todayMandalorian4dx = sessions[1];
         Session todayProyecto4dx = sessions[2];
-        Session todayMario_imax = sessions[3];
-        Session todayOdisea_imax = sessions[4];
-        Session todayTopgun_imax = sessions[5];
-        Session todayTopgun_std = sessions[6];
-        Session todayPlaya_std = sessions[7];
+        Session todayMarioImax = sessions[3];
+        Session todayOdiseaImax = sessions[4];
+        Session todayTopgunImax = sessions[5];
+        Session todayTopgunStd = sessions[6];
+        Session todayPlayaStd = sessions[7];
         User user = users[0];
         User user2 = users[1];
         User carlosR = users[2];
@@ -669,7 +669,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Sala 2 · Super Mario IMAX · hoy 16:00
-        List<Ticket> ts3 = ticketRepo.findBySession_Id(todayMario_imax.getId());
+        List<Ticket> ts3 = ticketRepo.findBySession_Id(todayMarioImax.getId());
         if (ts3.size() > 120) {
             ts3.get(2).setStatus(BuyStatus.PAGADO);   ts3.get(2).setUser(pabloG);
             ts3.get(2).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(2));
@@ -685,7 +685,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Sala 2 · La odisea IMAX · hoy 18:30
-        List<Ticket> ts4 = ticketRepo.findBySession_Id(todayOdisea_imax.getId());
+        List<Ticket> ts4 = ticketRepo.findBySession_Id(todayOdiseaImax.getId());
         if (ts4.size() > 88) {
             ts4.get(14).setStatus(BuyStatus.PAGADO); ts4.get(14).setUser(user2);
             ts4.get(14).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(1));
@@ -697,7 +697,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Sala 2 · Top Gun IMAX · hoy 21:00
-        List<Ticket> ts5 = ticketRepo.findBySession_Id(todayTopgun_imax.getId());
+        List<Ticket> ts5 = ticketRepo.findBySession_Id(todayTopgunImax.getId());
         if (ts5.size() > 115) {
             ts5.get(4).setStatus(BuyStatus.PAGADO);   ts5.get(4).setUser(javierT);
             ts5.get(4).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(3));
@@ -711,7 +711,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Sala 6 · Top Gun STANDARD · hoy 19:00
-        List<Ticket> ts6 = ticketRepo.findBySession_Id(todayTopgun_std.getId());
+        List<Ticket> ts6 = ticketRepo.findBySession_Id(todayTopgunStd.getId());
         if (ts6.size() > 30) {
             ts6.get(5).setStatus(BuyStatus.PAGADO);  ts6.get(5).setUser(user);
             ts6.get(5).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(2));
@@ -721,7 +721,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Sala 6 · Playa de lobos STANDARD · hoy 21:30
-        List<Ticket> ts7 = ticketRepo.findBySession_Id(todayPlaya_std.getId());
+        List<Ticket> ts7 = ticketRepo.findBySession_Id(todayPlayaStd.getId());
         if (ts7.size() > 20) {
             ts7.get(8).setStatus(BuyStatus.PAGADO); ts7.get(8).setUser(carlosR);
             ts7.get(8).setBuyDateTime(LocalDateTime.now(CINEMA_ZONE).minusHours(1));
