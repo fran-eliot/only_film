@@ -62,7 +62,6 @@ public class TicketControllerTest {
     private PasswordEncoder passwordEncoder;
 
     private Ticket ticket1;
-    private Ticket ticket2;
     private Ticket ticket3;
     private Session session;
     private User user;
@@ -99,7 +98,7 @@ public class TicketControllerTest {
                 .status(BuyStatus.PAGADO)
                 .build());
 
-        ticket2 = ticketRepository.save(Ticket.builder()
+        ticketRepository.save(Ticket.builder()
                 .session(session)
                 .row("A")
                 .seat("2")
