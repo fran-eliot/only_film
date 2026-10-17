@@ -37,6 +37,19 @@ class ThymeleafTitleTemplateContractTest {
     }
 
     @Test
+    void staticTitleFallbacksAreReplacedBySharedHeadAtRuntime() throws IOException {
+        for (String[] page : new String[][] {
+                {"movies/movie-list.html", "Cartelera — Only Film"},
+                {"tickets/ticket-form.html", "Editar descuento de entrada — Only Film"}
+        }) {
+            String html = template(page[0]);
+            assertTrue(html.contains("<head th:replace=\"~{layout/head :: head('"));
+            assertTrue(html.contains("<title>" + page[1] + "</title></head>"),
+                    () -> "Missing static title fallback in " + page[0]);
+        }
+    }
+
+    @Test
     void userTableHasAccessibleCaptionAndColumnHeaders() throws IOException {
         String html = template("users/user-list.html");
         assertTrue(html.contains("<caption class=\"visually-hidden\">Usuarios del sistema</caption>"));
