@@ -12,7 +12,6 @@ import com.demo.repository.RoomRepository;
 import com.demo.repository.SessionRepository;
 import com.demo.repository.TicketRepository;
 import com.demo.repository.UserRepository;
-import jakarta.servlet.ServletException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.springframework.transaction.annotation.Transactional;
