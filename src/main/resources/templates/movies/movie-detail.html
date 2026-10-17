@@ -101,14 +101,12 @@
                       ">
 
                 <!-- Cabecera de día (se muestra cuando cambia la fecha) -->
-                <div th:if="${isNewDay}"
-                     class="session-day-header"
-                     th:classappend="${isToday} ? ' today'"
-                     th:attr="data-group=${currentDay},aria-expanded=${isToday}"
-                     role="button"
-                     tabindex="0"
-                     onclick="toggleDayGroup(this)"
-                     onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleDayGroup(this); }">
+                <button type="button"
+                        th:if="${isNewDay}"
+                        class="session-day-header"
+                        th:classappend="${isToday} ? ' today'"
+                        th:attr="data-group=${currentDay},aria-expanded=${isToday}"
+                        onclick="toggleDayGroup(this)">
                     <div class="d-flex align-items-center gap-3">
                         <i class="fa-solid fa-calendar-day text-gold"></i>
                         <span class="day-name"
@@ -119,7 +117,7 @@
                     </div>
                     <i class="fa-solid fa-chevron-down day-toggle-icon"
                        th:classappend="${isToday} ? ' open'"></i>
-                </div>
+                </button>
 
                 <!-- Fila de sesión -->
                 <div class="session-row"
