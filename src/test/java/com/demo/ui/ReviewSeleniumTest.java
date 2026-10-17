@@ -96,7 +96,7 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
 
     @Test
     @DisplayName("Usuario escribe una reseña de una película")
-    void userWritesReviewSuccessfully() throws Exception {
+    void userWritesReviewSuccessfully() {
         // Iniciar sesión como usuario de review
         loginReviewUser();
 
@@ -171,7 +171,7 @@ public class ReviewSeleniumTest extends BaseSeleniumTest {
 
     @Test
     @DisplayName("Usuario no puede escribir reseña sin seleccionar puntuación")
-    void userCannotSubmitReviewWithoutRating() throws Exception {
+    void userCannotSubmitReviewWithoutRating() {
         loginReviewUser();
 
         driver.get(baseUrl + "reviews/new?movieId=" + movieToReview.getId());
