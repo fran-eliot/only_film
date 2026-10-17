@@ -50,6 +50,27 @@ class ThymeleafTitleTemplateContractTest {
     }
 
     @Test
+    void allStandalonePagesHaveStaticTitleFallbacks() throws IOException {
+        for (String page : new String[] {
+                "auth/login.html", "auth/register.html",
+                "error/403.html", "error/404.html", "error/500.html", "error/error.html",
+                "movies/movie-detail.html", "movies/movie-form.html", "movies/movie-list.html",
+                "reviews/review-detail.html", "reviews/review-form.html",
+                "rooms/room-detail.html", "rooms/room-form.html", "rooms/room-list.html",
+                "sessions/session-detail.html", "sessions/session-form.html", "sessions/session-list.html",
+                "tickets/ticket-checkout.html", "tickets/ticket-detail.html", "tickets/ticket-form.html",
+                "tickets/ticket-list.html",
+                "users/profile-form.html", "users/user-detail.html", "users/user-form.html", "users/user-list.html"
+        }) {
+            String html = template(page);
+            assertTrue(html.contains("<head th:replace=\"~{layout/head :: head('"),
+                    () -> "Missing shared head in " + page);
+            assertTrue(html.contains("<title>") && html.contains("</title></head>"),
+                    () -> "Missing title fallback in " + page);
+        }
+    }
+
+    @Test
     void userTableHasAccessibleCaptionAndColumnHeaders() throws IOException {
         String html = template("users/user-list.html");
         assertTrue(html.contains("<caption class=\"visually-hidden\">Usuarios del sistema</caption>"));
