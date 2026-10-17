@@ -30,7 +30,7 @@ public class AuthControllerTest {
 
 
     @Test
-    public void loginTest() throws Exception {
+    void loginTest() throws Exception {
         mockMvc.perform(get("/login"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("auth/login"));
@@ -47,7 +47,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void registerTest() throws Exception {
+    void registerTest() throws Exception {
         when(userService.register(any(RegisterForm.class))).thenReturn(User.builder().username("elpepe").build());
 
         mockMvc.perform(post("/register")
