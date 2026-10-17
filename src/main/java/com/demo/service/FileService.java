@@ -115,7 +115,22 @@ public class FileService {
         }
     }
 
-    // Internal transfer container; only its accessors are used.
-    private record ImageData(byte[] bytes, String extension) {
+    // Internal transfer container: identity semantics avoid misleading byte-array equality.
+    private static final class ImageData {
+        private final byte[] bytes;
+        private final String extension;
+
+        private ImageData(byte[] bytes, String extension) {
+            this.bytes = bytes;
+            this.extension = extension;
+        }
+
+        private byte[] bytes() {
+            return bytes;
+        }
+
+        private String extension() {
+            return extension;
+        }
     }
 }
