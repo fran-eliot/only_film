@@ -3,7 +3,6 @@ package com.demo.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -108,8 +107,9 @@ public class SecurityConfig {
         return http.build();
     }
     static boolean isLocalH2ConsoleAllowed(Environment environment) {
-        return environment.acceptsProfiles(Profiles.of("dev"))
-                && !environment.acceptsProfiles(Profiles.of("postgres", "prod"))
+        String[] activeProfiles = environment.getActiveProfiles();
+        return activeProfiles.length == 1
+                && "dev".equals(activeProfiles[0])
                 && environment.getProperty("spring.h2.console.enabled", Boolean.class, false)
                 && "127.0.0.1".equals(environment.getProperty("server.address"));
     }
