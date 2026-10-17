@@ -194,7 +194,7 @@ class ReviewControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
                         .string(org.hamcrest.Matchers.containsString(
-                                "width: 36px; height: 36px; border-color:")));
+                                "width: 36px; height: 36px; border: 2px solid var(--cinema-accent-gold);")));
     }
 
     // Verificamos que POST /reviews guarda una nueva review en BD
