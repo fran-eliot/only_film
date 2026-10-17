@@ -115,22 +115,7 @@ public class FileService {
         }
     }
 
-    // Internal transfer container: byte arrays should not use record reference-based equality.
-    private static final class ImageData {
-        private final byte[] bytes;
-        private final String extension;
-
-        private ImageData(byte[] bytes, String extension) {
-            this.bytes = bytes;
-            this.extension = extension;
-        }
-
-        private byte[] bytes() {
-            return bytes;
-        }
-
-        private String extension() {
-            return extension;
-        }
+    // Internal transfer container; only its accessors are used.
+    private record ImageData(byte[] bytes, String extension) {
     }
 }
