@@ -40,7 +40,7 @@ public class TicketServiceTest {
     private Session session;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         room = Room.builder()
                 .id(1L)
                 .name("Sala 1")
@@ -83,7 +83,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("findAll: devuelve todos los tickets")
-    public void findAll_returnsAllTickets() {
+    void findAll_returnsAllTickets() {
         // Arrange
         List<Ticket> tickets = List.of(
                 Ticket.builder().id(1L).row("A").seat("1").build(),
@@ -107,7 +107,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("findById: ticket existente -> devuelve Optional con ticket")
-    public void findById_existingTicket_returnsOptionalWithTicket() {
+    void findById_existingTicket_returnsOptionalWithTicket() {
         // Arrange
         Ticket ticket = Ticket.builder()
                 .id(1L)
@@ -235,7 +235,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("admin: descuento permitido solo en entrada libre")
-    public void updateAdminDiscount_changesOnlyFreeTicketDiscount() {
+    void updateAdminDiscount_changesOnlyFreeTicketDiscount() {
         Ticket ticket = Ticket.builder().id(1L).row("C").seat("3")
                 .price(9.50).session(session).discount(0.0).status(BuyStatus.LIBRE).build();
         com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
@@ -287,7 +287,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("admin: entrada pagada no admite cambios")
-    public void updateAdminDiscount_rejectsPaidTicket() {
+    void updateAdminDiscount_rejectsPaidTicket() {
         Ticket ticket = Ticket.builder().id(1L).price(9.5).status(BuyStatus.PAGADO).build();
         com.demo.dto.TicketAdminForm form = new com.demo.dto.TicketAdminForm();
         form.setId(1L);
@@ -299,7 +299,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("getBySessionId: devuelve tickets de una sesión")
-    public void getBySessionId_returnsTicketsFromSession() {
+    void getBySessionId_returnsTicketsFromSession() {
         // Arrange
         List<Ticket> tickets = List.of(
                 Ticket.builder().id(1L).session(session).build(),
@@ -321,7 +321,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("getByMovieId: devuelve tickets asociados a una película")
-    public void getByMovieId_returnsTicketsFromMovie() {
+    void getByMovieId_returnsTicketsFromMovie() {
         // Arrange
         List<Ticket> tickets = List.of(
                 Ticket.builder().id(1L).build(),
@@ -343,7 +343,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("getByUserId: devuelve tickets de un usuario")
-    public void getByUserId_returnsTicketsFromUser() {
+    void getByUserId_returnsTicketsFromUser() {
         // Arrange
         List<Ticket> tickets = List.of(
                 Ticket.builder().id(1L).build()
@@ -364,7 +364,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("generarTickets: sesión con sala válida -> genera tickets según capacidad")
-    public void generarTickets_withValidSessionAndRoom_generatesTicketsByRoomCapacity() {
+    void generarTickets_withValidSessionAndRoom_generatesTicketsByRoomCapacity() {
         when(ticketRepository.lockSessionForInventoryGeneration(1L)).thenReturn(Optional.of(session));
         // Arrange
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
@@ -547,7 +547,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("generarTickets: sesión sin sala -> devuelve lista vacía")
-    public void generarTickets_withoutRoom_returnsEmptyList() {
+    void generarTickets_withoutRoom_returnsEmptyList() {
         // Arrange
         Session sessionWithoutRoom = Session.builder()
                 .id(1L)
@@ -568,7 +568,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("generarTickets: sala sin id -> devuelve lista vacía")
-    public void generarTickets_withRoomWithoutId_returnsEmptyList() {
+    void generarTickets_withRoomWithoutId_returnsEmptyList() {
         // Arrange
         Room roomWithoutId = Room.builder()
                 .name("Sala sin id")
@@ -594,7 +594,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("generarTickets: sala con capacidad nula -> devuelve lista vacía")
-    public void generarTickets_withNullCapacity_returnsEmptyList() {
+    void generarTickets_withNullCapacity_returnsEmptyList() {
         // Arrange
         Room roomWithoutCapacity = Room.builder()
                 .id(1L)
@@ -619,7 +619,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("generarTickets: sala con capacidad cero -> devuelve lista vacía")
-    public void generarTickets_withZeroCapacity_returnsEmptyList() {
+    void generarTickets_withZeroCapacity_returnsEmptyList() {
         // Arrange
         Room roomWithZeroCapacity = Room.builder()
                 .id(1L)
@@ -644,7 +644,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("generarTickets: sala inexistente -> lanza NoSuchElementException")
-    public void generarTickets_withNonExistingRoom_throwsNoSuchElementException() {
+    void generarTickets_withNonExistingRoom_throwsNoSuchElementException() {
         // Arrange
         when(roomRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -658,7 +658,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("processCheckout: ticket existente con snacks y usuario -> marca como pagado y guarda")
-    public void processCheckout_existingTicketWithSnacksAndUser_marksAsPaidAndSaves() {
+    void processCheckout_existingTicketWithSnacksAndUser_marksAsPaidAndSaves() {
         // Arrange
         User user = User.builder()
                 .id(5L)
@@ -703,7 +703,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("processCheckout: ticket existente sin snacks -> snackPrice queda null")
-    public void processCheckout_existingTicketWithoutSnacks_setsSnackPriceNull() {
+    void processCheckout_existingTicketWithoutSnacks_setsSnackPriceNull() {
         // Arrange
         Ticket ticket = Ticket.builder()
                 .id(1L)
@@ -749,7 +749,7 @@ public class TicketServiceTest {
 
     @Test
     @DisplayName("processCheckout: ticket inexistente -> lanza NoSuchElementException")
-    public void processCheckout_nonExistingTicket_throwsNoSuchElementException() {
+    void processCheckout_nonExistingTicket_throwsNoSuchElementException() {
         // Arrange
         when(ticketRepository.findByIdForCheckout(99L)).thenReturn(Optional.empty());
 
