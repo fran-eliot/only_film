@@ -209,7 +209,7 @@ a:hover {
 .form-control,
 .form-select {
     background-color: var(--cinema-surface-2) !important;
-    border-color: var(--cinema-surface-1) !important;
+    border-color: var(--cinema-input-border-color, var(--cinema-surface-1)) !important;
     color: var(--cinema-text-primary) !important;
     font-family: var(--font-ui) !important;
     transition: all 0.3s ease;
