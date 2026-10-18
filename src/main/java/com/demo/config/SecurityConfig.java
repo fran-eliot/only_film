@@ -23,7 +23,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, Environment environment) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, Environment environment) {
 
         // En Spring Security 6+ HttpSessionRequestCache solo devuelve la petición guardada
         // si la URL contiene el parámetro "continue". Al ponerlo a null desactivamos ese check
