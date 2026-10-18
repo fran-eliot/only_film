@@ -249,7 +249,7 @@ a:hover {
     border: var(--cinema-card-border, 1px solid var(--cinema-surface-2)) !important;
     border-radius: 0.75rem !important;
     overflow: hidden !important;
-    box-shadow: var(--shadow-sm) !important;
+    box-shadow: var(--cinema-card-shadow, var(--shadow-sm)) !important;
     transition: all 0.3s ease;
     color: var(--cinema-text-primary) !important;
 }
