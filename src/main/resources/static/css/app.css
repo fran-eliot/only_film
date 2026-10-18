@@ -255,7 +255,7 @@ a:hover {
 }
 
 .card:hover {
-    border-color: var(--cinema-accent-gold) !important;
+    border-color: var(--cinema-card-hover-border-color, var(--cinema-accent-gold)) !important;
     box-shadow: var(--shadow-lg) !important;
     transform: translateY(-4px);
 }
