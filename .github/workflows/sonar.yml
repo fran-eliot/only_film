@@ -1,12 +1,8 @@
 name: SonarCloud Analysis
 
+# SonarCloud is intentionally opt-in to limit CI minutes on the free plan.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/sonar.yml'
 
 jobs:
   sonar:
