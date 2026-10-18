@@ -240,7 +240,7 @@ public class DataInitializer implements CommandLineRunner {
         //
         // Sala 1 · 4DX : [finde 11:30 Mandalorian] · 16:30 La odisea · 19:00 Mandalorian · 21:30 Proyecto
         // Sala 2 · IMAX: [finde 11:00 Toy Story]   · 16:00 Super Mario · 18:30 La odisea · 21:00 Top Gun
-        // Sala 4 · 3D  : 11:00 Ovejas(par)/Todo(impar) · 16:30 Devil Wears · 19:00 Playa · 21:15 El drama
+        // Sala 4 · 3D  : 11:00 Ovejas (días pares) / película «Todo lo que nunca fuimos» (días impares) · 16:30 Devil Wears · 19:00 Playa · 21:15 El drama
         // Sala 5 · STD : 10:30 Toy Story · 16:00 Super Mario · 18:30 Las ovejas · 21:00 El ser querido
         // Sala 6 · STD : 10:00 El drama  · 16:30 Proyecto    · 19:00 Top Gun   · 21:30 Playa de lobos
         List<Session> sesionesFuturas = new ArrayList<>();
