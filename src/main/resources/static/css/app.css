@@ -124,7 +124,7 @@ a:hover {
     font-family: var(--font-ui) !important;
     font-weight: 600 !important;
     border-radius: 0.5rem !important;
-    padding: var(--spacing-sm) var(--spacing-lg) !important;
+    padding: var(--cinema-button-padding, var(--spacing-sm) var(--spacing-lg)) !important;
     transition: all 0.3s ease !important;
     border: 2px solid transparent !important;
     text-transform: uppercase !important;
