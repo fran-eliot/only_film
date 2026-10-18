@@ -256,7 +256,7 @@ a:hover {
 
 .card:hover {
     border-color: var(--cinema-card-hover-border-color, var(--cinema-accent-gold)) !important;
-    box-shadow: var(--shadow-lg) !important;
+    box-shadow: var(--cinema-card-hover-shadow, var(--shadow-lg)) !important;
     transform: translateY(-4px);
 }
 
