@@ -115,22 +115,18 @@ public class FileService {
         }
     }
 
-    // Internal transfer container: identity semantics avoid misleading byte-array equality.
-    private static final class ImageData {
-        private final byte[] bytes;
-        private final String extension;
-
-        private ImageData(byte[] bytes, String extension) {
-            this.bytes = bytes;
-            this.extension = extension;
+    // Arrays require content-aware equality rather than record's default reference comparison.
+    private record ImageData(byte[] bytes, String extension) {
+        @Override
+        public boolean equals(Object other) {
+            return this == other || (other instanceof ImageData that
+                    && java.util.Arrays.equals(bytes, that.bytes)
+                    && java.util.Objects.equals(extension, that.extension));
         }
 
-        private byte[] bytes() {
-            return bytes;
-        }
-
-        private String extension() {
-            return extension;
+        @Override
+        public int hashCode() {
+            return 31 * java.util.Arrays.hashCode(bytes) + java.util.Objects.hashCode(extension);
         }
     }
 }
