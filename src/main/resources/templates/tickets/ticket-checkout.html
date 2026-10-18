@@ -531,7 +531,8 @@
     }
     .payment-input.is-invalid {
         --cinema-input-invalid-border-color: #e05555;
-        box-shadow: 0 0 0 3px rgba(224,85,85,0.15) !important;
+        --cinema-input-invalid-shadow: 0 0 0 3px rgba(224,85,85,0.15);
+        box-shadow: var(--cinema-input-invalid-shadow);
     }
     .card-number-input {
         font-family: 'Courier New', monospace;
