@@ -119,14 +119,22 @@ public class FileService {
     private record ImageData(byte[] bytes, String extension) {
         @Override
         public boolean equals(Object other) {
-            return this == other || (other instanceof ImageData that
-                    && java.util.Arrays.equals(bytes, that.bytes)
-                    && java.util.Objects.equals(extension, that.extension));
+            return this == other || (other instanceof ImageData(byte[] otherBytes, String otherExtension)
+                    && java.util.Arrays.equals(bytes, otherBytes)
+                    && java.util.Objects.equals(extension, otherExtension));
         }
 
         @Override
         public int hashCode() {
             return 31 * java.util.Arrays.hashCode(bytes) + java.util.Objects.hashCode(extension);
+        }
+
+        @Override
+        public String toString() {
+            // Summarize the array by content without exposing a potentially large image in logs.
+            return "ImageData[bytesLength=" + bytes.length
+                    + ", bytesHash=" + java.util.Arrays.hashCode(bytes)
+                    + ", extension=" + extension + "]";
         }
     }
 }
