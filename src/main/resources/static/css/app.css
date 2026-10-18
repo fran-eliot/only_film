@@ -246,7 +246,7 @@ a:hover {
 /* Cards */
 .card {
     background-color: var(--cinema-surface-1) !important;
-    border: 1px solid var(--cinema-surface-2) !important;
+    border: var(--cinema-card-border, 1px solid var(--cinema-surface-2)) !important;
     border-radius: 0.75rem !important;
     overflow: hidden !important;
     box-shadow: var(--shadow-sm) !important;
