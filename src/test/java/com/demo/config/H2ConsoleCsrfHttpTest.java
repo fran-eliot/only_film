@@ -41,6 +41,14 @@ class H2ConsoleCsrfHttpTest {
     }
 
     @Test
+    void checkoutAndReviewsStillRequireCsrfWithLocalH2Enabled() throws Exception {
+        for (String path : new String[] {"/tickets/save", "/reviews"}) {
+            mockMvc.perform(post(path).with(user("dev-admin").roles("ADMIN")))
+                    .andExpect(status().isForbidden());
+        }
+    }
+
+    @Test
     void normalMutationStillRequiresCsrfWithH2ConsoleEnabled() throws Exception {
         mockMvc.perform(post("/movies/deactivate/1").with(user("dev-admin").roles("ADMIN")))
                 .andExpect(status().isForbidden());
