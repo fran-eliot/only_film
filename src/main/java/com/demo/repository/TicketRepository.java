@@ -62,4 +62,31 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             @org.springframework.data.repository.query.Param("movieId") Long movieId,
             @org.springframework.data.repository.query.Param("roomId") Long roomId);
 
+
+    /** Cuenta la ocupación real de una sesión, incluyendo asientos no vendidos. */
+    @org.springframework.data.jpa.repository.Query("""
+            select new com.demo.dto.DashboardSessionOccupancy(
+                count(t),
+                coalesce(sum(case when t.status = com.demo.model.enums.BuyStatus.PAGADO then 1L else 0L end), 0L))
+            from Ticket t where t.session.id = :sessionId
+            """)
+    com.demo.dto.DashboardSessionOccupancy aggregateSessionOccupancy(
+            @org.springframework.data.repository.query.Param("sessionId") Long sessionId);
+
+    /** Ordena películas por ventas efectuadas, no por fecha de proyección. */
+    @org.springframework.data.jpa.repository.Query("""
+            select new com.demo.dto.DashboardMovieRanking(
+                t.session.movie.id, t.session.movie.title, count(t))
+            from Ticket t
+            where t.status = com.demo.model.enums.BuyStatus.PAGADO
+              and t.buyDateTime >= :from and t.buyDateTime < :until
+              and (:roomId is null or t.session.room.id = :roomId)
+            group by t.session.movie.id, t.session.movie.title
+            order by count(t) desc, t.session.movie.id asc
+            """)
+    List<com.demo.dto.DashboardMovieRanking> rankMoviesByPaidTickets(
+            @org.springframework.data.repository.query.Param("from") java.time.LocalDateTime from,
+            @org.springframework.data.repository.query.Param("until") java.time.LocalDateTime until,
+            @org.springframework.data.repository.query.Param("roomId") Long roomId);
+
 }
