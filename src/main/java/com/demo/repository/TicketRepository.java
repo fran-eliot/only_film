@@ -43,4 +43,23 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     boolean existsByUser_IdAndSession_Movie_IdAndStatus(Long userId, Long movieId, BuyStatus status);
 
     List<Ticket> findByUser_IdAndStatus(Long id, BuyStatus buyStatus);
+
+    /** Aggregate paid demonstration sales in the purchase-date interval [from, until). */
+    @org.springframework.data.jpa.repository.Query("""
+            select new com.demo.dto.DashboardSalesSummary(
+                count(t),
+                coalesce(sum(t.price), 0.0),
+                coalesce(sum(t.snackPrice), 0.0))
+            from Ticket t
+            where t.status = com.demo.model.enums.BuyStatus.PAGADO
+              and t.buyDateTime >= :from and t.buyDateTime < :until
+              and (:movieId is null or t.session.movie.id = :movieId)
+              and (:roomId is null or t.session.room.id = :roomId)
+            """)
+    com.demo.dto.DashboardSalesSummary aggregatePaidSales(
+            @org.springframework.data.repository.query.Param("from") java.time.LocalDateTime from,
+            @org.springframework.data.repository.query.Param("until") java.time.LocalDateTime until,
+            @org.springframework.data.repository.query.Param("movieId") Long movieId,
+            @org.springframework.data.repository.query.Param("roomId") Long roomId);
+
 }
